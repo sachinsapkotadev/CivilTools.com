@@ -1,0 +1,433 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Development Length Calculator (IS 456:2000)"
+  description="Calculate the development length (Ld) of reinforcement bars as per IS 456:2000. Supports plain/deformed bars in tension/compression zones for M20 to M40+ concrete grades."
+  eyebrow="Concrete Design Tool"
+>
+  <div class="calculator-card">
+    <div class="note-box">
+      <strong>Formula:</strong> L<sub>d</sub> = (&phi; &times; &sigma;<sub>s</sub>) / (4 &times; &tau;<sub>bd</sub>)<br />
+      <strong>Where:</strong><br />
+      &phi; = Diameter of bar (mm)<br />
+      &sigma;<sub>s</sub> = Stress in bar = f<sub>y</sub> (N/mm&sup2;)<br />
+      &tau;<sub>bd</sub> = Design bond stress (N/mm&sup2;)
+    </div>
+
+    <h2 class="section-title">Input Parameters</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Type of Rebar</label>
+        <select id="rebarType">
+          <option value="plain">Plain Rebar</option>
+          <option value="deformed">Deformed Rebar (HYSD)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Zone of Rebar</label>
+        <select id="zoneType">
+          <option value="tension">Tension Zone</option>
+          <option value="compression">Compression Zone</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Diameter of Rebar (&phi;)</label>
+        <div class="input-with-unit">
+          <input type="number" id="barDiameter" value="10" step="1" min="6" max="50" />
+          <span class="unit-label">mm</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Grade of Rebar (f<sub>y</sub>)</label>
+        <select id="steelGrade">
+          <option value="250">Fe 250</option>
+          <option value="415" selected>Fe 415</option>
+          <option value="500">Fe 500</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Grade of Concrete</label>
+        <select id="concreteGrade">
+          <option value="M20" selected>M20</option>
+          <option value="M25">M25</option>
+          <option value="M30">M30</option>
+          <option value="M35">M35</option>
+          <option value="M40">M40 &amp; Above</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection">
+      <h2 class="section-title">Calculation Details</h2>
+      <div class="table-wrap">
+        <table class="calc-table">
+          <thead>
+            <tr><th>Parameter</th><th>Value</th><th>Unit</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Type of Rebar</td><td id="rdRebarType">Plain</td><td>-</td></tr>
+            <tr><td>Zone</td><td id="rdZone">Tension</td><td>-</td></tr>
+            <tr><td>Diameter (&phi;)</td><td id="rdDiameter">10</td><td>mm</td></tr>
+            <tr><td>Grade of Rebar (f<sub>y</sub>)</td><td id="rdSteelGrade">415</td><td>N/mm&sup2;</td></tr>
+            <tr><td>Grade of Concrete</td><td id="rdConcreteGrade">M20</td><td>-</td></tr>
+            <tr><td>Base &tau;<sub>bd</sub> (Table 6.4)</td><td id="rdBaseBond">1.2</td><td>N/mm&sup2;</td></tr>
+            <tr><td>&tau;<sub>bd</sub> Modifier (Rebar type)</td><td id="rdRebarMod">1.00</td><td>-</td></tr>
+            <tr><td>&tau;<sub>bd</sub> Modifier (Zone)</td><td id="rdZoneMod">1.00</td><td>-</td></tr>
+            <tr id="rowDesignBond"><td><strong>Design &tau;<sub>bd</sub> (Taken)</strong></td><td id="rdDesignBond"><strong>1.20</strong></td><td><strong>N/mm&sup2;</strong></td></tr>
+            <tr><td>Stress in bar (&sigma;<sub>s</sub>)</td><td id="rdStress">415.00</td><td>N/mm&sup2;</td></tr>
+            <tr id="rowResult"><td><strong>Development Length (L<sub>d</sub>)</strong></td><td id="rdResult"><strong>864.58</strong></td><td><strong>mm</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  const BOND_STRESS_TABLE = {
+    'M20': 1.2,
+    'M25': 1.4,
+    'M30': 1.5,
+    'M35': 1.6,
+    'M40': 1.8
+  };
+
+  const REBAR_MODIFIER = {
+    'plain': 1.0,
+    'deformed': 1.6
+  };
+
+  const ZONE_MODIFIER = {
+    'tension': 1.0,
+    'compression': 1.25
+  };
+
+  function fmt(v, d) {
+    return Number(v).toFixed(d);
+  }
+
+  function calculate() {
+    const rebarType = document.getElementById('rebarType').value;
+    const zoneType = document.getElementById('zoneType').value;
+    const barDiameter = parseFloat(document.getElementById('barDiameter').value) || 0;
+    const steelGrade = parseInt(document.getElementById('steelGrade').value) || 0;
+    const concreteGrade = document.getElementById('concreteGrade').value;
+
+    const baseBond = BOND_STRESS_TABLE[concreteGrade];
+    const rebarMod = REBAR_MODIFIER[rebarType];
+    const zoneMod = ZONE_MODIFIER[zoneType];
+    const designBond = baseBond * rebarMod * zoneMod;
+    const stress = steelGrade;
+
+    const ld = (barDiameter * stress) / (4 * designBond);
+
+    document.getElementById('rdRebarType').textContent = rebarType === 'plain' ? 'Plain' : 'Deformed (HYSD)';
+    document.getElementById('rdZone').textContent = zoneType === 'tension' ? 'Tension' : 'Compression';
+    document.getElementById('rdDiameter').textContent = barDiameter;
+    document.getElementById('rdSteelGrade').textContent = steelGrade;
+    document.getElementById('rdConcreteGrade').textContent = concreteGrade;
+    document.getElementById('rdBaseBond').textContent = fmt(baseBond, 2);
+    document.getElementById('rdRebarMod').textContent = fmt(rebarMod, 2);
+    document.getElementById('rdZoneMod').textContent = fmt(zoneMod, 2);
+    document.getElementById('rdDesignBond').textContent = fmt(designBond, 2);
+    document.getElementById('rdStress').textContent = fmt(stress, 2);
+    document.getElementById('rdResult').textContent = fmt(ld, 2);
+  }
+
+  function resetForm() {
+    document.getElementById('rebarType').value = 'plain';
+    document.getElementById('zoneType').value = 'tension';
+    document.getElementById('barDiameter').value = 10;
+    document.getElementById('steelGrade').value = '415';
+    document.getElementById('concreteGrade').value = 'M20';
+    calculate();
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+
+  // Auto-calculate on input change
+  ['rebarType', 'zoneType', 'barDiameter', 'steelGrade', 'concreteGrade'].forEach(id => {
+    document.getElementById(id).addEventListener('change', calculate);
+    const el = document.getElementById(id);
+    if (el.tagName === 'INPUT') {
+      el.addEventListener('input', calculate);
+    }
+  });
+
+  // Init
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .note-box {
+    background: var(--result-bg);
+    border: 1px solid var(--result-border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+  }
+
+  .note-box strong {
+    color: var(--text-primary);
+  }
+
+  .input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .input-group label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .input-group input,
+  .input-group select {
+    height: 44px;
+    padding: 0 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--text-primary);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
+
+  .input-group input:focus,
+  .input-group select:focus {
+    outline: none;
+    border-color: var(--border-strong);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+  }
+
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+  }
+
+  .unit-label {
+    display: inline-flex;
+    align-items: center;
+    height: 44px;
+    padding: 0 12px;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--text-tertiary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 28px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-primary:hover {
+    opacity: 0.85;
+  }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 28px;
+    background: var(--btn-secondary-bg);
+    color: var(--btn-secondary-text);
+    border: 1px solid var(--btn-secondary-border);
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-secondary:hover {
+    background: var(--bg-hover);
+  }
+
+  .results-section {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .calc-table th,
+  .calc-table td {
+    padding: 10px 14px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  .calc-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .calc-table td:first-child {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .calc-table td:last-child {
+    color: var(--text-secondary);
+    font-size: 13px;
+  }
+
+  .calc-table td:nth-child(2) {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  #rowDesignBond td {
+    background: var(--result-bg);
+  }
+
+  #rowDesignBond td:first-child {
+    font-weight: 600;
+  }
+
+  #rowResult td {
+    background: var(--bg-page);
+    border-top: 2px solid var(--result-border);
+  }
+
+  #rowResult td:first-child {
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  #rowResult td:nth-child(2) {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--link-blue);
+  }
+
+  #rowResult td:last-child {
+    font-weight: 600;
+    font-size: 15px;
+  }
+
+  @media (max-width: 768px) {
+    .input-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .calc-table th,
+    .calc-table td {
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+
+    #rowResult td:nth-child(2) {
+      font-size: 18px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .input-grid {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .calc-table th,
+    .calc-table td {
+      padding: 6px 8px;
+      font-size: 12px;
+    }
+
+    #rowResult td:nth-child(2) {
+      font-size: 16px;
+    }
+
+    .note-box {
+      padding: 12px 16px;
+      font-size: 13px;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .calc-table th,
+    .calc-table td {
+      padding: 5px 6px;
+      font-size: 11px;
+    }
+
+    #rowResult td:nth-child(2) {
+      font-size: 14px;
+    }
+  }
+</style>

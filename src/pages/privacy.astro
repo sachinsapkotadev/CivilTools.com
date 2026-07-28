@@ -1,0 +1,162 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Privacy Policy | CivilTools.com"
+  description="Privacy policy for CivilTools.com — a solo project by Sachin Sapkota. Learn what data is collected and how it is used."
+  canonical="https://www.civiltools.com/privacy"
+>
+  <section class="page-header">
+    <div class="band-inner">
+      <p class="eyebrow-mono">Legal</p>
+      <h1 class="page-title">Privacy Policy.</h1>
+      <p class="page-desc">Last updated: July 2026</p>
+    </div>
+  </section>
+
+  <section class="story-section">
+    <div class="band-inner">
+      <div class="prose-content">
+        <h2 class="section-title">What this covers</h2>
+        <p class="story-text">
+          CivilTools.com ("we", "I", "the site") is a solo project. This page explains what information is collected when you use the site and how it is handled.
+        </p>
+
+        <h3 class="prose-h3">Information we collect</h3>
+        <p class="story-text">
+          <strong>Account data:</strong> If you create an account, we store your email address and a secured password hash via Firebase Authentication. You can delete your account at any time from the dashboard.
+        </p>
+        <p class="story-text">
+          <strong>Usage data:</strong> We collect basic, anonymized usage data (page views, tool usage) to understand which tools are most useful and to improve the site. This data cannot be traced back to you personally.
+        </p>
+        <p class="story-text">
+          <strong>Cookies:</strong> We use a minimal cookie to maintain your login session. No third-party tracking cookies are used.
+        </p>
+
+        <h3 class="prose-h3">How we use your data</h3>
+        <p class="story-text">
+          Your data is used only to operate the site — keeping you logged in, saving your preferences, and improving the tools. We do not sell, rent, or share your personal data with third parties.
+        </p>
+
+        <h3 class="prose-h3">Third-party services</h3>
+        <p class="story-text">
+          The site uses <strong>Firebase</strong> (Google) for authentication and <strong>Stripe</strong> for payment processing (if applicable). These services have their own privacy policies. We do not store your full payment details.
+        </p>
+
+        <h3 class="prose-h3">Contact</h3>
+        <p class="story-text">
+          If you have questions about this policy, email <a href="mailto:sachin.sapkota.dev@gmail.com" class="inline-link">sachin.sapkota.dev@gmail.com</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style is:global>
+  .page-header {
+    background: var(--bg-surface);
+    padding: 96px 0 64px;
+    text-align: center;
+  }
+
+  .eyebrow-mono {
+    font-family: JetBrains Mono, ui-monospace, monospace;
+    font-size: 12px;
+    font-weight: 400;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 16px;
+    letter-spacing: 0.05em;
+  }
+
+  .page-title {
+    font-size: 48px;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+  }
+
+  .page-desc {
+    font-size: 18px;
+    line-height: 28px;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .story-section {
+    background: var(--bg-page);
+    padding: 100px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .prose-content {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .section-title {
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 24px;
+    letter-spacing: -0.02em;
+  }
+
+  .prose-h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 40px 0 12px;
+    letter-spacing: -0.01em;
+  }
+
+  .story-text {
+    font-size: 16px;
+    line-height: 28px;
+    color: var(--text-secondary);
+    margin: 0 0 16px;
+  }
+
+  .inline-link {
+    color: var(--link-blue);
+    text-decoration: underline;
+  }
+
+  .inline-link:hover {
+    color: var(--link-blue-hover);
+  }
+
+  .band-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  @media (max-width: 768px) {
+    .page-header { padding: 72px 0 44px; }
+    .page-title { font-size: 36px; }
+    .page-desc { font-size: 16px; }
+    .story-section { padding: 64px 0; }
+    .band-inner { padding: 0 16px; }
+  }
+
+  @media (max-width: 480px) {
+    .page-title { font-size: 28px; }
+    .section-title { font-size: 24px; }
+    .prose-h3 { font-size: 16px; }
+  }
+
+  @media (max-width: 360px) {
+    .page-title { font-size: 24px; }
+    .page-desc { font-size: 15px; line-height: 24px; }
+    .section-title { font-size: 21px; }
+    .page-header { padding: 64px 0 36px; }
+    .story-section { padding: 48px 0; }
+    .band-inner { padding: 0 12px; }
+  }
+</style>

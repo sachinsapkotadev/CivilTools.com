@@ -1,0 +1,343 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Concrete Calculator" 
+  description="Estimate the wet and dry volume of concrete and the required quantities of cement, sand, and aggregate for beams, slabs, columns, or any concrete member."
+  eyebrow="Estimation Tool"
+>
+  <div class="calculator-card">
+    <h2 class="section-title">A) Member, Size, Quantity</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Member type</label>
+        <select id="memberType">
+          <option value="beam">Beam</option>
+          <option value="slab">Slab</option>
+          <option value="column">Column</option>
+          <option value="foundation">Foundation</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>a) Length</label>
+        <div class="input-with-unit">
+          <input type="number" id="memberLength" value="9" step="any" />
+          <select id="lengthUnit"><option>ft</option><option>m</option></select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>b) Width</label>
+        <div class="input-with-unit">
+          <input type="number" id="memberWidth" value="9" step="any" />
+          <select id="widthUnit"><option>ft</option><option>m</option></select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>c) Height / Thickness</label>
+        <div class="input-with-unit">
+          <input type="number" id="memberHeight" value="10" step="any" />
+          <select id="heightUnit"><option>ft</option><option>m</option></select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>e) Quantity</label>
+        <div class="input-with-unit">
+          <input type="number" id="memberQty" value="1" step="1" min="1" />
+          <span class="unit-label">Nos.</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">B) Mix Ratio and Factors</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>d) Mix ratio Cement : Sand : Aggregate</label>
+        <div class="triple-input">
+          <input type="number" id="mixCement" value="1" step="1" min="1" />
+          <span class="split-sep">:</span>
+          <input type="number" id="mixSand" value="2" step="1" min="1" />
+          <span class="split-sep">:</span>
+          <input type="number" id="mixAgg" value="3" step="1" min="1" />
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Dry volume factor</label>
+        <div class="input-with-unit">
+          <input type="number" id="dryFactor" value="1.54" step="0.01" min="1" />
+          <span class="unit-label">Dry = Wet × factor</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Re-Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <h2 class="section-title">Concrete Calculator – Calculation</h2>
+
+      <h3 class="table-heading">Inputs summary</h3>
+      <div class="table-wrap">
+      <table class="calc-table">
+        <thead>
+          <tr><th>Item</th><th>Value</th><th>Unit</th></tr>
+        </thead>
+        <tbody id="inputSummaryBody">
+          <tr><td>Member</td><td id="isMember">beam</td><td>-</td></tr>
+          <tr><td>Length</td><td id="isLength">9</td><td id="isLengthUnit">ft</td></tr>
+          <tr><td>Width</td><td id="isWidth">9</td><td id="isWidthUnit">ft</td></tr>
+          <tr><td>Height/Thickness</td><td id="isHeight">10</td><td id="isHeightUnit">ft</td></tr>
+          <tr><td>Quantity</td><td id="isQty">1</td><td>Nos.</td></tr>
+          <tr><td>Mix ratio</td><td id="isMixRatio">1:2:3</td><td id="isMixTotal">Total 6.00</td></tr>
+          <tr><td>Dry factor</td><td id="isDryFactor">1.54</td><td>Dry = Wet × factor</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3 class="table-heading">Results</h3>
+      <div class="table-wrap">
+      <table class="calc-table">
+        <thead>
+          <tr><th>Item</th><th>Value</th><th>Unit</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Wet volume of concrete</td><td id="resWetVol">–</td><td>m³</td></tr>
+          <tr><td>Dry volume of concrete</td><td id="resDryVol">–</td><td>m³</td></tr>
+          <tr><td>Volume of cement</td><td id="resCementVol">–</td><td>m³</td></tr>
+          <tr><td>Weight of cement</td><td id="resCementMass">–</td><td>kg</td></tr>
+          <tr><td>No. of cement bags</td><td id="resCementBags">–</td><td>50 kg bags</td></tr>
+          <tr><td>Volume of sand</td><td id="resSand">–</td><td>m³</td></tr>
+          <tr><td>Volume of aggregate</td><td id="resAgg">–</td><td>m³</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function toMeters(val, unit) {
+    if (unit === 'ft') return val * 0.3048;
+    return val;
+  }
+
+  function formatNum(v, d) {
+    return v.toFixed(d);
+  }
+
+  function calculate() {
+    const mType = document.getElementById('memberType').value;
+
+    const mLraw = parseFloat(document.getElementById('memberLength').value) || 0;
+    const mWraw = parseFloat(document.getElementById('memberWidth').value) || 0;
+    const mHraw = parseFloat(document.getElementById('memberHeight').value) || 0;
+    const lUnit = document.getElementById('lengthUnit').value;
+    const wUnit = document.getElementById('widthUnit').value;
+    const hUnit = document.getElementById('heightUnit').value;
+
+    const mL = toMeters(mLraw, lUnit);
+    const mW = toMeters(mWraw, wUnit);
+    const mH = toMeters(mHraw, hUnit);
+    const qty = parseInt(document.getElementById('memberQty').value) || 1;
+
+    const mixC = parseFloat(document.getElementById('mixCement').value) || 1;
+    const mixS = parseFloat(document.getElementById('mixSand').value) || 1;
+    const mixA = parseFloat(document.getElementById('mixAgg').value) || 1;
+    const dryFactor = parseFloat(document.getElementById('dryFactor').value) || 1.54;
+
+    const wetVol = mL * mW * mH * qty;
+    const dryVol = wetVol * dryFactor;
+    const totalParts = mixC + mixS + mixA;
+
+    let cementVol = 0, cementMass = 0, cementBags = 0, sandVol = 0, aggVol = 0;
+    if (totalParts > 0 && dryVol > 0) {
+      cementVol = (mixC / totalParts) * dryVol;
+      cementMass = cementVol * 1440;
+      cementBags = cementMass / 50;
+      sandVol = (mixS / totalParts) * dryVol;
+      aggVol = (mixA / totalParts) * dryVol;
+    }
+
+    // Input summary
+    document.getElementById('isMember').textContent = mType;
+    document.getElementById('isLength').textContent = formatNum(mLraw, 4);
+    document.getElementById('isLengthUnit').textContent = lUnit;
+    document.getElementById('isWidth').textContent = formatNum(mWraw, 4);
+    document.getElementById('isWidthUnit').textContent = wUnit;
+    document.getElementById('isHeight').textContent = formatNum(mHraw, 4);
+    document.getElementById('isHeightUnit').textContent = hUnit;
+    document.getElementById('isQty').textContent = qty;
+    document.getElementById('isMixRatio').textContent = `${mixC}:${mixS}:${mixA}`;
+    document.getElementById('isMixTotal').textContent = `Total ${formatNum(totalParts, 2)}`;
+    document.getElementById('isDryFactor').textContent = formatNum(dryFactor, 2);
+
+    // Results
+    document.getElementById('resWetVol').textContent = formatNum(wetVol, 3);
+    document.getElementById('resDryVol').textContent = formatNum(dryVol, 3);
+    document.getElementById('resCementVol').textContent = formatNum(cementVol, 3);
+    document.getElementById('resCementMass').textContent = Math.round(cementMass).toString();
+    document.getElementById('resCementBags').textContent = Math.ceil(cementBags).toString();
+    document.getElementById('resSand').textContent = formatNum(sandVol, 3);
+    document.getElementById('resAgg').textContent = formatNum(aggVol, 3);
+
+    document.getElementById('resultsSection').style.display = 'block';
+  }
+
+  function resetForm() {
+    const vals = {
+      memberType: 'beam',
+      memberLength: '9', lengthUnit: 'ft',
+      memberWidth: '9', widthUnit: 'ft',
+      memberHeight: '10', heightUnit: 'ft',
+      memberQty: '1',
+      mixCement: '1', mixSand: '2', mixAgg: '3',
+      dryFactor: '1.54'
+    };
+    for (const [id, val] of Object.entries(vals)) {
+      document.getElementById(id).value = val;
+    }
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .input-with-unit select {
+    width: 80px;
+    flex-shrink: 0;
+  }
+
+  .unit-label {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  .triple-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .triple-input input {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+  }
+
+  .split-sep {
+    font-size: 14px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .table-heading {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 24px 0 12px;
+  }
+
+  .calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .calc-table th,
+  .calc-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .calc-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .calc-table td:last-child {
+    color: var(--text-tertiary);
+    font-size: 13px;
+  }
+
+  .calc-table td:nth-child(2) {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+</style>

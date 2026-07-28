@@ -1,0 +1,239 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Wood Cubic Feet Calculator" 
+  description="Calculate the total volume of wood in cubic feet from length, width, and height dimensions. Supports multiple units including meter, feet, inch, cm, and mm."
+  eyebrow="Estimation Tool"
+>
+  <div class="calculator-card">
+    <div class="input-grid">
+      <div class="input-group">
+        <label>1) Length of Wood</label>
+        <div class="input-with-unit">
+          <input type="number" id="woodLength" value="1" step="any" min="0" />
+          <select id="lenUnit">
+            <option value="m">meter</option>
+            <option value="ft">Feet</option>
+            <option value="inch">inch</option>
+            <option value="cm">cm</option>
+            <option value="mm">mm</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>2) Width of Wood</label>
+        <div class="input-with-unit">
+          <input type="number" id="woodWidth" value="1" step="any" min="0" />
+          <select id="widUnit">
+            <option value="m">meter</option>
+            <option value="ft">Feet</option>
+            <option value="inch">inch</option>
+            <option value="cm">cm</option>
+            <option value="mm">mm</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>3) Height / Thickness of Wood</label>
+        <div class="input-with-unit">
+          <input type="number" id="woodHeight" value="1" step="any" min="0" />
+          <select id="htUnit">
+            <option value="m">meter</option>
+            <option value="ft">Feet</option>
+            <option value="inch">inch</option>
+            <option value="cm">cm</option>
+            <option value="mm">mm</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Quantity</label>
+        <div class="input-with-unit">
+          <input type="number" id="woodQty" value="1" step="1" min="1" />
+          <span class="unit-label">No.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Re-Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <h3 class="table-heading">Total Volume of Wood</h3>
+      <div class="table-wrap">
+      <table class="calc-table">
+        <thead>
+          <tr><th>Unit</th><th>Volume</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Cubic Feet (ft&#179;)</td><td id="resFt3">–</td></tr>
+          <tr><td>Cubic Meters (m&#179;)</td><td id="resM3">–</td></tr>
+          <tr><td>Cubic Inches (in&#179;)</td><td id="resIn3">–</td></tr>
+          <tr><td>Board Feet</td><td id="resBdFt">–</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function toMeters(val, unit) {
+    if (unit === 'ft') return val * 0.3048;
+    if (unit === 'inch') return val * 0.0254;
+    if (unit === 'cm') return val / 100;
+    if (unit === 'mm') return val / 1000;
+    return val;
+  }
+
+  function fmt(v, d) {
+    return Number(v.toFixed(d)).toLocaleString('en-IN');
+  }
+
+  function calculate() {
+    const L = toMeters(parseFloat(document.getElementById('woodLength').value) || 0, document.getElementById('lenUnit').value);
+    const W = toMeters(parseFloat(document.getElementById('woodWidth').value) || 0, document.getElementById('widUnit').value);
+    const H = toMeters(parseFloat(document.getElementById('woodHeight').value) || 0, document.getElementById('htUnit').value);
+    const qty = parseInt(document.getElementById('woodQty').value) || 1;
+
+    const volM3 = L * W * H * qty;
+    const volFt3 = volM3 * 35.3147;
+    const volIn3 = volM3 * 61023.7;
+    const volBdFt = volM3 * 423.776;
+
+    document.getElementById('resFt3').textContent = fmt(volFt3, 2) + ' ft\u00B3';
+    document.getElementById('resM3').textContent = fmt(volM3, 3) + ' m\u00B3';
+    document.getElementById('resIn3').textContent = fmt(volIn3, 2) + ' in\u00B3';
+    document.getElementById('resBdFt').textContent = fmt(volBdFt, 2) + ' bd ft';
+
+    document.getElementById('resultsSection').style.display = 'block';
+  }
+
+  function resetForm() {
+    const defaults = {
+      woodLength: '1', lenUnit: 'm',
+      woodWidth: '1', widUnit: 'm',
+      woodHeight: '1', htUnit: 'm',
+      woodQty: '1'
+    };
+    for (const [id, val] of Object.entries(defaults)) {
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    }
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .input-with-unit select {
+    width: 120px;
+    flex-shrink: 0;
+  }
+
+  .unit-label {
+    display: flex;
+    align-items: center;
+    height: 44px;
+    padding: 0 14px;
+    background: var(--bg-hover);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .table-heading {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 24px 0 12px;
+  }
+
+  .calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .calc-table th,
+  .calc-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .calc-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .calc-table td:last-child {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+</style>

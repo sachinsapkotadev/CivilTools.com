@@ -1,0 +1,297 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+
+const workTypes = [
+  { value: 'brick-230', label: 'Brick Masonry (230mm wall)', unit: 'm\u00B3', skilled: 1.5, unskilled: 3.0 },
+  { value: 'brick-115', label: 'Brick Masonry (115mm wall)', unit: 'm\u00B2', skilled: 0.12, unskilled: 0.24 },
+  { value: 'block', label: 'Block Masonry', unit: 'm\u00B2', skilled: 0.1, unskilled: 0.2 },
+  { value: 'plaster', label: 'Cement Plastering', unit: 'm\u00B2', skilled: 0.02, unskilled: 0.04 },
+  { value: 'concrete', label: 'Concrete (Mixing & Pouring)', unit: 'm\u00B3', skilled: 1.0, unskilled: 4.0 },
+  { value: 'pcc', label: 'Plain Cement Concrete (PCC)', unit: 'm\u00B3', skilled: 1.0, unskilled: 4.0 },
+  { value: 'rcc', label: 'Reinforced Cement Concrete (RCC)', unit: 'm\u00B3', skilled: 1.5, unskilled: 5.0 },
+  { value: 'rebar', label: 'Reinforcement Work', unit: 'tonne', skilled: 4.0, unskilled: 4.0 },
+  { value: 'formwork', label: 'Formwork', unit: 'm\u00B2', skilled: 0.4, unskilled: 0.8 },
+  { value: 'flooring', label: 'Flooring / Tiling', unit: 'm\u00B2', skilled: 0.15, unskilled: 0.15 },
+  { value: 'painting', label: 'Painting (Interior / Exterior)', unit: 'm\u00B2', skilled: 0.02, unskilled: 0.02 },
+  { value: 'earthwork', label: 'Earthwork Excavation', unit: 'm\u00B3', skilled: 0.05, unskilled: 0.5 },
+  { value: 'plaster-100', label: 'Plastering (per 100 m\u00B2)', unit: '100 m\u00B2', skilled: 2.0, unskilled: 4.0 },
+];
+---
+
+<ToolLayout 
+  title="Labour Cost Estimator" 
+  description="Estimate labour cost for construction works including skilled and unskilled workers. Select work type, enter quantity, and set daily wages to calculate total labour cost."
+  eyebrow="Estimation Tool"
+>
+  <div class="calculator-card">
+    <h2 class="section-title">A) Type of Civil Work</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Select Work</label>
+        <select id="workType">
+          {workTypes.map(wt => (
+            <option value={wt.value} data-skilled={wt.skilled} data-unskilled={wt.unskilled} data-unit={wt.unit}>{wt.label}</option>
+          ))}
+        </select>
+      </div>
+    </div>
+
+    <h2 class="section-title">B) Input Quantity</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Quantity</label>
+        <div class="input-with-unit">
+          <input type="number" id="quantity" value="10" step="any" min="0" />
+          <span class="unit-label" id="unitLabel">m&#179;</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">C) Labour Rates</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Skilled Labour Cost (per head per day)</label>
+        <div class="input-with-unit">
+          <input type="number" id="skilledRate" value="800" step="10" min="0" />
+          <span class="unit-label">Rs</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Unskilled Labour Cost (per head per day)</label>
+        <div class="input-with-unit">
+          <input type="number" id="unskilledRate" value="500" step="10" min="0" />
+          <span class="unit-label">Rs</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <h3 class="table-heading">Estimated Labour Cost</h3>
+      <div class="table-wrap">
+      <table class="calc-table">
+        <thead>
+          <tr><th>Item</th><th>Days Required</th><th>Cost</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Skilled Labour</td><td id="resSkilledDays">–</td><td id="resSkilledCost">–</td></tr>
+          <tr><td>Unskilled Labour</td><td id="resUnskilledDays">–</td><td id="resUnskilledCost">–</td></tr>
+          <tr class="total-row"><td>Total Labour Cost</td><td>–</td><td id="resTotalCost">–</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  const workData = {
+    'brick-230': { label: 'Brick Masonry (230mm wall)', unit: 'm\u00B3', skilled: 1.5, unskilled: 3.0 },
+    'brick-115': { label: 'Brick Masonry (115mm wall)', unit: 'm\u00B2', skilled: 0.12, unskilled: 0.24 },
+    'block': { label: 'Block Masonry', unit: 'm\u00B2', skilled: 0.1, unskilled: 0.2 },
+    'plaster': { label: 'Cement Plastering', unit: 'm\u00B2', skilled: 0.02, unskilled: 0.04 },
+    'concrete': { label: 'Concrete (Mixing & Pouring)', unit: 'm\u00B3', skilled: 1.0, unskilled: 4.0 },
+    'pcc': { label: 'Plain Cement Concrete (PCC)', unit: 'm\u00B3', skilled: 1.0, unskilled: 4.0 },
+    'rcc': { label: 'Reinforced Cement Concrete (RCC)', unit: 'm\u00B3', skilled: 1.5, unskilled: 5.0 },
+    'rebar': { label: 'Reinforcement Work', unit: 'tonne', skilled: 4.0, unskilled: 4.0 },
+    'formwork': { label: 'Formwork', unit: 'm\u00B2', skilled: 0.4, unskilled: 0.8 },
+    'flooring': { label: 'Flooring / Tiling', unit: 'm\u00B2', skilled: 0.15, unskilled: 0.15 },
+    'painting': { label: 'Painting (Interior / Exterior)', unit: 'm\u00B2', skilled: 0.02, unskilled: 0.02 },
+    'earthwork': { label: 'Earthwork Excavation', unit: 'm\u00B3', skilled: 0.05, unskilled: 0.5 },
+    'plaster-100': { label: 'Plastering (per 100 m\u00B2)', unit: '100 m\u00B2', skilled: 2.0, unskilled: 4.0 },
+  };
+
+  function fmt(v, d) {
+    return Number(v.toFixed(d)).toLocaleString('en-IN');
+  }
+
+  function fmtCost(v) {
+    if (v <= 0) return '\u2013';
+    return 'Rs ' + Number(v.toFixed(2)).toLocaleString('en-IN');
+  }
+
+  function updateUnit() {
+    const val = document.getElementById('workType').value;
+    const data = workData[val];
+    if (data) {
+      document.getElementById('unitLabel').textContent = data.unit;
+    }
+  }
+
+  function calculate() {
+    const workVal = document.getElementById('workType').value;
+    const data = workData[workVal];
+    if (!data) return;
+
+    const qty = parseFloat(document.getElementById('quantity').value) || 0;
+    const sRate = parseFloat(document.getElementById('skilledRate').value) || 0;
+    const uRate = parseFloat(document.getElementById('unskilledRate').value) || 0;
+
+    const sDays = qty * data.skilled;
+    const uDays = qty * data.unskilled;
+    const sCost = sDays * sRate;
+    const uCost = uDays * uRate;
+    const total = sCost + uCost;
+
+    document.getElementById('resSkilledDays').textContent = fmt(sDays, 2);
+    document.getElementById('resSkilledCost').textContent = fmtCost(sCost);
+    document.getElementById('resUnskilledDays').textContent = fmt(uDays, 2);
+    document.getElementById('resUnskilledCost').textContent = fmtCost(uCost);
+    document.getElementById('resTotalCost').textContent = fmtCost(total);
+
+    document.getElementById('resultsSection').style.display = 'block';
+  }
+
+  function resetForm() {
+    document.getElementById('workType').value = 'brick-230';
+    document.getElementById('quantity').value = '10';
+    document.getElementById('skilledRate').value = '800';
+    document.getElementById('unskilledRate').value = '500';
+    updateUnit();
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  document.getElementById('workType').addEventListener('change', updateUnit);
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  updateUnit();
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .input-with-unit select {
+    width: 100%;
+  }
+
+  .unit-label {
+    display: flex;
+    align-items: center;
+    height: 44px;
+    padding: 0 14px;
+    background: var(--bg-hover);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .table-heading {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 24px 0 12px;
+  }
+
+  .calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .calc-table th,
+  .calc-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .calc-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .calc-table td:nth-child(2),
+  .calc-table td:nth-child(3) {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  .calc-table td:nth-child(3) {
+    color: var(--color-success);
+  }
+
+  .total-row td {
+    border-top: 2px solid var(--border-strong);
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .total-row td:last-child {
+    font-size: 16px;
+    color: var(--color-success);
+  }
+</style>

@@ -1,0 +1,415 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Concrete Weight Estimator" 
+  description="Calculate the total weight and volume of concrete for slabs, beams, columns, footings, or any concrete member. Supports multiple concrete types and unit systems."
+  eyebrow="Estimation Tool"
+>
+  <div class="calculator-card">
+    <h2 class="section-title">A) Concrete Type</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>a) Type of concrete</label>
+        <select id="concreteType">
+          <option value="2400">Plain Cement Concrete (PCC)</option>
+          <option value="2500">Reinforced Cement Concrete (RCC)</option>
+          <option value="1800">Lightweight Concrete</option>
+          <option value="2000">Pervious Concrete</option>
+          <option value="2500">High Strength Concrete</option>
+          <option value="2500">Self Compacting Concrete</option>
+          <option value="2500">Prestressed Concrete</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+      <div class="input-group" id="customDensityGroup" style="display: none;">
+        <label>Custom density (kg/m³)</label>
+        <input type="number" id="customDensity" value="2400" step="1" min="1" />
+      </div>
+    </div>
+
+    <h2 class="section-title">B) Dimensions</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>b) Length</label>
+        <div class="input-with-unit">
+          <input type="number" id="memberLength" value="1" step="any" />
+          <select id="lengthUnit">
+            <option value="m">meter</option>
+            <option value="mm">mm</option>
+            <option value="cm">cm</option>
+            <option value="ft">ft</option>
+            <option value="in">in</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>c) Width</label>
+        <div class="input-with-unit">
+          <input type="number" id="memberWidth" value="1" step="any" />
+          <select id="widthUnit">
+            <option value="m">meter</option>
+            <option value="mm">mm</option>
+            <option value="cm">cm</option>
+            <option value="ft">ft</option>
+            <option value="in">in</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>d) Height or thickness</label>
+        <div class="input-with-unit">
+          <input type="number" id="memberHeight" value="1000" step="any" />
+          <select id="heightUnit">
+            <option value="mm">mm</option>
+            <option value="m">meter</option>
+            <option value="cm">cm</option>
+            <option value="ft">ft</option>
+            <option value="in">in</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>e) Quantity of identical pieces</label>
+        <div class="input-with-unit">
+          <input type="number" id="memberQty" value="1" step="1" min="1" />
+          <span class="unit-label">No.</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">C) Output Units</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>f) Show volume in</label>
+        <select id="volumeUnit">
+          <option value="m3">m³</option>
+          <option value="ft3">ft³</option>
+          <option value="yd3">yd³</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>g) Show weight in</label>
+        <select id="weightUnit">
+          <option value="kg">kg</option>
+          <option value="tonne">tonne</option>
+          <option value="lb">lb</option>
+          <option value="us-ton">US ton</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Re-Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <h2 class="section-title">Concrete Calculator – Calculation</h2>
+
+      <h3 class="table-heading">Inputs summary</h3>
+      <div class="table-wrap">
+      <table class="calc-table">
+        <thead>
+          <tr><th>Item</th><th>Value</th><th>Unit</th><th>Converted</th></tr>
+        </thead>
+        <tbody id="inputSummaryBody">
+          <tr><td>Type of concrete</td><td id="isConcreteType">Plain Cement Concrete</td><td>-</td><td id="isDensity">Density 2400 kg/m³</td></tr>
+          <tr><td>Length</td><td id="isLength">1</td><td id="isLengthUnit">m</td><td id="isLengthConv">1.000 m</td></tr>
+          <tr><td>Width</td><td id="isWidth">1</td><td id="isWidthUnit">m</td><td id="isWidthConv">1.000 m</td></tr>
+          <tr><td>Height/Thickness</td><td id="isHeight">1000</td><td id="isHeightUnit">mm</td><td id="isHeightConv">1.000 m</td></tr>
+          <tr><td>Quantity</td><td id="isQty">1</td><td>No.</td><td>-</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3 class="table-heading">Results</h3>
+      <div class="table-wrap">
+      <table class="calc-table">
+        <thead>
+          <tr><th>Item</th><th>Value</th><th id="resVolUnitHeader">m³</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Total volume</td><td id="resVolume">–</td><td id="resVolUnit">m³</td></tr>
+          <tr><td>Total weight</td><td id="resWeight">–</td><td id="resWeightUnit">kg</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function toMeters(val, unit) {
+    if (unit === 'mm') return val / 1000;
+    if (unit === 'cm') return val / 100;
+    if (unit === 'ft') return val * 0.3048;
+    if (unit === 'in') return val * 0.0254;
+    return val;
+  }
+
+  function toCubicFeet(m3) { return m3 * 35.3147; }
+  function toCubicYards(m3) { return m3 * 1.30795; }
+  function toKgTo(val, unit) {
+    if (unit === 'tonne') return val / 1000;
+    if (unit === 'lb') return val * 2.20462;
+    if (unit === 'us-ton') return val * 0.00110231;
+    return val;
+  }
+
+  function formatNum(v, d) {
+    return Number(v.toFixed(d));
+  }
+
+  function getDensity() {
+    const type = document.getElementById('concreteType').value;
+    if (type === 'custom') {
+      return parseFloat(document.getElementById('customDensity').value) || 0;
+    }
+    // Get first matching value from options (since multiple options share same value)
+    const sel = document.getElementById('concreteType');
+    const text = sel.options[sel.selectedIndex].text;
+    if (text.includes('PCC')) return 2400;
+    if (text.includes('Lightweight')) return 1800;
+    if (text.includes('Pervious')) return 2000;
+    return 2500;
+  }
+
+  function getConcreteLabel() {
+    const sel = document.getElementById('concreteType');
+    return sel.options[sel.selectedIndex].text;
+  }
+
+  function calculate() {
+    const mType = document.getElementById('concreteType');
+    const mTypeText = mType.options[mType.selectedIndex].text;
+    const density = getDensity();
+
+    const mLraw = parseFloat(document.getElementById('memberLength').value) || 0;
+    const mWraw = parseFloat(document.getElementById('memberWidth').value) || 0;
+    const mHraw = parseFloat(document.getElementById('memberHeight').value) || 0;
+    const lUnit = document.getElementById('lengthUnit').value;
+    const wUnit = document.getElementById('widthUnit').value;
+    const hUnit = document.getElementById('heightUnit').value;
+
+    const mL = toMeters(mLraw, lUnit);
+    const mW = toMeters(mWraw, wUnit);
+    const mH = toMeters(mHraw, hUnit);
+    const qty = parseInt(document.getElementById('memberQty').value) || 1;
+
+    const volUnit = document.getElementById('volumeUnit').value;
+    const wtUnit = document.getElementById('weightUnit').value;
+
+    const volM3 = mL * mW * mH * qty;
+    const weightKg = volM3 * density;
+
+    let volDisplay, volUnitLabel;
+    if (volUnit === 'ft3') {
+      volDisplay = toCubicFeet(volM3);
+      volUnitLabel = 'ft³';
+    } else if (volUnit === 'yd3') {
+      volDisplay = toCubicYards(volM3);
+      volUnitLabel = 'yd³';
+    } else {
+      volDisplay = volM3;
+      volUnitLabel = 'm³';
+    }
+
+    let wtDisplay, wtUnitLabel;
+    if (wtUnit === 'tonne') {
+      wtDisplay = toKgTo(weightKg, 'tonne');
+      wtUnitLabel = 'tonne';
+    } else if (wtUnit === 'lb') {
+      wtDisplay = toKgTo(weightKg, 'lb');
+      wtUnitLabel = 'lb';
+    } else if (wtUnit === 'us-ton') {
+      wtDisplay = toKgTo(weightKg, 'us-ton');
+      wtUnitLabel = 'US ton';
+    } else {
+      wtDisplay = weightKg;
+      wtUnitLabel = 'kg';
+    }
+
+    // Input summary
+    document.getElementById('isConcreteType').textContent = mTypeText;
+    document.getElementById('isDensity').textContent = `Density ${density} kg/m³`;
+    document.getElementById('isLength').textContent = formatNum(mLraw, 4);
+    document.getElementById('isLengthUnit').textContent = lUnit;
+    document.getElementById('isLengthConv').textContent = `${formatNum(mL, 3)} m`;
+    document.getElementById('isWidth').textContent = formatNum(mWraw, 4);
+    document.getElementById('isWidthUnit').textContent = wUnit;
+    document.getElementById('isWidthConv').textContent = `${formatNum(mW, 3)} m`;
+    document.getElementById('isHeight').textContent = formatNum(mHraw, 4);
+    document.getElementById('isHeightUnit').textContent = hUnit;
+    document.getElementById('isHeightConv').textContent = `${formatNum(mH, 3)} m`;
+    document.getElementById('isQty').textContent = qty;
+
+    // Results
+    document.getElementById('resVolume').textContent = formatNum(volDisplay, 3);
+    document.getElementById('resVolUnit').textContent = volUnitLabel;
+    document.getElementById('resVolUnitHeader').textContent = volUnitLabel;
+    document.getElementById('resWeight').textContent = formatNum(wtDisplay, 3);
+    document.getElementById('resWeightUnit').textContent = wtUnitLabel;
+
+    document.getElementById('resultsSection').style.display = 'block';
+  }
+
+  function resetForm() {
+    document.getElementById('concreteType').value = '2400';
+    document.getElementById('customDensityGroup').style.display = 'none';
+    document.getElementById('customDensity').value = '2400';
+    document.getElementById('memberLength').value = '1';
+    document.getElementById('lengthUnit').value = 'm';
+    document.getElementById('memberWidth').value = '1';
+    document.getElementById('widthUnit').value = 'm';
+    document.getElementById('memberHeight').value = '1000';
+    document.getElementById('heightUnit').value = 'mm';
+    document.getElementById('memberQty').value = '1';
+    document.getElementById('volumeUnit').value = 'm3';
+    document.getElementById('weightUnit').value = 'kg';
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  document.getElementById('concreteType').addEventListener('change', function () {
+    if (this.value === 'custom') {
+      document.getElementById('customDensityGroup').style.display = 'block';
+    } else {
+      document.getElementById('customDensityGroup').style.display = 'none';
+    }
+  });
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .input-with-unit select {
+    width: 110px;
+    flex-shrink: 0;
+  }
+
+  .unit-label {
+    display: flex;
+    align-items: center;
+    height: 44px;
+    padding: 0 14px;
+    background: var(--bg-hover);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .table-heading {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 24px 0 12px;
+  }
+
+  .calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .calc-table th,
+  .calc-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .calc-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .calc-table td:last-child,
+  .calc-table td:nth-child(3) {
+    color: var(--text-tertiary);
+    font-size: 13px;
+  }
+
+  .calc-table td:nth-child(2) {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 768px) {
+    .input-with-unit select {
+      width: 80px;
+    }
+  }
+</style>

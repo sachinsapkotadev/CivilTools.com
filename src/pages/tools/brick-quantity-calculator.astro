@@ -1,0 +1,316 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Brick Quantity Calculator with Mortar" 
+  description="Calculate the number of bricks required for a wall along with estimated mortar volume, including wastage allowance."
+  eyebrow="Estimation Tool"
+>
+  <div class="calculator-card">
+    <h2 class="section-title">Section A. Wall Dimensions</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>1. Wall Length</label>
+        <div class="input-with-unit">
+          <input type="number" id="wallLength" value="10" step="any" />
+          <select id="wallLengthUnit"><option>m</option><option>ft</option></select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>2. Wall Height</label>
+        <div class="input-with-unit">
+          <input type="number" id="wallHeight" value="3" step="any" />
+          <select id="wallHeightUnit"><option>m</option><option>ft</option></select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>3. Wall Thickness</label>
+        <div class="input-with-unit">
+          <input type="number" id="wallThick" value="0.23" step="any" />
+          <select id="wallThickUnit"><option>m</option><option>ft</option></select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>4. Mortar Thickness</label>
+        <div class="input-with-unit">
+          <input type="number" id="mortarThick" value="10" step="any" />
+          <select id="mortarUnit"><option>mm</option><option>Inch</option></select>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Section B. Brick Details</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>1. Brick Length</label>
+        <div class="input-with-unit">
+          <input type="number" id="brickLength" value="190" step="any" />
+          <select id="brickLengthUnit"><option>mm</option><option>Inch</option><option>ft</option></select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>2. Brick Width</label>
+        <div class="input-with-unit">
+          <input type="number" id="brickWidth" value="90" step="any" />
+          <select id="brickWidthUnit"><option>mm</option><option>Inch</option><option>ft</option></select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>3. Brick Height</label>
+        <div class="input-with-unit">
+          <input type="number" id="brickHeight" value="90" step="any" />
+          <select id="brickHeightUnit"><option>mm</option><option>Inch</option><option>ft</option></select>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Section C. Wastage</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>1. Wastage Percentage</label>
+        <input type="number" id="wastage" value="5" step="0.1" min="0" max="50" />
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <div class="result-unit-bar">
+        <label>Result Unit</label>
+        <select id="resultUnit">
+          <option value="m3">m³</option>
+          <option value="ft3">ft³</option>
+          <option value="in3">in³</option>
+          <option value="mm3">mm³</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+      <table class="result-table">
+        <thead>
+          <tr><th>Item</th><th>Value</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Total Wall Volume</td><td id="resWallVol">0.000</td></tr>
+          <tr><td>Brick Volume With Mortar</td><td id="resBrickVolWM">0.000</td></tr>
+          <tr><td>Single Brick Volume Without Mortar</td><td id="resBrickVolSW">0.000</td></tr>
+          <tr><td>Required Bricks</td><td id="resBricks">0 Nos</td></tr>
+          <tr><td>Bricks With Wastage</td><td id="resBricksWaste">0 Nos</td></tr>
+          <tr><td>Estimated Mortar Volume</td><td id="resMortarVol">0.000</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function toMeters(val, unit) {
+    if (unit === 'ft') return val * 0.3048;
+    if (unit === 'Inch') return val * 0.0254;
+    if (unit === 'mm') return val / 1000;
+    return val; // m
+  }
+
+  function formatNum(v, d) {
+    return v.toFixed(d);
+  }
+
+  function convertVol(v, unit) {
+    if (unit === 'ft3') return v * 35.3147;
+    if (unit === 'in3') return v * 61023.744;
+    if (unit === 'mm3') return v * 1e9;
+    return v; // m3
+  }
+
+  function volUnitLabel(unit) {
+    if (unit === 'ft3') return 'ft³';
+    if (unit === 'in3') return 'in³';
+    if (unit === 'mm3') return 'mm³';
+    return 'm³';
+  }
+
+  function formatVol(v, unit, decimals) {
+    return formatNum(convertVol(v, unit), decimals) + ' ' + volUnitLabel(unit);
+  }
+
+  function calculate() {
+    const wallL = toMeters(parseFloat(document.getElementById('wallLength').value) || 0, document.getElementById('wallLengthUnit').value);
+    const wallH = toMeters(parseFloat(document.getElementById('wallHeight').value) || 0, document.getElementById('wallHeightUnit').value);
+    const wallT = toMeters(parseFloat(document.getElementById('wallThick').value) || 0, document.getElementById('wallThickUnit').value);
+    const mThick = toMeters(parseFloat(document.getElementById('mortarThick').value) || 0, document.getElementById('mortarUnit').value);
+
+    const bL = toMeters(parseFloat(document.getElementById('brickLength').value) || 0, document.getElementById('brickLengthUnit').value);
+    const bW = toMeters(parseFloat(document.getElementById('brickWidth').value) || 0, document.getElementById('brickWidthUnit').value);
+    const bH = toMeters(parseFloat(document.getElementById('brickHeight').value) || 0, document.getElementById('brickHeightUnit').value);
+
+    const wastage = (parseFloat(document.getElementById('wastage').value) || 0) / 100;
+
+    const wallVol = wallL * wallH * wallT;
+    const brickVolWM = (bL + mThick) * (bW + mThick) * (bH + mThick);
+    const brickVolSW = bL * bW * bH;
+
+    const bricks = brickVolWM > 0 ? Math.round(wallVol / brickVolWM) : 0;
+    const bricksWaste = Math.ceil(bricks * (1 + wastage));
+    const mortarVol = wallVol - (bricks * brickVolSW);
+
+    const ru = document.getElementById('resultUnit').value;
+
+    document.getElementById('resBricks').textContent = bricks.toLocaleString() + ' Nos';
+    document.getElementById('resBricksWaste').textContent = bricksWaste.toLocaleString() + ' Nos';
+    document.getElementById('resWallVol').textContent = formatVol(wallVol, ru, 3);
+    document.getElementById('resBrickVolWM').textContent = formatVol(brickVolWM, ru, ru === 'mm3' ? 1 : 4);
+    document.getElementById('resBrickVolSW').textContent = formatVol(brickVolSW, ru, ru === 'mm3' ? 0 : 6);
+    document.getElementById('resMortarVol').textContent = formatVol(mortarVol, ru, 4);
+
+    document.getElementById('resultsSection').style.display = 'block';
+  }
+
+  function resetForm() {
+    const vals = {
+      wallLength: '10', wallLengthUnit: 'm',
+      wallHeight: '3', wallHeightUnit: 'm',
+      wallThick: '0.23', wallThickUnit: 'm',
+      mortarThick: '10', mortarUnit: 'mm',
+      brickLength: '190', brickLengthUnit: 'mm',
+      brickWidth: '90', brickWidthUnit: 'mm',
+      brickHeight: '90', brickHeightUnit: 'mm',
+      wastage: '5'
+    };
+    for (const [id, val] of Object.entries(vals)) {
+      document.getElementById(id).value = val;
+    }
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.getElementById('resultUnit').addEventListener('change', calculate);
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .input-with-unit select {
+    width: 80px;
+    flex-shrink: 0;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .result-unit-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .result-unit-bar label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .result-unit-bar select {
+    height: 36px;
+    padding: 0 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-input);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    width: 90px;
+  }
+
+  .result-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .result-table th,
+  .result-table td {
+    padding: 12px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .result-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .result-table td:last-child {
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+</style>

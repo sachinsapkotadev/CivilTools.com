@@ -1,0 +1,203 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Weight of Concrete per Square Foot" 
+  description="Calculate the weight of concrete per square foot for any thickness. Supports PCC and RCC with multiple unit outputs including kg, US ton, pound, and ounce."
+  eyebrow="Estimation Tool"
+>
+  <div class="calculator-card">
+    <h2 class="section-title">Input</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Thickness of Concrete</label>
+        <div class="input-with-unit">
+          <input type="number" id="thickness" value="6" step="any" min="0" />
+          <select id="thickUnit">
+            <option value="in">inch</option>
+            <option value="mm">mm</option>
+            <option value="ft">Feet</option>
+            <option value="m">meter</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Type of Concrete</label>
+        <select id="concreteType">
+          <option value="2400">PCC (Plain Cement Concrete)</option>
+          <option value="2500">RCC (Reinforced Cement Concrete)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Re-Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <h3 class="table-heading">Total Weight of Concrete per Square Foot</h3>
+      <div class="table-wrap">
+      <table class="calc-table">
+        <thead>
+          <tr><th>Unit</th><th>Weight</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Kilogram (kg)</td><td id="resKg">–</td></tr>
+          <tr><td>US Ton</td><td id="resUsTon">–</td></tr>
+          <tr><td>Pound (lb)</td><td id="resLb">–</td></tr>
+          <tr><td>Ounce (oz)</td><td id="resOz">–</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function fmt(v, d) {
+    return Number(v.toFixed(d)).toLocaleString('en-IN');
+  }
+
+  function toFeet(val, unit) {
+    if (unit === 'mm') return val / 304.8;
+    if (unit === 'm') return val * 3.28084;
+    if (unit === 'in') return val / 12;
+    return val; // ft
+  }
+
+  function calculate() {
+    const thickRaw = parseFloat(document.getElementById('thickness').value) || 0;
+    const thickUnit = document.getElementById('thickUnit').value;
+    const density = parseFloat(document.getElementById('concreteType').value) || 2400;
+
+    const tFt = toFeet(thickRaw, thickUnit);
+    const volFt3 = 1 * 1 * tFt; // 1 sq ft area
+    const volM3 = volFt3 * 0.0283168;
+
+    const weightKg = volM3 * density;
+    const weightUsTon = weightKg * 0.00110231;
+    const weightLb = weightKg * 2.20462;
+    const weightOz = weightKg * 35.274;
+
+    document.getElementById('resKg').textContent = fmt(weightKg, 3) + ' kg';
+    document.getElementById('resUsTon').textContent = fmt(weightUsTon, 3) + ' US ton';
+    document.getElementById('resLb').textContent = fmt(weightLb, 3) + ' lb';
+    document.getElementById('resOz').textContent = fmt(weightOz, 3) + ' oz';
+
+    document.getElementById('resultsSection').style.display = 'block';
+  }
+
+  function resetForm() {
+    document.getElementById('thickness').value = '6';
+    document.getElementById('thickUnit').value = 'in';
+    document.getElementById('concreteType').value = '2400';
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .input-with-unit select {
+    width: 110px;
+    flex-shrink: 0;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .table-heading {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 24px 0 12px;
+  }
+
+  .calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .calc-table th,
+  .calc-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .calc-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .calc-table td:last-child {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+</style>

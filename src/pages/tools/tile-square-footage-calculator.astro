@@ -1,0 +1,237 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Tile Square Footage Calculator" 
+  description="Calculate the total area of a room, number of tiles required, and total cost of tiles for flooring or wall tiling projects."
+  eyebrow="Estimation Tool"
+>
+  <div class="calculator-card">
+    <h2 class="section-title">Input Dimension of Room for Tiling</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Length of Room</label>
+        <div class="input-with-unit">
+          <input type="number" id="roomLength" value="12" step="any" />
+          <span class="unit-label">feet</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Width of Room</label>
+        <div class="input-with-unit">
+          <input type="number" id="roomWidth" value="11" step="any" />
+          <span class="unit-label">feet</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Numbers of Room</label>
+        <div class="input-with-unit">
+          <input type="number" id="roomQty" value="1" step="1" min="1" />
+          <span class="unit-label">Nos.</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Length of Tile</label>
+        <div class="input-with-unit">
+          <input type="number" id="tileLength" value="2" step="any" />
+          <span class="unit-label">feet</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Width of Tile</label>
+        <div class="input-with-unit">
+          <input type="number" id="tileWidth" value="1.5" step="any" />
+          <span class="unit-label">feet</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Cost of Tiles per Square Feet</label>
+        <div class="input-with-unit">
+          <input type="number" id="costPerSqFt" value="300" step="any" min="0" />
+          <span class="unit-label">Rs.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <h2 class="section-title">Tile Square Footage Calculator – Results</h2>
+
+      <h3 class="table-heading">Results</h3>
+      <div class="table-wrap">
+      <table class="calc-table">
+        <thead>
+          <tr><th>Item</th><th>Value</th><th>Unit</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Total Area of Rooms</td><td id="resTotalArea">–</td><td>Square Feet</td></tr>
+          <tr><td>Area of one Tile</td><td id="resTileArea">–</td><td>Square Feet</td></tr>
+          <tr><td>Total Number of tiles required</td><td id="resTileQty">–</td><td>Nos.</td></tr>
+          <tr><td>Total cost of tile</td><td id="resTotalCost">–</td><td>Rs.</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function formatNum(v, d) {
+    return v.toFixed(d);
+  }
+
+  function calculate() {
+    const roomLength = parseFloat(document.getElementById('roomLength').value) || 0;
+    const roomWidth = parseFloat(document.getElementById('roomWidth').value) || 0;
+    const roomQty = parseFloat(document.getElementById('roomQty').value) || 1;
+    const tileLength = parseFloat(document.getElementById('tileLength').value) || 0;
+    const tileWidth = parseFloat(document.getElementById('tileWidth').value) || 0;
+    const costPerSqFt = parseFloat(document.getElementById('costPerSqFt').value) || 0;
+
+    const totalArea = roomLength * roomWidth * roomQty;
+    const tileArea = tileLength * tileWidth;
+    const tileQty = tileArea > 0 ? Math.ceil(totalArea / tileArea) : 0;
+    const totalCost = tileQty * costPerSqFt;
+
+    document.getElementById('resTotalArea').textContent = formatNum(totalArea, 2);
+    document.getElementById('resTileArea').textContent = formatNum(tileArea, 2);
+    document.getElementById('resTileQty').textContent = tileQty.toString();
+    document.getElementById('resTotalCost').textContent = Math.round(totalCost).toString();
+
+    document.getElementById('resultsSection').style.display = 'block';
+  }
+
+  function resetForm() {
+    const vals = {
+      roomLength: '12', roomWidth: '11', roomQty: '1',
+      tileLength: '2', tileWidth: '1.5', costPerSqFt: '300'
+    };
+    for (const [id, val] of Object.entries(vals)) {
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    }
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('input').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .unit-label {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .table-heading {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 24px 0 12px;
+  }
+
+  .calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .calc-table th,
+  .calc-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .calc-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .calc-table td:last-child {
+    color: var(--text-tertiary);
+    font-size: 13px;
+  }
+
+  .calc-table td:nth-child(2) {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+</style>

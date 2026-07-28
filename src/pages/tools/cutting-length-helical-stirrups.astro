@@ -1,0 +1,445 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout
+  title="Cutting Length of Helical Stirrups in Pile/Column Calculator"
+  description="Calculate the cutting length, total weight of helical/spiral stirrups for piles and columns. Uses CL = (L/s) × √(π²(D−2c)² + s²) formula."
+  eyebrow="Cutting Length Tool"
+>
+  <div class="calculator-card">
+    <svg class="helix-figure" viewBox="0 0 320 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="10" width="300" height="260" rx="4" stroke="var(--border-strong)" stroke-width="1.5" stroke-dasharray="6 4" fill="none" />
+      <text x="160" y="274" text-anchor="middle" font-size="12" fill="var(--text-tertiary)">Pile / Column Section with Helical Stirrups</text>
+      <line x1="160" y1="30" x2="160" y2="250" stroke="var(--text-secondary)" stroke-width="1" stroke-miterlimit="10" marker-start="url(#arrowUp)" marker-end="url(#arrowDown)" />
+      <text x="168" y="145" font-size="12" fill="var(--text-secondary)" font-weight="500">L</text>
+      <circle cx="160" cy="140" r="80" stroke="var(--text-primary)" stroke-width="1.5" fill="none" />
+      <text x="160" y="226" text-anchor="middle" font-size="12" fill="var(--text-primary)" font-weight="600">D (Column Dia)</text>
+      <line x1="160" y1="60" x2="160" y2="220" stroke="var(--text-tertiary)" stroke-width="1" stroke-dasharray="4 3" />
+      <path d="M 120 60 C 100 90, 100 110, 120 140" stroke="var(--color-info)" stroke-width="2" fill="none" />
+      <path d="M 120 140 C 140 170, 140 190, 120 220" stroke="var(--color-info)" stroke-width="2" fill="none" />
+      <path d="M 200 60 C 220 90, 220 110, 200 140" stroke="var(--color-info)" stroke-width="2" fill="none" />
+      <path d="M 200 140 C 180 170, 180 190, 200 220" stroke="var(--color-info)" stroke-width="2" fill="none" />
+      <text x="90" y="138" font-size="10" fill="var(--color-info)">s</text>
+      <text x="222" y="138" font-size="10" fill="var(--color-info)">s</text>
+      <text x="160" y="104" text-anchor="middle" font-size="10" fill="var(--text-tertiary)">D − 2×cover</text>
+      <defs>
+        <marker id="arrowUp" markerWidth="6" markerHeight="6" refX="3" refY="6" orient="auto-start-reverse">
+          <path d="M 0 6 L 3 0 L 6 6" fill="none" stroke="var(--text-secondary)" stroke-width="1" />
+        </marker>
+        <marker id="arrowDown" markerWidth="6" markerHeight="6" refX="3" refY="0" orient="auto">
+          <path d="M 0 0 L 3 6 L 6 0" fill="none" stroke="var(--text-secondary)" stroke-width="1" />
+        </marker>
+      </defs>
+    </svg>
+
+    <h2 class="section-title">A) Diameter of Pile/Column</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Diameter of Pile/Column</label>
+        <div class="input-with-unit">
+          <input type="number" id="colDia" value="450" step="any" min="1" />
+          <span class="unit-label">mm</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Diameter of Helical Stirrups</label>
+        <div class="input-with-unit">
+          <select id="barDia">
+            <option value="6">6 mm</option>
+            <option value="8">8 mm</option>
+            <option value="10">10 mm</option>
+            <option value="12">12 mm</option>
+            <option value="16">16 mm</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Clear Cover</label>
+        <div class="input-with-unit">
+          <input type="number" id="clearCover" value="25" step="1" min="0" />
+          <span class="unit-label">mm</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">D) Height &amp; Spacing</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Height of Pile (L)</label>
+        <div class="input-with-unit">
+          <input type="number" id="runLength" value="10" step="any" min="0" />
+          <select id="runLengthUnit"><option value="ft">feet</option><option value="mm">mm</option><option value="m">m</option></select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Spacing between Stirrups</label>
+        <div class="input-with-unit">
+          <input type="number" id="spacing" value="150" step="1" min="1" />
+          <span class="unit-label">mm</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>No. of Pile</label>
+        <div class="input-with-unit">
+          <input type="number" id="numPile" value="1" step="1" min="1" />
+          <span class="unit-label">Nos.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="formula-note">
+      <strong>Cutting length formula used,</strong> CL = (L / s) &times; &radic;(&pi;<sup>2</sup>(D &minus; 2&times;cover)<sup>2</sup> + s<sup>2</sup>)<br />
+      where D = column/pile diameter, s = spiral pitch (spacing), L = height of pile.<br />
+      Unit weight of steel = d<sup>2</sup> &divide; 162.25 kg/m.
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Re-Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <h2 class="section-title">Helical Stirrups &ndash; Calculation</h2>
+
+      <h3 class="table-heading">Inputs summary</h3>
+      <div class="table-wrap">
+      <table class="calc-table">
+        <thead>
+          <tr><th>Item</th><th>Value</th><th>Unit</th><th>Converted</th></tr>
+        </thead>
+        <tbody id="inputSummaryBody">
+          <tr><td>Pile/Column diameter</td><td id="isColDia">450</td><td>mm</td><td>-</td></tr>
+          <tr><td>Clear cover</td><td id="isCover">25</td><td>mm</td><td>-</td></tr>
+          <tr><td>Bar diameter</td><td id="isBarDia">6</td><td>mm</td><td id="isUnitWt">Unit wt = 0.222 kg/m</td></tr>
+          <tr><td>Height of pile</td><td id="isRunLength">10</td><td id="isRunLengthUnit">ft</td><td id="isRunLengthConverted">3048.0 mm</td></tr>
+          <tr><td>Spiral spacing (pitch)</td><td id="isSpacing">150</td><td>mm</td><td>-</td></tr>
+          <tr><td>No. of pile</td><td id="isNumPile">1</td><td>nos.</td><td>-</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3 class="table-heading">Results</h3>
+      <div class="table-wrap">
+      <table class="calc-table">
+        <thead>
+          <tr><th>Item</th><th>Value</th><th>Unit</th><th>Notes</th></tr>
+        </thead>
+        <tbody id="resultsBody">
+          <tr><td>Effective diameter (center line)</td><td id="resEffDia">400</td><td>mm</td><td>D &minus; 2&times;cover</td></tr>
+          <tr><td>One complete turn length</td><td id="resTurnLength">1265.56</td><td>mm</td><td>&radic;((&pi;&times;D<sub>eff</sub>)<sup>2</sup> + s<sup>2</sup>)</td></tr>
+          <tr><td>No. of turns</td><td id="resTurns">20.32</td><td>nos.</td><td>L &divide; s</td></tr>
+          <tr><td>Cutting length of single helical bar</td><td id="resCL">25.715</td><td>m</td><td>turns &times; turn length</td></tr>
+          <tr><td>Total length of helical bar</td><td id="resTotalLength">25.715</td><td>m</td><td>single &times; no. of pile</td></tr>
+          <tr><td>Weight of single helical steel required</td><td id="resWeightSingle">5.706</td><td>Kg</td><td>d<sup>2</sup>/162.25 &times; CL(m)</td></tr>
+          <tr><td>Total weight of helical steel required</td><td id="resWeightTotal">5.706</td><td>Kg</td><td>single &times; no. of pile</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="result-cards" id="resultCards">
+        <div class="result-card primary">
+          <span class="result-card-label">Cutting Length (Single)</span>
+          <span class="result-card-value" id="rcCL">25.715 <small>m</small></span>
+        </div>
+        <div class="result-card">
+          <span class="result-card-label">Total Length</span>
+          <span class="result-card-value" id="rcTotalLength">25.715 <small>m</small></span>
+        </div>
+        <div class="result-card">
+          <span class="result-card-label">Total Weight</span>
+          <span class="result-card-value" id="rcWeight">5.706 <small>Kg</small></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function toMm(val, unit) {
+    if (unit === 'ft') return val * 304.8;
+    if (unit === 'm') return val * 1000;
+    return val;
+  }
+
+  function formatNum(v, d) {
+    return Number(v).toFixed(d);
+  }
+
+  function calculate() {
+    const D = parseFloat(document.getElementById('colDia').value) || 0;
+    const barDia = parseFloat(document.getElementById('barDia').value) || 0;
+    const cover = parseFloat(document.getElementById('clearCover').value) || 0;
+    const runRaw = parseFloat(document.getElementById('runLength').value) || 0;
+    const runUnit = document.getElementById('runLengthUnit').value;
+    const spacing = parseFloat(document.getElementById('spacing').value) || 1;
+    const numPile = parseFloat(document.getElementById('numPile').value) || 1;
+
+    const runMm = toMm(runRaw, runUnit);
+
+    const effDia = D - 2 * cover;
+    const oneTurn = Math.sqrt(Math.PI * Math.PI * effDia * effDia + spacing * spacing);
+    const numTurns = runMm / spacing;
+    const clPerPileMm = numTurns * oneTurn;
+    const clPerPileM = clPerPileMm / 1000;
+    const totalLengthM = clPerPileM * numPile;
+    const unitWt = (barDia * barDia) / 162.25;
+    const wtSingle = unitWt * clPerPileM;
+    const wtTotal = wtSingle * numPile;
+
+    document.getElementById('isColDia').textContent = formatNum(D, 0);
+    document.getElementById('isCover').textContent = formatNum(cover, 0);
+    document.getElementById('isBarDia').textContent = formatNum(barDia, 0);
+    document.getElementById('isUnitWt').textContent = 'Unit wt = ' + formatNum(unitWt, 3) + ' kg/m';
+    document.getElementById('isRunLength').textContent = formatNum(runRaw, 4);
+    document.getElementById('isRunLengthUnit').textContent = runUnit;
+    document.getElementById('isRunLengthConverted').textContent = formatNum(runMm, 1) + ' mm';
+    document.getElementById('isSpacing').textContent = formatNum(spacing, 0);
+    document.getElementById('isNumPile').textContent = formatNum(numPile, 0);
+
+    document.getElementById('resEffDia').textContent = formatNum(effDia, 0);
+    document.getElementById('resTurnLength').textContent = formatNum(oneTurn, 2);
+    document.getElementById('resTurns').textContent = formatNum(numTurns, 2);
+    document.getElementById('resCL').textContent = formatNum(clPerPileM, 3);
+    document.getElementById('resTotalLength').textContent = formatNum(totalLengthM, 3);
+    document.getElementById('resWeightSingle').textContent = formatNum(wtSingle, 3);
+    document.getElementById('resWeightTotal').textContent = formatNum(wtTotal, 3);
+
+    document.getElementById('rcCL').innerHTML = formatNum(clPerPileM, 3) + ' <small>m</small>';
+    document.getElementById('rcTotalLength').innerHTML = formatNum(totalLengthM, 3) + ' <small>m</small>';
+    document.getElementById('rcWeight').innerHTML = formatNum(wtTotal, 3) + ' <small>Kg</small>';
+
+    document.getElementById('resultsSection').style.display = 'block';
+  }
+
+  function resetForm() {
+    const vals = {
+      colDia: '450', barDia: '6', clearCover: '25',
+      runLength: '10', runLengthUnit: 'ft',
+      spacing: '150', numPile: '1'
+    };
+    for (const [id, val] of Object.entries(vals)) {
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    }
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .helix-figure {
+    display: block;
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto 28px;
+  }
+
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .input-with-unit select {
+    width: auto;
+    flex-shrink: 0;
+  }
+
+  .unit-label {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  .formula-note {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    font-size: 13px;
+    line-height: 22px;
+    color: var(--text-secondary);
+    margin-top: 24px;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .table-heading {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 24px 0 12px;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+  }
+
+  .calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .calc-table th,
+  .calc-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .calc-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .calc-table td:last-child {
+    color: var(--text-tertiary);
+    font-size: 13px;
+  }
+
+  .calc-table td:nth-child(2) {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .result-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .result-card {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .result-card.primary {
+    background: var(--btn-primary-bg);
+    border-color: var(--btn-primary-bg);
+  }
+
+  .result-card.primary .result-card-label {
+    color: rgba(255,255,255,0.75);
+  }
+
+  .result-card.primary .result-card-value {
+    color: #ffffff;
+  }
+
+  .result-card-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    margin-bottom: 8px;
+  }
+
+  .result-card-value {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .result-card-value small {
+    font-size: 14px;
+    font-weight: 400;
+    color: inherit;
+    opacity: 0.7;
+  }
+
+  @media (max-width: 768px) {
+    .result-cards {
+      grid-template-columns: 1fr;
+    }
+    .result-card-value {
+      font-size: 20px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .btn-row {
+      flex-direction: column;
+    }
+    .btn-primary,
+    .btn-secondary {
+      width: 100%;
+    }
+    .result-cards {
+      gap: 12px;
+    }
+    .result-card {
+      padding: 16px;
+    }
+  }
+</style>

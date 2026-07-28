@@ -1,0 +1,632 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Roof Cost Estimator" 
+  description="Estimate roof slab materials and cost including concrete volume, cement, sand, aggregate, rebar quantities, and shuttering area. Approximate cost for RCC roof construction."
+  eyebrow="Estimation Tool"
+>
+  <div class="calculator-card">
+    <p class="disclaimer">This calculator is for approximate roof slab material and cost estimation only. Final structural design must be checked by a qualified engineer.</p>
+
+    <h2 class="section-title">A) Roof Dimensions</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>1) Roof Length</label>
+        <div class="input-with-unit">
+          <input type="number" id="roofLength" value="43" step="any" />
+          <select id="lengthUnit"><option>ft</option><option>m</option></select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>2) Roof Width</label>
+        <div class="input-with-unit">
+          <input type="number" id="roofWidth" value="28" step="any" />
+          <select id="widthUnit"><option>ft</option><option>m</option></select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>3) Slab Thickness</label>
+        <div class="input-with-unit">
+          <input type="number" id="slabThick" value="5" step="any" />
+          <select id="thickUnit"><option>inch</option><option>mm</option><option>cm</option></select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>4) Long Beams, Number</label>
+        <div class="input-with-unit">
+          <input type="number" id="longBeams" value="3" step="1" min="0" />
+          <span class="unit-label">No.</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>5) Short Beams, Number</label>
+        <div class="input-with-unit">
+          <input type="number" id="shortBeams" value="5" step="1" min="0" />
+          <span class="unit-label">No.</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>6) Beam Width</label>
+        <div class="input-with-unit">
+          <input type="number" id="beamWidth" value="10" step="any" />
+          <select id="beamWUnit"><option>inch</option><option>mm</option><option>cm</option></select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>7) Beam Depth</label>
+        <div class="input-with-unit">
+          <input type="number" id="beamDepth" value="12" step="any" />
+          <select id="beamDUnit"><option>inch</option><option>mm</option><option>cm</option></select>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">B) Rates</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>8) Cement per Bag</label>
+        <div class="input-with-unit">
+          <input type="number" id="cementRate" value="750" step="1" min="0" />
+          <span class="unit-label">Rs</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>9) Sand per m³</label>
+        <div class="input-with-unit">
+          <input type="number" id="sandRate" value="640" step="1" min="0" />
+          <span class="unit-label">Rs</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>10) Aggregate per m³</label>
+        <div class="input-with-unit">
+          <input type="number" id="aggRate" value="1440" step="1" min="0" />
+          <span class="unit-label">Rs</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>11) Rebar per kg</label>
+        <div class="input-with-unit">
+          <input type="number" id="rebarRate" value="110" step="1" min="0" />
+          <span class="unit-label">Rs</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>12) Shuttering / Labour per sq ft</label>
+        <div class="input-with-unit">
+          <input type="number" id="shutteringRate" value="45" step="1" min="0" />
+          <span class="unit-label">Rs</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">C) Concrete Mix (Cement : Sand : Aggregate)</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Cement Part</label>
+        <input type="number" id="mixCement" value="1" step="0.5" min="0.5" />
+      </div>
+      <div class="input-group">
+        <label>Sand Part</label>
+        <input type="number" id="mixSand" value="1.5" step="0.5" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Aggregate Part</label>
+        <input type="number" id="mixAgg" value="3" step="0.5" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Dry Volume Factor</label>
+        <input type="number" id="dryFactor" value="1.54" step="0.01" min="1" />
+      </div>
+    </div>
+
+    <h2 class="section-title">D) Slab Reinforcement</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Slab Type</label>
+        <select id="slabType">
+          <option value="single">Single Mesh</option>
+          <option value="double">Double Mesh</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Main Bar Diameter</label>
+        <div class="input-with-unit">
+          <input type="number" id="mainBarDia" value="8" step="1" min="6" />
+          <span class="unit-label">mm</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Main Bar Spacing</label>
+        <div class="input-with-unit">
+          <input type="number" id="mainBarSpacing" value="6" step="0.5" min="3" />
+          <span class="unit-label">inch</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Distribution Bar Diameter</label>
+        <div class="input-with-unit">
+          <input type="number" id="distBarDia" value="8" step="1" min="6" />
+          <span class="unit-label">mm</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Distribution Bar Spacing</label>
+        <div class="input-with-unit">
+          <input type="number" id="distBarSpacing" value="6" step="0.5" min="3" />
+          <span class="unit-label">inch</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">E) Beam Reinforcement</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Type A Bar Diameter</label>
+        <div class="input-with-unit">
+          <input type="number" id="beamBarADia" value="16" step="1" min="10" />
+          <span class="unit-label">mm</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Type A Quantity</label>
+        <div class="input-with-unit">
+          <input type="number" id="beamBarAQty" value="4" step="1" min="0" />
+          <span class="unit-label">bars</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Type B Bar Diameter</label>
+        <div class="input-with-unit">
+          <input type="number" id="beamBarBDia" value="12" step="1" min="8" />
+          <span class="unit-label">mm</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Type B Quantity</label>
+        <div class="input-with-unit">
+          <input type="number" id="beamBarBQty" value="2" step="1" min="0" />
+          <span class="unit-label">bars</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Stirrup Diameter</label>
+        <div class="input-with-unit">
+          <input type="number" id="stirrupDia" value="8" step="1" min="6" />
+          <span class="unit-label">mm</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Stirrup Spacing</label>
+        <div class="input-with-unit">
+          <input type="number" id="stirrupSpacing" value="5" step="0.5" min="2" />
+          <span class="unit-label">inch</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Clear Cover for Stirrup</label>
+        <div class="input-with-unit">
+          <input type="number" id="clearCover" value="1.5" step="0.25" min="0.5" />
+          <span class="unit-label">inch</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Rebar Lap / Wastage</label>
+        <div class="input-with-unit">
+          <input type="number" id="wastage" value="10" step="1" min="0" />
+          <span class="unit-label">%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Re-Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <h3 class="table-heading">Results</h3>
+      <div class="table-wrap">
+      <table class="calc-table">
+        <thead>
+          <tr><th>Item</th><th>Quantity</th><th>Cost</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Roof Area</td><td id="resArea">–</td><td>–</td></tr>
+          <tr><td>Slab Wet Volume</td><td id="resSlabVol">–</td><td>–</td></tr>
+          <tr><td>Beam Wet Volume</td><td id="resBeamVol">–</td><td>–</td></tr>
+          <tr><td>Total Wet Concrete Volume</td><td id="resTotalWet">–</td><td>–</td></tr>
+          <tr><td>Dry Volume for Material</td><td id="resDryVol">–</td><td>–</td></tr>
+          <tr><td>Cement Quantity</td><td id="resCement">–</td><td id="resCementCost">–</td></tr>
+          <tr><td>Sand Quantity</td><td id="resSand">–</td><td id="resSandCost">–</td></tr>
+          <tr><td>Aggregate Quantity</td><td id="resAgg">–</td><td id="resAggCost">–</td></tr>
+          <tr><td>Slab Main Bar (<span id="resMainDiaLabel">8</span> mm)</td><td id="resMainBar">–</td><td>–</td></tr>
+          <tr><td>Slab Distribution Bar (<span id="resDistDiaLabel">8</span> mm)</td><td id="resDistBar">–</td><td>–</td></tr>
+          <tr><td>Total Slab Rebar</td><td id="resSlabRebar">–</td><td>–</td></tr>
+          <tr><td>Beam Type A Bar (<span id="resBarADiaLabel">16</span> mm)</td><td id="resBeamBarA">–</td><td>–</td></tr>
+          <tr><td>Beam Type B Bar (<span id="resBarBDiaLabel">12</span> mm)</td><td id="resBeamBarB">–</td><td>–</td></tr>
+          <tr><td>Beam Stirrups (<span id="resStirrupDiaLabel">8</span> mm)</td><td id="resStirrup">–</td><td>–</td></tr>
+          <tr><td>Total Rebar</td><td id="resTotalRebar">–</td><td id="resRebarCost">–</td></tr>
+          <tr><td>Shuttering / Labour</td><td id="resShuttering">–</td><td id="resShutteringCost">–</td></tr>
+          <tr class="total-row"><td>Approximate Total Cost</td><td>–</td><td id="resTotalCost">–</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function toFt(val, unit) {
+    if (unit === 'mm') return val / 304.8;
+    if (unit === 'cm') return val / 30.48;
+    if (unit === 'inch') return val / 12;
+    if (unit === 'm') return val * 3.28084;
+    return val; // ft
+  }
+
+  function toM(val, unit) {
+    if (unit === 'mm') return val / 1000;
+    if (unit === 'cm') return val / 100;
+    if (unit === 'inch') return val * 0.0254;
+    if (unit === 'ft') return val * 0.3048;
+    return val; // m
+  }
+
+  function rebarWtPerFt(diaMm) {
+    return (diaMm * diaMm) / 531.5;
+  }
+
+  function fmt(v, d) {
+    return Number(v.toFixed(d)).toLocaleString('en-IN');
+  }
+
+  function fmtCost(v) {
+    if (v <= 0) return '–';
+    return 'Rs ' + Number(v.toFixed(2)).toLocaleString('en-IN');
+  }
+
+  function calculate() {
+    const Lft = parseFloat(document.getElementById('roofLength').value) || 0;
+    const Wft = parseFloat(document.getElementById('roofWidth').value) || 0;
+    const lUnit = document.getElementById('lengthUnit').value;
+    const wUnit = document.getElementById('widthUnit').value;
+    const L = toFt(Lft, lUnit);
+    const W = toFt(Wft, wUnit);
+
+    const thickRaw = parseFloat(document.getElementById('slabThick').value) || 0;
+    const thickUnit = document.getElementById('thickUnit').value;
+    const tFt = toFt(thickRaw, thickUnit);
+
+    const nLong = parseInt(document.getElementById('longBeams').value) || 0;
+    const nShort = parseInt(document.getElementById('shortBeams').value) || 0;
+    const bwRaw = parseFloat(document.getElementById('beamWidth').value) || 0;
+    const bdRaw = parseFloat(document.getElementById('beamDepth').value) || 0;
+    const bwUnit = document.getElementById('beamWUnit').value;
+    const bdUnit = document.getElementById('beamDUnit').value;
+    const bwFt = toFt(bwRaw, bwUnit);
+    const bdFt = toFt(bdRaw, bdUnit);
+
+    const cRate = parseFloat(document.getElementById('cementRate').value) || 0;
+    const sRate = parseFloat(document.getElementById('sandRate').value) || 0;
+    const aRate = parseFloat(document.getElementById('aggRate').value) || 0;
+    const rRate = parseFloat(document.getElementById('rebarRate').value) || 0;
+    const shRate = parseFloat(document.getElementById('shutteringRate').value) || 0;
+
+    const mixC = parseFloat(document.getElementById('mixCement').value) || 1;
+    const mixS = parseFloat(document.getElementById('mixSand').value) || 0;
+    const mixA = parseFloat(document.getElementById('mixAgg').value) || 0;
+    const dryFactor = parseFloat(document.getElementById('dryFactor').value) || 1.54;
+
+    const slabType = document.getElementById('slabType').value;
+    const mainDia = parseFloat(document.getElementById('mainBarDia').value) || 8;
+    const mainSpacing = parseFloat(document.getElementById('mainBarSpacing').value) || 6;
+    const distDia = parseFloat(document.getElementById('distBarDia').value) || 8;
+    const distSpacing = parseFloat(document.getElementById('distBarSpacing').value) || 6;
+
+    const bBarADia = parseFloat(document.getElementById('beamBarADia').value) || 16;
+    const bBarAQty = parseInt(document.getElementById('beamBarAQty').value) || 0;
+    const bBarBDia = parseFloat(document.getElementById('beamBarBDia').value) || 12;
+    const bBarBQty = parseInt(document.getElementById('beamBarBQty').value) || 0;
+    const stirDia = parseFloat(document.getElementById('stirrupDia').value) || 8;
+    const stirSpacing = parseFloat(document.getElementById('stirrupSpacing').value) || 5;
+    const cover = parseFloat(document.getElementById('clearCover').value) || 1.5;
+    const wastagePct = parseFloat(document.getElementById('wastage').value) || 0;
+
+    const wastageFactor = 1 + wastagePct / 100;
+
+    // Areas and volumes
+    const areaSqft = L * W;
+    const slabVolFt3 = L * W * tFt;
+    const slabVolM3 = slabVolFt3 / 35.315;
+
+    // Beam volumes (account for intersections)
+    const longBeamVol = nLong * bwFt * bdFt * L;
+    const shortBeamVol = nShort * bwFt * bdFt * W;
+    const intersections = nLong * nShort;
+    const intersectionVol = intersections * bwFt * bwFt * bdFt;
+    const beamVolFt3 = longBeamVol + shortBeamVol - intersectionVol;
+    const beamVolM3 = beamVolFt3 / 35.315;
+
+    const totalWetM3 = slabVolM3 + beamVolM3;
+    const dryVolM3 = totalWetM3 * dryFactor;
+
+    // Materials
+    const totalParts = mixC + mixS + mixA;
+    let cementBags = 0, sandM3 = 0, aggM3 = 0;
+    if (totalParts > 0) {
+      const cementVol = (mixC / totalParts) * dryVolM3;
+      cementBags = (cementVol * 1440) / 50;
+      sandM3 = (mixS / totalParts) * dryVolM3;
+      aggM3 = (mixA / totalParts) * dryVolM3;
+    }
+
+    // Slab rebar
+    const mainWtPerFt = rebarWtPerFt(mainDia);
+    const distWtPerFt = rebarWtPerFt(distDia);
+
+    const mainNum = Math.floor(W / (mainSpacing / 12)) + 1;
+    const mainLenFt = L + 2 * (9 * mainDia / 304.8); // 9d hooks
+    const mainTotalKg = mainNum * mainLenFt * mainWtPerFt * wastageFactor;
+
+    const distNum = Math.floor(L / (distSpacing / 12)) + 1;
+    const distLenFt = W + 2 * (9 * distDia / 304.8);
+    const distTotalKg = distNum * distLenFt * distWtPerFt * wastageFactor;
+
+    let slabRebarKg = mainTotalKg + distTotalKg;
+    if (slabType === 'double') {
+      slabRebarKg *= 2;
+    }
+
+    // Beam rebar
+    const barAWtPerFt = rebarWtPerFt(bBarADia);
+    const barBWtPerFt = rebarWtPerFt(bBarBDia);
+    const stirWtPerFt = rebarWtPerFt(stirDia);
+
+    // Total beam length (sum of all beam centerlines minus intersections)
+    const totalBeamLen = (nLong * L) + (nShort * W) - (intersections * bwFt);
+
+    const beamBarAKg = bBarAQty * totalBeamLen * barAWtPerFt * wastageFactor;
+    const beamBarBKg = bBarBQty * totalBeamLen * barBWtPerFt * wastageFactor;
+
+    // Stirrups
+    const stirrupLenFt = 2 * ((bwFt * 12 - 2 * cover) + (bdFt * 12 - 2 * cover)) / 12 + 2 * (10 * stirDia / 304.8);
+    const stirrupCount = totalBeamLen / (stirSpacing / 12) + nLong + nShort;
+    const stirrupKg = stirrupCount * stirrupLenFt * stirWtPerFt * wastageFactor;
+
+    const totalRebarKg = slabRebarKg + beamBarAKg + beamBarBKg + stirrupKg;
+
+    // Shuttering area
+    const beamPerimeter = 2 * (bwFt + bdFt);
+    const beamShuttering = beamPerimeter * totalBeamLen;
+    const slabShuttering = areaSqft;
+    const shutteringArea = slabShuttering + beamShuttering;
+
+    // Costs
+    const cementCost = cementBags * cRate;
+    const sandCost = sandM3 * sRate;
+    const aggCost = aggM3 * aRate;
+    const rebarCost = totalRebarKg * rRate;
+    const shutteringCost = shutteringArea * shRate;
+    const totalCost = cementCost + sandCost + aggCost + rebarCost + shutteringCost;
+
+    // Render
+    document.getElementById('resArea').textContent = fmt(areaSqft, 0) + ' sq ft';
+    document.getElementById('resSlabVol').textContent = fmt(slabVolFt3, 2) + ' ft\u00B3';
+    document.getElementById('resBeamVol').textContent = fmt(beamVolFt3, 2) + ' ft\u00B3';
+    document.getElementById('resTotalWet').textContent = fmt(totalWetM3, 2) + ' m\u00B3';
+    document.getElementById('resDryVol').textContent = fmt(dryVolM3, 2) + ' m\u00B3';
+    document.getElementById('resCement').textContent = fmt(cementBags, 2) + ' bags';
+    document.getElementById('resCementCost').textContent = fmtCost(cementCost);
+    document.getElementById('resSand').textContent = fmt(sandM3, 2) + ' m\u00B3';
+    document.getElementById('resSandCost').textContent = fmtCost(sandCost);
+    document.getElementById('resAgg').textContent = fmt(aggM3, 2) + ' m\u00B3';
+    document.getElementById('resAggCost').textContent = fmtCost(aggCost);
+
+    document.getElementById('resMainDiaLabel').textContent = mainDia;
+    document.getElementById('resMainBar').textContent = fmt(mainTotalKg, 2) + ' kg';
+    document.getElementById('resDistDiaLabel').textContent = distDia;
+    document.getElementById('resDistBar').textContent = fmt(distTotalKg, 2) + ' kg';
+    document.getElementById('resSlabRebar').textContent = fmt(slabRebarKg, 2) + ' kg';
+
+    document.getElementById('resBarADiaLabel').textContent = bBarADia;
+    document.getElementById('resBeamBarA').textContent = fmt(beamBarAKg, 2) + ' kg';
+    document.getElementById('resBarBDiaLabel').textContent = bBarBDia;
+    document.getElementById('resBeamBarB').textContent = fmt(beamBarBKg, 2) + ' kg';
+    document.getElementById('resStirrupDiaLabel').textContent = stirDia;
+    document.getElementById('resStirrup').textContent = fmt(stirrupKg, 2) + ' kg';
+
+    document.getElementById('resTotalRebar').textContent = fmt(totalRebarKg, 2) + ' kg';
+    document.getElementById('resRebarCost').textContent = fmtCost(rebarCost);
+
+    document.getElementById('resShuttering').textContent = fmt(shutteringArea, 2) + ' sq ft';
+    document.getElementById('resShutteringCost').textContent = fmtCost(shutteringCost);
+    document.getElementById('resTotalCost').textContent = fmtCost(totalCost);
+
+    document.getElementById('resultsSection').style.display = 'block';
+  }
+
+  function resetForm() {
+    const defaults = {
+      roofLength: '43', lengthUnit: 'ft',
+      roofWidth: '28', widthUnit: 'ft',
+      slabThick: '5', thickUnit: 'inch',
+      longBeams: '3', shortBeams: '5',
+      beamWidth: '10', beamWUnit: 'inch',
+      beamDepth: '12', beamDUnit: 'inch',
+      cementRate: '750', sandRate: '640', aggRate: '1440',
+      rebarRate: '110', shutteringRate: '45',
+      mixCement: '1', mixSand: '1.5', mixAgg: '3', dryFactor: '1.54',
+      slabType: 'single',
+      mainBarDia: '8', mainBarSpacing: '6',
+      distBarDia: '8', distBarSpacing: '6',
+      beamBarADia: '16', beamBarAQty: '4',
+      beamBarBDia: '12', beamBarBQty: '2',
+      stirrupDia: '8', stirrupSpacing: '5',
+      clearCover: '1.5', wastage: '10'
+    };
+    for (const [id, val] of Object.entries(defaults)) {
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    }
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .disclaimer {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    background: #fff8e6;
+    border: 1px solid #f0d78e;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .input-with-unit select {
+    width: 90px;
+    flex-shrink: 0;
+  }
+
+  .unit-label {
+    display: flex;
+    align-items: center;
+    height: 44px;
+    padding: 0 14px;
+    background: var(--bg-hover);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .table-heading {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 24px 0 12px;
+  }
+
+  .calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .calc-table th,
+  .calc-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .calc-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .calc-table td:nth-child(2),
+  .calc-table td:nth-child(3) {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  .calc-table td:nth-child(3) {
+    color: var(--color-success);
+  }
+
+  .total-row td {
+    border-top: 2px solid var(--border-strong);
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .total-row td:last-child {
+    font-size: 16px;
+    color: var(--color-success);
+  }
+
+  @media (max-width: 768px) {
+    .input-with-unit select {
+      width: 75px;
+    }
+  }
+</style>

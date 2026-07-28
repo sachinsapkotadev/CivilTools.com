@@ -1,0 +1,14 @@
+dist/
+node_modules/
+.astro/
+.wrangler/
+.wrangler-local/
+public/sitemap.xml
+package-lock.json
+*.apk
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.ico

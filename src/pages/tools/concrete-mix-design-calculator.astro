@@ -1,0 +1,424 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Concrete Mix Design Calculator" 
+  description="Easily calculate cement, sand, aggregate, and water requirements for any grade of concrete using the standard mix design method."
+  eyebrow="Mix Design Tool"
+>
+  <div class="calculator-card">
+    <h2 class="section-title">Input Parameters</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Grade of Concrete</label>
+        <select id="gradeSelect">
+          <option value="1:1.5:3" selected>M20 (1:1.5:3)</option>
+          <option value="1:1:2">M25 (1:1:2)</option>
+          <option value="1:0.75:1.5">M30 (1:0.75:1.5)</option>
+          <option value="1:0.5:1">M35 (1:0.5:1)</option>
+          <option value="1:0.25:0.5">M40 (1:0.25:0.5)</option>
+          <option value="1:5:10">M5 (1:5:10)</option>
+          <option value="1:4:8">M7.5 (1:4:8)</option>
+          <option value="1:3:6">M10 (1:3:6)</option>
+          <option value="1:2:4">M15 (1:2:4)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Required Volume of Concrete</label>
+        <div class="input-with-unit">
+          <input type="number" id="volumeInput" value="1" step="any" min="0" />
+          <span class="unit-label">meter&sup3;</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Water Cement Ratio</label>
+        <div class="input-with-unit">
+          <input type="number" id="wcRatio" value="0.5" step="0.05" min="0.1" max="1" />
+          <span class="unit-label">W/C</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Wet to Dry Volume Conversion Factor (%)</label>
+        <div class="input-with-unit">
+          <input type="number" id="dryFactorPct" value="54" step="1" min="0" />
+          <span class="unit-label">%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection">
+      <h2 class="section-title">Calculation Results</h2>
+
+      <div class="table-wrap">
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th>Material</th>
+              <th>Volume</th>
+              <th>Weight / Quantity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-label">Total Dry Volume</td>
+              <td id="resDryVol" class="td-value">1.54 m&sup3;</td>
+              <td class="td-sub">-</td>
+            </tr>
+            <tr>
+              <td class="td-label">Cement Required</td>
+              <td id="resCementVol" class="td-value">0.28 m&sup3;</td>
+              <td id="resCementDetail" class="td-sub">403.2 Kg | 8.06 Bags (50kg)</td>
+            </tr>
+            <tr>
+              <td class="td-label">Sand Required</td>
+              <td id="resSandVol" class="td-value">0.42 m&sup3;</td>
+              <td class="td-sub">-</td>
+            </tr>
+            <tr>
+              <td class="td-label">Aggregate Required</td>
+              <td id="resAggVol" class="td-value">0.84 m&sup3;</td>
+              <td class="td-sub">-</td>
+            </tr>
+            <tr>
+              <td class="td-label">Water Required</td>
+              <td class="td-value">-</td>
+              <td id="resWater" class="td-sub">201.6 Liter</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="table-heading">Detailed Breakdown</h3>
+      <div class="table-wrap">
+        <table class="breakdown-table">
+          <thead>
+            <tr>
+              <th>Material</th>
+              <th>Volume (m&sup3;)</th>
+              <th>Weight (Kg)</th>
+              <th>Bags (50kg)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Cement</td>
+              <td id="detCementVol">0.28</td>
+              <td id="detCementMass">403.2</td>
+              <td id="detCementBags">8.06</td>
+            </tr>
+            <tr>
+              <td>Sand</td>
+              <td id="detSandVol">0.42</td>
+              <td id="detSandMass">-</td>
+              <td>-</td>
+            </tr>
+            <tr>
+              <td>Aggregate</td>
+              <td id="detAggVol">0.84</td>
+              <td id="detAggMass">-</td>
+              <td>-</td>
+            </tr>
+            <tr>
+              <td>Water</td>
+              <td>-</td>
+              <td id="detWaterMass">201.6</td>
+              <td>-</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Mix Ratio (C:S:A)</span>
+          <span id="infoMixRatio" class="info-value">1 : 1.5 : 3</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Water-Cement Ratio</span>
+          <span id="infoWCRatio" class="info-value">0.50</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Total Dry Volume</span>
+          <span id="infoDryVol" class="info-value large">1.54 m&sup3;</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function getGradeParts(grade) {
+    const parts = grade.split(':').map(Number);
+    return { cement: parts[0], sand: parts[1], agg: parts[2] };
+  }
+
+  function formatNum(v, d) {
+    return v.toFixed(d);
+  }
+
+  function calculate() {
+    const gradeVal = document.getElementById('gradeSelect').value;
+    const volume = parseFloat(document.getElementById('volumeInput').value) || 0;
+    const wc = parseFloat(document.getElementById('wcRatio').value) || 0.5;
+    const dryPct = parseFloat(document.getElementById('dryFactorPct').value) || 54;
+
+    const { cement: cPart, sand: sPart, agg: aPart } = getGradeParts(gradeVal);
+    const totalParts = cPart + sPart + aPart;
+
+    const dryFactor = 1 + dryPct / 100;
+    const dryVol = volume * dryFactor;
+
+    const cementVol = totalParts > 0 ? (cPart / totalParts) * dryVol : 0;
+    const cementMass = cementVol * 1440;
+    const cementBags = cementMass / 50;
+
+    const sandVol = totalParts > 0 ? (sPart / totalParts) * dryVol : 0;
+    const aggVol = totalParts > 0 ? (aPart / totalParts) * dryVol : 0;
+
+    const waterLiters = cementMass * wc;
+
+    const gradeLabelMap = {
+      '1:1.5:3': 'M20',
+      '1:1:2': 'M25',
+      '1:0.75:1.5': 'M30',
+      '1:0.5:1': 'M35',
+      '1:0.25:0.5': 'M40',
+      '1:5:10': 'M5',
+      '1:4:8': 'M7.5',
+      '1:3:6': 'M10',
+      '1:2:4': 'M15'
+    };
+    const gradeLabel = gradeLabelMap[gradeVal] || gradeVal;
+
+    document.getElementById('resDryVol').innerHTML = formatNum(dryVol, 2) + ' m&sup3;';
+    document.getElementById('resCementVol').innerHTML = formatNum(cementVol, 2) + ' m&sup3;';
+    document.getElementById('resCementDetail').innerHTML = formatNum(cementMass, 1) + ' Kg | ' + formatNum(cementBags, 2) + ' Bags (50kg)';
+    document.getElementById('resSandVol').innerHTML = formatNum(sandVol, 2) + ' m&sup3;';
+    document.getElementById('resAggVol').innerHTML = formatNum(aggVol, 2) + ' m&sup3;';
+    document.getElementById('resWater').innerHTML = formatNum(waterLiters, 1) + ' Liter';
+
+    document.getElementById('detCementVol').textContent = formatNum(cementVol, 2);
+    document.getElementById('detCementMass').textContent = formatNum(cementMass, 1);
+    document.getElementById('detCementBags').textContent = formatNum(cementBags, 2);
+    document.getElementById('detSandVol').textContent = formatNum(sandVol, 2);
+    document.getElementById('detAggVol').textContent = formatNum(aggVol, 2);
+    document.getElementById('detWaterMass').textContent = formatNum(waterLiters, 1);
+
+    document.getElementById('infoMixRatio').textContent = gradeLabel + ' (' + gradeVal.replace(/:/g, ' : ') + ')';
+    document.getElementById('infoWCRatio').textContent = formatNum(wc, 2);
+    document.getElementById('infoDryVol').innerHTML = formatNum(dryVol, 2) + ' m&sup3;';
+  }
+
+  function resetForm() {
+    document.getElementById('gradeSelect').value = '1:1.5:3';
+    document.getElementById('volumeInput').value = '1';
+    document.getElementById('wcRatio').value = '0.5';
+    document.getElementById('dryFactorPct').value = '54';
+    calculate();
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .input-with-unit select {
+    width: 80px;
+    flex-shrink: 0;
+  }
+
+  .unit-label {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { opacity: 0.85; }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .table-heading {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 24px 0 12px;
+  }
+
+  .result-table,
+  .breakdown-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .result-table th,
+  .result-table td,
+  .breakdown-table th,
+  .breakdown-table td {
+    padding: 12px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .result-table th,
+  .breakdown-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .result-table .td-label {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .result-table .td-value {
+    font-weight: 600;
+    color: var(--link-blue);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .result-table .td-sub {
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .breakdown-table td:first-child {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .breakdown-table td:not(:first-child) {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 24px;
+    padding: 20px;
+    background: var(--result-bg);
+    border: 1px solid var(--result-border);
+    border-radius: 10px;
+  }
+
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .info-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--result-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .info-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .info-value.large {
+    font-size: 20px;
+    color: var(--link-blue);
+  }
+
+  @media (max-width: 768px) {
+    .info-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      padding: 16px;
+    }
+    .result-table td,
+    .breakdown-table td {
+      padding: 10px 12px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .info-grid {
+      padding: 14px;
+    }
+    .info-value.large {
+      font-size: 18px;
+    }
+  }
+</style>

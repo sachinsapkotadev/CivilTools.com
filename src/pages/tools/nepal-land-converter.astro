@@ -1,0 +1,413 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+
+const pageTitle = "Land Area Unit Converter for Nepal | Ropani, Bigha, Sq Ft";
+const pageDesc = "Convert between traditional Nepali land measurement systems (Ropani-Aana-Paisa-Dam & Bigha-Kattha-Dhur) and international units (Sq Ft, Sq M, Hectare, Acre) accurately.";
+const keywords = "nepal land area converter, ropani to bigha, ropani to square feet, bigha to sq ft, aana to sq ft, land measurement nepal, bigha kattha dhur to ropani";
+const canonicalUrl = "/tools/nepal-land-converter";
+
+const appSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Land Area Unit Converter for Nepal",
+  "url": "https://www.civiltools.com/tools/nepal-land-converter",
+  "description": pageDesc,
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "All",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How many square feet are in 1 Ropani?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "1 Ropani is equal to exactly 5,476 square feet (or 508.72 square meters)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How many Kattha are in 1 Bigha in Nepal?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "In the Terai land system of Nepal, 1 Bigha is equal to 20 Kattha, and 1 Kattha is equal to 20 Dhur. Therefore, 1 Bigha equals 400 Dhur."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the difference between the Hill and Terai land measurement systems in Nepal?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The Hill system is based on Ropani (comprising Ropani, Aana, Paisa, and Dam), where 1 Ropani = 5,476 sq ft. The Terai system is based on Bigha (comprising Bigha, Kattha, and Dhur), where 1 Bigha = 72,900 sq ft."
+      }
+    }
+  ]
+};
+
+const pageSchemas = [appSchema, faqSchema];
+---
+
+<ToolLayout 
+  title="Land Area Unit Converter for Nepal" 
+  description={pageDesc}
+  eyebrow="Conversion Tool"
+  canonical={canonicalUrl}
+  keywords={keywords}
+  schema={pageSchemas}
+>
+  <div class="calculator-card">
+    <div class="input-grid">
+      <div class="input-group">
+        <label for="fromUnit">Convert From</label>
+        <select id="fromUnit">
+          <optgroup label="Hill System (Ropani)">
+            <option value="ropani">Ropani</option>
+            <option value="aana">Aana</option>
+            <option value="paisa">Paisa</option>
+            <option value="dam">Dam</option>
+          </optgroup>
+          <optgroup label="Terai System (Bigha)">
+            <option value="bigha">Bigha</option>
+            <option value="kattha">Kattha</option>
+            <option value="dhur">Dhur</option>
+          </optgroup>
+          <optgroup label="Standard Units">
+            <option value="sqm" selected>Square Meters (m²)</option>
+            <option value="sqft">Square Feet (ft²)</option>
+            <option value="acre">Acres</option>
+            <option value="hectare">Hectares</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="fromValue">Value</label>
+        <input type="number" id="fromValue" value="1" step="any" />
+      </div>
+    </div>
+
+    <div class="main-results-display">
+      <div class="result-panel">
+        <div class="panel-header">Hill System</div>
+        <div class="panel-body">
+          <div class="formatted-result" id="formattedHill">0 Ropani, 0 Aana, 0 Paisa, 0 Dam</div>
+          <div class="unit-pills">
+            <div class="pill"><strong>R:</strong> <span id="resRopani">0</span></div>
+            <div class="pill"><strong>A:</strong> <span id="resAana">0</span></div>
+            <div class="pill"><strong>P:</strong> <span id="resPaisa">0</span></div>
+            <div class="pill"><strong>D:</strong> <span id="resDam">0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-panel">
+        <div class="panel-header">Terai System</div>
+        <div class="panel-body">
+          <div class="formatted-result" id="formattedTerai">0 Bigha, 0 Kattha, 0 Dhur</div>
+          <div class="unit-pills">
+            <div class="pill"><strong>B:</strong> <span id="resBigha">0</span></div>
+            <div class="pill"><strong>K:</strong> <span id="resKattha">0</span></div>
+            <div class="pill"><strong>Dh:</strong> <span id="resDhur">0</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="results-section">
+      <h3>International Equivalents</h3>
+      <div class="standard-grid">
+        <div class="std-item">
+          <span class="l">Square Meters</span>
+          <span class="v" id="resSqm">0</span>
+        </div>
+        <div class="std-item">
+          <span class="l">Square Feet</span>
+          <span class="v" id="resSqft">0</span>
+        </div>
+        <div class="std-item">
+          <span class="l">Acres</span>
+          <span class="v" id="resAcre">0</span>
+        </div>
+        <div class="std-item">
+          <span class="l">Hectares</span>
+          <span class="v" id="resHectare">0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <h3>Reference Table</h3>
+      <div class="ref-split">
+        <div class="ref-col">
+          <h4>Hill System (Ropani)</h4>
+          <ul>
+            <li>1 Ropani = 16 Aana</li>
+            <li>1 Aana = 4 Paisa</li>
+            <li>1 Paisa = 4 Dam</li>
+            <li>1 Ropani = 5476 Sq. Ft (508.72 m²)</li>
+          </ul>
+        </div>
+        <div class="ref-col">
+          <h4>Terai System (Bigha)</h4>
+          <ul>
+            <li>1 Bigha = 20 Kattha</li>
+            <li>1 Kattha = 20 Dhur</li>
+            <li>1 Bigha = 72,900 Sq. Ft (6772.63 m²)</li>
+            <li>1 Kattha = 3,645 Sq. Ft (338.63 m²)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Educational Content for SEO and AEO -->
+    <article class="seo-article" style="margin-top: 40px; border-top: 1px solid var(--border); padding-top: 40px; line-height: 1.6; font-size: 15px;">
+      <h2 style="color: var(--text-primary); font-size: 22px; margin-bottom: 16px; font-weight: 600;">Traditional Nepali Land Measurement Systems</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 20px;">
+        In Nepal, two traditional land measurement systems coexist alongside international standard units like square feet, square meters, acres, and hectares. The **Hill System (Ropani-Aana-Paisa-Dam)** is used in hilly and mountainous regions including Kathmandu Valley. The **Terai System (Bigha-Kattha-Dhur)** is used in the flat Terai plains of southern Nepal.
+      </p>
+
+      <h3 style="color: var(--text-primary); font-size: 18px; margin-top: 24px; margin-bottom: 12px; font-weight: 600;">The Hill System (Ropani System)</h3>
+      <p style="color: var(--text-secondary); margin-bottom: 20px;">
+        The Ropani system is divided hierarchically as follows:
+      </p>
+      <ul style="color: var(--text-secondary); margin-bottom: 20px; padding-left: 20px;">
+        <li style="margin-bottom: 8px;"><strong>1 Ropani</strong> = 16 Aana = 5476 sq. ft = 508.72 m²</li>
+        <li style="margin-bottom: 8px;"><strong>1 Aana</strong> = 4 Paisa = 342.25 sq. ft = 31.795 m²</li>
+        <li style="margin-bottom: 8px;"><strong>1 Paisa</strong> = 4 Dam = 85.56 sq. ft = 7.949 m²</li>
+        <li style="margin-bottom: 8px;"><strong>1 Dam</strong> = 21.39 sq. ft = 1.987 m²</li>
+      </ul>
+
+      <h3 style="color: var(--text-primary); font-size: 18px; margin-top: 24px; margin-bottom: 12px; font-weight: 600;">The Terai System (Bigha System)</h3>
+      <p style="color: var(--text-secondary); margin-bottom: 20px;">
+        The Bigha system is divided hierarchically as follows:
+      </p>
+      <ul style="color: var(--text-secondary); margin-bottom: 20px; padding-left: 20px;">
+        <li style="margin-bottom: 8px;"><strong>1 Bigha</strong> = 20 Kattha = 72900 sq. ft = 6772.63 m² (approx. 1.6 acres)</li>
+        <li style="margin-bottom: 8px;"><strong>1 Kattha</strong> = 20 Dhur = 3645 sq. ft = 338.63 m²</li>
+        <li style="margin-bottom: 8px;"><strong>1 Dhur</strong> = 182.25 sq. ft = 16.93 m²</li>
+      </ul>
+
+      <h3 style="color: var(--text-primary); font-size: 18px; margin-top: 24px; margin-bottom: 16px; font-weight: 600;">Frequently Asked Questions (FAQ)</h3>
+      <div class="faq-section" style="display: flex; flex-direction: column; gap: 20px;">
+        <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+          <h4 style="color: var(--text-primary); font-size: 15px; margin-bottom: 8px; font-weight: 600;">How many Aana make 1 Ropani?</h4>
+          <p style="color: var(--text-secondary); margin: 0;">
+            Exactly 16 Aana make 1 Ropani.
+          </p>
+        </div>
+        <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+          <h4 style="color: var(--text-primary); font-size: 15px; margin-bottom: 8px; font-weight: 600;">How many square feet are in 1 Kattha?</h4>
+          <p style="color: var(--text-secondary); margin: 0;">
+            In Nepal, 1 Kattha is equal to exactly 3,645 square feet (or 338.63 square meters).
+          </p>
+        </div>
+        <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+          <h4 style="color: var(--text-primary); font-size: 15px; margin-bottom: 8px; font-weight: 600;">How do you convert Bigha to Ropani?</h4>
+          <p style="color: var(--text-secondary); margin: 0;">
+            To convert Bigha to Ropani, you can convert Bigha to square feet (Bigha * 72,900) and then divide the result by 5,476 (square feet per Ropani). 1 Bigha is approximately equal to 13.31 Ropani.
+          </p>
+        </div>
+      </div>
+    </article>
+  </div>
+</ToolLayout>
+
+<script>
+  const fromUnit = document.getElementById('fromUnit') as HTMLSelectElement;
+  const fromValue = document.getElementById('fromValue') as HTMLInputElement;
+
+  // Constants based on government standards
+  const units = {
+    ropani: 508.72,
+    aana: 31.795,
+    paisa: 7.94875,
+    dam: 1.9871875,
+    bigha: 6772.63,
+    kattha: 338.6315,
+    dhur: 16.931575,
+    sqm: 1,
+    sqft: 0.092903,
+    acre: 4046.86,
+    hectare: 10000
+  };
+
+  function update() {
+    const val = parseFloat(fromValue.value) || 0;
+    const unit = fromUnit.value;
+    const sqmTotal = val * units[unit];
+
+    // Standard Results
+    document.getElementById('resSqm')!.textContent = sqmTotal.toLocaleString(undefined, {maximumFractionDigits: 4}) + ' m²';
+    document.getElementById('resSqft')!.textContent = (sqmTotal / units.sqft).toLocaleString(undefined, {maximumFractionDigits: 2}) + ' ft²';
+    document.getElementById('resAcre')!.textContent = (sqmTotal / units.acre).toLocaleString(undefined, {maximumFractionDigits: 6});
+    document.getElementById('resHectare')!.textContent = (sqmTotal / units.hectare).toLocaleString(undefined, {maximumFractionDigits: 6});
+
+    // Hill System Breakdown
+    let r = Math.floor(sqmTotal / units.ropani);
+    let remR = sqmTotal % units.ropani;
+    let a = Math.floor(remR / units.aana);
+    let remA = remR % units.aana;
+    let p = Math.floor(remA / units.paisa);
+    let remP = remA % units.paisa;
+    let d = parseFloat((remP / units.dam).toFixed(2));
+
+    document.getElementById('resRopani')!.textContent = r.toString();
+    document.getElementById('resAana')!.textContent = a.toString();
+    document.getElementById('resPaisa')!.textContent = p.toString();
+    document.getElementById('resDam')!.textContent = d.toString();
+    document.getElementById('formattedHill')!.textContent = `${r} Ropani, ${a} Aana, ${p} Paisa, ${d} Dam`;
+
+    // Terai System Breakdown
+    let b = Math.floor(sqmTotal / units.bigha);
+    let remB = sqmTotal % units.bigha;
+    let k = Math.floor(remB / units.kattha);
+    let remK = remB % units.kattha;
+    let dh = parseFloat((remK / units.dhur).toFixed(2));
+
+    document.getElementById('resBigha')!.textContent = b.toString();
+    document.getElementById('resKattha')!.textContent = k.toString();
+    document.getElementById('resDhur')!.textContent = dh.toString();
+    document.getElementById('formattedTerai')!.textContent = `${b} Bigha, ${k} Kattha, ${dh} Dhur`;
+  }
+
+  fromUnit.addEventListener('change', update);
+  fromValue.addEventListener('input', update);
+  update();
+</script>
+
+<style>
+  .main-results-display {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .result-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+
+  .panel-header {
+    background: #171717;
+    color: #ffffff;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .panel-body {
+    padding: 24px;
+  }
+
+  .formatted-result {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+  }
+
+  .unit-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .pill {
+    background: var(--bg-hover);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .pill strong {
+    color: var(--text-primary);
+    margin-right: 4px;
+  }
+
+  .standard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .std-item {
+    background: var(--bg-page);
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .std-item .l {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .std-item .v {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .ref-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  .ref-col h4 {
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+
+  .ref-col ul {
+    list-style: none;
+    padding: 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .info-grid {
+    margin-top: 48px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .info-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .info-card h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+  }
+  @media (max-width: 768px) {
+    .main-results-display, .ref-split { grid-template-columns: 1fr; }
+  }
+</style>

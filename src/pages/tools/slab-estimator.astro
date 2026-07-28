@@ -1,0 +1,448 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Slab Estimator" 
+  description="Estimate concrete volume, reinforcement quantities, cutting lengths, and material requirements for RCC slabs including top and bottom mesh."
+  eyebrow="Estimation Tool"
+>
+  <div class="calculator-card">
+    <h2 class="section-title">A. Slab Dimension</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Length (A-A)</label>
+        <div class="input-with-unit">
+          <input type="number" id="slabLength" value="5" step="any" />
+          <select id="lengthUnit">
+            <option value="meter">meter</option>
+            <option value="feet">feet</option>
+            <option value="inch">inch</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Width (B-B)</label>
+        <div class="input-with-unit">
+          <input type="number" id="slabWidth" value="3" step="any" />
+          <select id="widthUnit">
+            <option value="meter">meter</option>
+            <option value="feet">feet</option>
+            <option value="inch">inch</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Height/Thickness</label>
+        <div class="input-with-unit">
+          <input type="number" id="slabThk" value="200" step="any" />
+          <select id="thkUnit">
+            <option value="mm">mm</option>
+            <option value="inch">inch</option>
+            <option value="feet">feet</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">B. Reinforcement Detail</h2>
+    <h3 class="sub-section-title">a. Top Mesh Rebar</h3>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Dia. (A-A direction)</label>
+        <div class="input-with-unit">
+          <input type="number" id="topAA" value="10" step="any" min="1" />
+          <span class="unit-label">mm</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Spacing (A-A direction)</label>
+        <div class="input-with-unit">
+          <input type="number" id="topAASpacing" value="110" step="any" min="1" />
+          <span class="unit-label">mm</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Dia. (B-B direction)</label>
+        <div class="input-with-unit">
+          <input type="number" id="topBB" value="12" step="any" min="1" />
+          <span class="unit-label">mm</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Spacing (B-B direction)</label>
+        <div class="input-with-unit">
+          <input type="number" id="topBBSpacing" value="110" step="any" min="1" />
+          <span class="unit-label">mm</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="sub-section-title">b. Bottom Mesh Rebar</h3>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Dia. (A-A direction)</label>
+        <div class="input-with-unit">
+          <input type="number" id="botAA" value="10" step="any" min="1" />
+          <span class="unit-label">mm</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Spacing (A-A direction)</label>
+        <div class="input-with-unit">
+          <input type="number" id="botAASpacing" value="110" step="any" min="1" />
+          <span class="unit-label">mm</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Dia. (B-B direction)</label>
+        <div class="input-with-unit">
+          <input type="number" id="botBB" value="12" step="any" min="1" />
+          <span class="unit-label">mm</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Spacing (B-B direction)</label>
+        <div class="input-with-unit">
+          <input type="number" id="botBBSpacing" value="110" step="any" min="1" />
+          <span class="unit-label">mm</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Extra Rebar %</label>
+        <div class="input-with-unit">
+          <input type="number" id="extraRebar" value="5" step="1" min="0" />
+          <span class="unit-label">%</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">C. Concrete Mix Detail</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Ratio of Cement : Sand : Aggregate</label>
+        <div class="triple-input">
+          <input type="number" id="mixCement" value="1" step="1" min="1" />
+          <span class="split-sep">:</span>
+          <input type="number" id="mixSand" value="2" step="1" min="1" />
+          <span class="split-sep">:</span>
+          <input type="number" id="mixAgg" value="3" step="1" min="1" />
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Wet Volume to Dry Factor</label>
+        <div class="input-with-unit">
+          <input type="number" id="dryFactor" value="1.54" step="0.01" min="1" />
+          <span class="unit-label">Dry = Wet × factor</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Clear Cover of Slab</label>
+        <div class="input-with-unit">
+          <input type="number" id="clearCover" value="25" step="1" min="0" />
+          <span class="unit-label">mm</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Calculate Estimate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <h3 class="table-heading">Results</h3>
+      <div class="table-wrap">
+      <table class="calc-table">
+        <thead>
+          <tr><th>S.N</th><th>Description</th><th>Value</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Wet Volume of Concrete</td><td id="resWetVol">–</td></tr>
+          <tr><td>2</td><td>Dry Volume of Concrete</td><td id="resDryVol">–</td></tr>
+          <tr><td>3</td><td>No. of Rebar in A-A Direction</td><td id="resNumAA">–</td></tr>
+          <tr><td>4</td><td>Cutting Length of Single Rebar in A-A Direction</td><td id="resCutAA">–</td></tr>
+          <tr><td>5</td><td>No. of Rebar in B-B Direction</td><td id="resNumBB">–</td></tr>
+          <tr><td>6</td><td>Cutting Length of Single Steel in B-B Direction</td><td id="resCutBB">–</td></tr>
+          <tr><td>7</td><td>Volume of Sand Required</td><td id="resSandVol">–</td></tr>
+          <tr><td>8</td><td>Volume of Aggregate Required</td><td id="resAggVol">–</td></tr>
+          <tr><td>9</td><td>Weight of Cement Required</td><td id="resCementWt">–</td></tr>
+          <tr><td>10</td><td>Bags of Cement Required</td><td id="resCementBags">–</td></tr>
+          <tr><td>11</td><td>Total Weight of Rebar Required</td><td id="resRebarWt">–</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function toMeters(val, unit) {
+    if (unit === 'feet') return val * 0.3048;
+    if (unit === 'inch') return val * 0.0254;
+    return val;
+  }
+
+  function toMm(val, unit) {
+    if (unit === 'feet') return val * 304.8;
+    if (unit === 'inch') return val * 25.4;
+    return val;
+  }
+
+  function formatNum(v, d) {
+    return v.toFixed(d);
+  }
+
+  function calculate() {
+    const slabLengthRaw = parseFloat(document.getElementById('slabLength').value) || 0;
+    const slabWidthRaw = parseFloat(document.getElementById('slabWidth').value) || 0;
+    const slabThkRaw = parseFloat(document.getElementById('slabThk').value) || 0;
+    const lUnit = document.getElementById('lengthUnit').value;
+    const wUnit = document.getElementById('widthUnit').value;
+    const tUnit = document.getElementById('thkUnit').value;
+
+    const lengthM = toMeters(slabLengthRaw, lUnit);
+    const widthM = toMeters(slabWidthRaw, wUnit);
+    const thkM = toMeters(slabThkRaw, tUnit);
+    const lengthMm = toMm(slabLengthRaw, lUnit);
+    const widthMm = toMm(slabWidthRaw, wUnit);
+
+    const topAA = parseFloat(document.getElementById('topAA').value) || 0;
+    const topAASpacing = parseFloat(document.getElementById('topAASpacing').value) || 1;
+    const topBB = parseFloat(document.getElementById('topBB').value) || 0;
+    const topBBSpacing = parseFloat(document.getElementById('topBBSpacing').value) || 1;
+
+    const botAA = parseFloat(document.getElementById('botAA').value) || 0;
+    const botAASpacing = parseFloat(document.getElementById('botAASpacing').value) || 1;
+    const botBB = parseFloat(document.getElementById('botBB').value) || 0;
+    const botBBSpacing = parseFloat(document.getElementById('botBBSpacing').value) || 1;
+
+    const extraRebar = parseFloat(document.getElementById('extraRebar').value) || 0;
+    const mixC = parseFloat(document.getElementById('mixCement').value) || 1;
+    const mixS = parseFloat(document.getElementById('mixSand').value) || 1;
+    const mixA = parseFloat(document.getElementById('mixAgg').value) || 1;
+    const dryFactor = parseFloat(document.getElementById('dryFactor').value) || 1.54;
+    const coverMm = parseFloat(document.getElementById('clearCover').value) || 0;
+
+    const wetVol = lengthM * widthM * thkM;
+    const dryVol = wetVol * dryFactor;
+    const totalParts = mixC + mixS + mixA;
+
+    const numAA = widthMm / topAASpacing;
+    const numBB = lengthMm / topBBSpacing;
+
+    const coverM = coverMm / 1000;
+    const cutLengthAAM = lengthM - 2 * coverM;
+    const cutLengthBBM = widthM - 2 * coverM;
+    const cutLengthAAFt = cutLengthAAM / 0.3048;
+    const cutLengthBBFt = cutLengthBBM / 0.3048;
+
+    function rebarWeight(diaMm, count, lengthM) {
+      if (diaMm <= 0 || count <= 0 || lengthM <= 0) return 0;
+      return count * lengthM * (diaMm * diaMm / 162);
+    }
+
+    const topAAWt = rebarWeight(topAA, numAA, cutLengthAAM);
+    const topBBWt = rebarWeight(topBB, numBB, cutLengthBBM);
+    const botAAWt = rebarWeight(botAA, numAA, cutLengthAAM);
+    const botBBWt = rebarWeight(botBB, numBB, cutLengthBBM);
+    const rebarSubtotal = topAAWt + topBBWt + botAAWt + botBBWt;
+    const rebarTotal = rebarSubtotal * (1 + extraRebar / 100);
+
+    const cementVol = totalParts > 0 ? (mixC / totalParts) * dryVol : 0;
+    const sandVol = totalParts > 0 ? (mixS / totalParts) * dryVol : 0;
+    const aggVol = totalParts > 0 ? (mixA / totalParts) * dryVol : 0;
+    const cementWt = cementVol * 1440;
+    const cementBags = cementWt / 50;
+
+    document.getElementById('resWetVol').textContent = formatNum(wetVol, 3) + ' m³';
+    document.getElementById('resDryVol').textContent = formatNum(dryVol, 3) + ' m³';
+    document.getElementById('resNumAA').textContent = formatNum(numAA, 3) + ' Nos.';
+    document.getElementById('resCutAA').textContent = formatNum(cutLengthAAFt, 3) + ' Foot';
+    document.getElementById('resNumBB').textContent = formatNum(numBB, 3) + ' Nos.';
+    document.getElementById('resCutBB').textContent = formatNum(cutLengthBBFt, 3) + ' Foot';
+    document.getElementById('resSandVol').textContent = formatNum(sandVol, 2) + ' m³';
+    document.getElementById('resAggVol').textContent = formatNum(aggVol, 2) + ' m³';
+    document.getElementById('resCementWt').textContent = formatNum(cementWt, 1) + ' Kg';
+    document.getElementById('resCementBags').textContent = formatNum(cementBags, 3) + ' Nos.';
+    document.getElementById('resRebarWt').textContent = formatNum(rebarTotal, 3) + ' Kg';
+
+    document.getElementById('resultsSection').style.display = 'block';
+  }
+
+  function resetForm() {
+    const vals = {
+      slabLength: '5', lengthUnit: 'meter',
+      slabWidth: '3', widthUnit: 'meter',
+      slabThk: '200', thkUnit: 'mm',
+      topAA: '10', topAASpacing: '110',
+      topBB: '12', topBBSpacing: '110',
+      botAA: '10', botAASpacing: '110',
+      botBB: '12', botBBSpacing: '110',
+      extraRebar: '5',
+      mixCement: '1', mixSand: '2', mixAgg: '3',
+      dryFactor: '1.54',
+      clearCover: '25'
+    };
+    for (const [id, val] of Object.entries(vals)) {
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    }
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .sub-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin: 0 0 12px;
+  }
+
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .input-with-unit select {
+    width: 90px;
+    flex-shrink: 0;
+  }
+
+  .unit-label {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .triple-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .triple-input input {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+  }
+
+  .split-sep {
+    font-size: 14px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .table-heading {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 24px 0 12px;
+  }
+
+  .calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .calc-table th,
+  .calc-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .calc-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .calc-table th:first-child {
+    width: 50px;
+  }
+
+  .calc-table td:first-child {
+    color: var(--text-tertiary);
+    font-size: 13px;
+    text-align: center;
+  }
+
+  .calc-table td:nth-child(3) {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+</style>

@@ -1,0 +1,242 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Building Cost Calculator" 
+  description="Estimate the total cost of building your house based on area, location, and number of storeys."
+  eyebrow="Estimation Tool"
+>
+  <div class="calculator-card">
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Total Area</label>
+        <div class="input-with-unit">
+          <input type="number" id="area" value="1000" step="1" />
+          <select id="areaUnit">
+            <option value="sqft">Sq. Ft</option>
+            <option value="sqm">Sq. Meter</option>
+            <option value="sqyd">Sq. Yard</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Country / Currency</label>
+        <select id="country">
+          <option value="3000" data-curr="₹">India (₹)</option>
+          <option value="3500" data-curr="Rs">Nepal (Rs)</option>
+          <option value="150" data-curr="$">USA ($)</option>
+          <option value="120" data-curr="£">UK (£)</option>
+          <option value="custom" data-curr="Units">Custom Rate</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="input-grid" id="customRateContainer" style="display: none;">
+      <div class="input-group">
+        <label>Custom Rate (per unit area)</label>
+        <input type="number" id="customRate" value="3000" step="1" />
+      </div>
+    </div>
+
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Number of Storeys</label>
+        <select id="storeys">
+          <option value="1">1 Storey (Ground Only)</option>
+          <option value="2">2 Storeys (G + 1)</option>
+          <option value="3">3 Storeys (G + 2)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="results-section">
+      <div class="result-display">
+        <div class="main-result">
+          <span class="label">Estimated Total Cost</span>
+          <div id="resTotalCost" class="result-value large">0.00</div>
+          <p class="sub-text">Including ~2% Design & Consultation fees</p>
+        </div>
+        
+        <div class="breakdown-container">
+          <h3>Cost Component Breakdown</h3>
+          <div class="table-wrap">
+          <table class="breakdown-table">
+            <thead>
+              <tr>
+                <th>S.N</th>
+                <th>Cost Component</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody id="breakdownBody">
+              <!-- Dynamically populated -->
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2">Total Construction Cost</td>
+                <td id="resBaseCostTable">0.00</td>
+              </tr>
+              <tr>
+                <td colspan="2">Design and Consultation Fees (2%)</td>
+                <td id="resFeesTable">0.00</td>
+              </tr>
+              <tr class="total-row">
+                <td colspan="2">Total Estimated Cost</td>
+                <td id="resFinalTotalTable">0.00</td>
+              </tr>
+            </tfoot>
+          </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function update() {
+    const areaInput = document.getElementById('area') as HTMLInputElement;
+    const countrySelect = document.getElementById('country') as HTMLSelectElement;
+    const storeys = parseInt((document.getElementById('storeys') as HTMLSelectElement).value);
+    const customRateInput = document.getElementById('customRate') as HTMLInputElement;
+    const customRateContainer = document.getElementById('customRateContainer') as HTMLElement;
+
+    let area = parseFloat(areaInput.value) || 0;
+    let rate = 0;
+    let currency = countrySelect.options[countrySelect.selectedIndex].dataset.curr;
+
+    if (countrySelect.value === 'custom') {
+      customRateContainer.style.display = 'grid';
+      rate = parseFloat(customRateInput.value) || 0;
+    } else {
+      customRateContainer.style.display = 'none';
+      rate = parseFloat(countrySelect.value);
+    }
+
+    let multiplier = 1;
+    if (storeys === 2) multiplier = 1.7;
+    if (storeys === 3) multiplier = 2.4;
+
+    const baseCost = area * rate * multiplier;
+    const fees = baseCost * 0.02;
+    const totalCost = baseCost + fees;
+
+    document.getElementById('resTotalCost')!.textContent = currency + ' ' + totalCost.toLocaleString(undefined, {maximumFractionDigits: 2});
+    
+    // Detailed Breakdown
+    const components = [
+      { name: "Labour", percent: 0.25 },
+      { name: "Cement", percent: 0.15 },
+      { name: "Sand", percent: 0.05 },
+      { name: "Steel", percent: 0.12 },
+      { name: "Bricks", percent: 0.10 },
+      { name: "Doors and Windows", percent: 0.10 },
+      { name: "Electrical Work", percent: 0.08 },
+      { name: "Plumbing Work", percent: 0.05 },
+      { name: "Finishing (Paint and Plaster)", percent: 0.05 },
+      { name: "Flooring", percent: 0.03 },
+      { name: "Miscellaneous", percent: 0.02 }
+    ];
+
+    const tbody = document.getElementById('breakdownBody')!;
+    tbody.innerHTML = '';
+    
+    components.forEach((comp, index) => {
+      const amount = baseCost * comp.percent;
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${comp.name}</td>
+        <td>${currency} ${amount.toLocaleString(undefined, {maximumFractionDigits: 2})}</td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    // Add Contingency Fund as a reference item in the table (5%)
+    const contingency = baseCost * 0.05;
+    const contRow = document.createElement('tr');
+    contRow.innerHTML = `
+      <td>12</td>
+      <td>Contingency Fund (5%)</td>
+      <td>${currency} ${contingency.toLocaleString(undefined, {maximumFractionDigits: 2})}</td>
+    `;
+    tbody.appendChild(contRow);
+
+    document.getElementById('resBaseCostTable')!.textContent = currency + ' ' + baseCost.toLocaleString(undefined, {maximumFractionDigits: 2});
+    document.getElementById('resFeesTable')!.textContent = currency + ' ' + fees.toLocaleString(undefined, {maximumFractionDigits: 2});
+    document.getElementById('resFinalTotalTable')!.textContent = currency + ' ' + totalCost.toLocaleString(undefined, {maximumFractionDigits: 2});
+  }
+
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('input', update);
+  });
+
+  update();
+</script>
+
+<style>
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+  }
+  .input-with-unit input {
+    flex: 1;
+  }
+  .input-with-unit select {
+    width: 120px;
+  }
+  .result-display {
+    background: var(--result-bg);
+    padding: 32px;
+    border-radius: 12px;
+    text-align: center;
+  }
+  .main-result {
+    margin-bottom: 32px;
+  }
+  .main-result .label {
+    font-size: 14px;
+    color: var(--result-text-muted);
+    margin-bottom: 8px;
+    display: block;
+  }
+  
+  .breakdown-container {
+    text-align: left;
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 1px solid var(--result-border);
+  }
+  .breakdown-container h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+  }
+  .breakdown-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .breakdown-table th, .breakdown-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--result-border);
+    text-align: left;
+  }
+  .breakdown-table th {
+    background: var(--result-bg);
+    color: var(--result-text-muted);
+    font-weight: 500;
+  }
+  .breakdown-table tfoot td {
+    font-weight: 600;
+    background: var(--result-bg);
+  }
+  .total-row td {
+    background: var(--table-header-bg) !important;
+    font-size: 16px;
+    color: var(--text-primary);
+  }
+</style>
+

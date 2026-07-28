@@ -1,0 +1,269 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Steel Bar Weight Calculator in Feet With Total Cost"
+  description="Calculate the total weight and cost of steel bars when the length is measured in feet. Uses the formula (D² × L) / 533 with steel density 7800 kg/m³."
+  eyebrow="Steel Weight Tool"
+>
+  <div class="calculator-card">
+    <div class="note-box">
+      <strong>Standard Data used in this Calculator</strong><br />
+      Density of steel = 7800 Kg/m&sup3;<br />
+      Formula, Weight of Steel rod = (d&sup2; &times; L) / 533<br />
+      Where, (L) is the length of the rod in feet and (d) is the diameter in millimetre.
+    </div>
+
+    <h2 class="section-title">Enter Details of steel Rod</h2>
+    <p class="section-subtitle">Length of steel rod must be in Feet</p>
+
+    <div class="input-table-wrap">
+      <table class="input-table">
+        <tbody>
+          <tr>
+            <td class="td-label">Input Diameter (in mm):</td>
+            <td><div class="inline-unit-input"><input type="number" id="barDia" class="inline-input" value="12" step="any" min="0" /></div></td>
+          </tr>
+          <tr>
+            <td class="td-label">Input Length (in Feet):</td>
+            <td><div class="inline-unit-input"><input type="number" id="barLength" class="inline-input" value="40" step="any" min="0" /></div></td>
+          </tr>
+          <tr>
+            <td class="td-label">Input Numbers of Steel Rod (Nos.):</td>
+            <td><div class="inline-unit-input"><input type="number" id="barQty" class="inline-input" value="4" step="1" min="1" /></div></td>
+          </tr>
+          <tr>
+            <td class="td-label">Input Cost of steel Rod per Kg. (Rs):</td>
+            <td><div class="inline-unit-input"><input type="number" id="barRate" class="inline-input" value="155" step="any" min="0" /></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section">
+      <h2 class="section-title">Results</h2>
+      <div class="table-wrap">
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Total Weight of Steel rods (Kg)</td>
+              <td><span id="resWeight">0</span></td>
+            </tr>
+            <tr>
+              <td>Total Cost of steel Rods (Rs.) :</td>
+              <td><span id="resCost">0</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function fmt(v) { return Math.round(v * 100) / 100; }
+
+  function calculate() {
+    const dia = parseFloat(document.getElementById('barDia').value) || 0;
+    const lenFt = parseFloat(document.getElementById('barLength').value) || 0;
+    const qty = parseInt(document.getElementById('barQty').value) || 1;
+    const rate = parseFloat(document.getElementById('barRate').value) || 0;
+
+    const wt = (dia * dia * lenFt * qty) / 533;
+    const cost = wt * rate;
+
+    document.getElementById('resWeight').textContent = fmt(wt);
+    document.getElementById('resCost').textContent = fmt(cost);
+  }
+
+  function resetForm() {
+    document.getElementById('barDia').value = '12';
+    document.getElementById('barLength').value = '40';
+    document.getElementById('barQty').value = '4';
+    document.getElementById('barRate').value = '155';
+    calculate();
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('.input-table .inline-input').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .section-subtitle {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    margin: -8px 0 16px;
+    font-style: italic;
+  }
+
+  .note-box {
+    background: var(--bg-page);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .note-box strong {
+    color: var(--text-primary);
+  }
+
+  .input-table-wrap { overflow-x: auto; }
+
+  .input-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .input-table td {
+    padding: 10px 12px;
+    border: 1px solid var(--result-border);
+    vertical-align: middle;
+  }
+
+  .td-label {
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    width: 55%;
+  }
+
+  .inline-unit-input {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .inline-input {
+    flex: 1;
+    height: 36px;
+    padding: 0 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-input);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    min-width: 80px;
+  }
+
+  .inline-input:focus {
+    outline: none;
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .results-section {
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+
+  .result-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .result-table th,
+  .result-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .result-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .result-table td:first-child {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .result-table td:last-child {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 480px) {
+    .btn-row { flex-direction: column; }
+    .btn-primary, .btn-secondary { width: 100%; }
+    .inline-input { font-size: 13px; height: 32px; }
+  }
+</style>

@@ -1,0 +1,328 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout
+  title="Cutting Length of Rectangular or Square Ties Calculator"
+  description="Calculate the cutting length, number of ties, and total weight of rectangular or square stirrups/ties for columns and beams. Uses CL = 2(a+b) + 6d formula."
+  eyebrow="Cutting Length Tool"
+>
+  <div class="calculator-card">
+    <h2 class="section-title">A) Input detail of member and steel</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>a) Column/Beam size AB × BC</label>
+        <div class="double-input">
+          <input type="number" id="sizeAB" value="300" step="any" min="1" />
+          <span class="split-sep">×</span>
+          <input type="number" id="sizeBC" value="250" step="any" min="1" />
+          <span class="unit-tag">mm</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>b) Diameter of ties/stirrups</label>
+        <div class="input-with-unit">
+          <input type="number" id="barDia" value="6" step="0.5" min="1" />
+          <span class="unit-label">mm</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>c) Clear cover</label>
+        <div class="input-with-unit">
+          <input type="number" id="clearCover" value="25" step="1" min="0" />
+          <span class="unit-label">mm</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">B) Stirrups run and spacing</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>d) Length over which stirrups are provided</label>
+        <div class="input-with-unit">
+          <input type="number" id="runLength" value="10" step="any" min="0" />
+          <select id="runLengthUnit"><option value="ft">feet</option><option value="mm">mm</option><option value="m">m</option></select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>e) Spacing between stirrups</label>
+        <div class="input-with-unit">
+          <input type="number" id="spacing" value="150" step="1" min="1" />
+          <span class="unit-label">mm</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="formula-note">
+      <strong>Cutting length formula used,</strong> CL = 2(a + b) + 18d − 12d = 2(a + b) + 6d, where a = AB − 2×cover, b = BC − 2×cover, d = bar diameter. No. of ties = floor(run length ÷ spacing) + 1. Unit weight = d² ÷ 162.25 kg per meter.
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Re-Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <h2 class="section-title">Concrete Calculator – Calculation</h2>
+
+      <h3 class="table-heading">Inputs summary</h3>
+      <div class="table-wrap">
+      <table class="calc-table">
+        <thead>
+          <tr><th>Item</th><th>Value</th><th>Unit</th><th>Converted</th></tr>
+        </thead>
+        <tbody id="inputSummaryBody">
+          <tr><td>Section size</td><td id="isSectionSize">300 × 250</td><td>mm</td><td>-</td></tr>
+          <tr><td>Clear cover</td><td id="isCover">25</td><td>mm</td><td>-</td></tr>
+          <tr><td>Bar diameter</td><td id="isBarDia">6</td><td>mm</td><td id="isUnitWt">Unit wt = 0.222 kg/m</td></tr>
+          <tr><td>Run length</td><td id="isRunLength">10</td><td id="isRunLengthUnit">ft</td><td id="isRunLengthConverted">3048.0 mm</td></tr>
+          <tr><td>Stirrups spacing</td><td id="isSpacing">150</td><td>mm</td><td>-</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3 class="table-heading">Stirrups results</h3>
+      <div class="table-wrap">
+      <table class="calc-table">
+        <thead>
+          <tr><th>Item</th><th>Value</th><th>Unit</th><th>Notes</th></tr>
+        </thead>
+        <tbody id="resultsBody">
+          <tr><td>Length in AB direction</td><td id="resA">250</td><td>mm</td><td>a = AB − 2×cover</td></tr>
+          <tr><td>Length in BC direction</td><td id="resB">200</td><td>mm</td><td>b = BC − 2×cover</td></tr>
+          <tr><td>Hook length provided</td><td id="resHook">108</td><td>mm</td><td>18d total</td></tr>
+          <tr><td>No. of 90° bends</td><td>3</td><td>nos.</td><td>Deduction 6d</td></tr>
+          <tr><td>No. of 135° bends</td><td>2</td><td>nos.</td><td>Deduction 6d</td></tr>
+          <tr><td>Cutting length per stirrup</td><td id="resCL">936</td><td>mm</td><td>CL = 2(a+b)+6d</td></tr>
+          <tr><td>No. of ties required</td><td id="resTies">21</td><td>nos.</td><td>floor(run/spacing)+1</td></tr>
+          <tr><td>Total steel weight</td><td id="resWeight">4.361</td><td>kg</td><td>d²/162.25 × CL(m) × ties</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function toMm(val, unit) {
+    if (unit === 'ft') return val * 304.8;
+    if (unit === 'm') return val * 1000;
+    return val;
+  }
+
+  function formatNum(v, d) {
+    return Number(v).toFixed(d);
+  }
+
+  function calculate() {
+    const ab = parseFloat(document.getElementById('sizeAB').value) || 0;
+    const bc = parseFloat(document.getElementById('sizeBC').value) || 0;
+    const d = parseFloat(document.getElementById('barDia').value) || 0;
+    const cover = parseFloat(document.getElementById('clearCover').value) || 0;
+    const runRaw = parseFloat(document.getElementById('runLength').value) || 0;
+    const runUnit = document.getElementById('runLengthUnit').value;
+    const spacing = parseFloat(document.getElementById('spacing').value) || 1;
+
+    const runMm = toMm(runRaw, runUnit);
+
+    const a = ab - 2 * cover;
+    const b = bc - 2 * cover;
+    const hook = 18 * d;
+    const bendDed = 12 * d;
+    const clPerStirrup = 2 * (a + b) + 6 * d;
+    const numTies = Math.floor(runMm / spacing) + 1;
+    const unitWt = (d * d) / 162.25;
+    const totalWt = (unitWt * clPerStirrup * numTies) / 1000;
+
+    // Input summary
+    document.getElementById('isSectionSize').textContent = `${ab} × ${bc}`;
+    document.getElementById('isCover').textContent = formatNum(cover, 0);
+    document.getElementById('isBarDia').textContent = formatNum(d, 1);
+    document.getElementById('isUnitWt').textContent = `Unit wt = ${formatNum(unitWt, 3)} kg/m`;
+    document.getElementById('isRunLength').textContent = formatNum(runRaw, 4);
+    document.getElementById('isRunLengthUnit').textContent = runUnit;
+    document.getElementById('isRunLengthConverted').textContent = `${formatNum(runMm, 1)} mm`;
+    document.getElementById('isSpacing').textContent = formatNum(spacing, 0);
+
+    // Results
+    document.getElementById('resA').textContent = formatNum(a, 0);
+    document.getElementById('resB').textContent = formatNum(b, 0);
+    document.getElementById('resHook').textContent = formatNum(hook, 0);
+    document.getElementById('resCL').textContent = formatNum(clPerStirrup, 0);
+    document.getElementById('resTies').textContent = numTies;
+    document.getElementById('resWeight').textContent = formatNum(totalWt, 3);
+
+    document.getElementById('resultsSection').style.display = 'block';
+  }
+
+  function resetForm() {
+    const vals = {
+      sizeAB: '300', sizeBC: '250',
+      barDia: '6', clearCover: '25',
+      runLength: '10', runLengthUnit: 'ft',
+      spacing: '150'
+    };
+    for (const [id, val] of Object.entries(vals)) {
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    }
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .input-with-unit select {
+    width: 80px;
+    flex-shrink: 0;
+  }
+
+  .unit-label {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  .double-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .double-input input {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+  }
+
+  .unit-tag {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .split-sep {
+    font-size: 14px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+  }
+
+  .formula-note {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    font-size: 13px;
+    line-height: 20px;
+    color: var(--text-secondary);
+    margin-top: 24px;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .table-heading {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 24px 0 12px;
+  }
+
+  .calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .calc-table th,
+  .calc-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .calc-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .calc-table td:last-child {
+    color: var(--text-tertiary);
+    font-size: 13px;
+  }
+
+  .calc-table td:nth-child(2) {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+</style>

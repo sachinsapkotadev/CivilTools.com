@@ -1,0 +1,344 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Stair Calculator with Landing" 
+  description="Design dog-legged RCC staircase for residential and commercial buildings. Computes riser, tread, landing width, number of steps per flight, and validates against standard design criteria."
+  eyebrow="Structural Design Tool"
+>
+  <div class="calculator-card">
+    <h2 class="section-title">1. Room Dimensions</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Length of Staircase Room</label>
+        <div class="input-with-unit">
+          <input type="number" id="roomLength" value="12" step="any" min="0" />
+          <span class="unit-label">feet</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Width of Staircase Room</label>
+        <div class="input-with-unit">
+          <input type="number" id="roomWidth" value="8" step="any" min="0" />
+          <span class="unit-label">feet</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Clear Height of Floor</label>
+        <div class="input-with-unit">
+          <input type="number" id="floorHeight" value="10" step="any" min="0" />
+          <span class="unit-label">feet</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">2. Step Dimensions</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Riser Height</label>
+        <div class="input-with-unit">
+          <input type="number" id="riserInput" value="6" step="any" min="0" />
+          <select id="riserUnit">
+            <option value="inch">inch</option>
+            <option value="mm">mm</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Tread Length</label>
+        <div class="input-with-unit">
+          <input type="number" id="treadInput" value="10" step="any" min="0" />
+          <select id="treadUnit">
+            <option value="inch">inch</option>
+            <option value="mm">mm</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Check Design</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <h3 class="section-title" style="margin-top: 0;">Design Status</h3>
+      <div id="statusLanding" class="status-badge"></div>
+      <div id="statusRiser" class="status-badge"></div>
+      <div id="statusTread" class="status-badge"></div>
+
+      <h3 class="section-title">Details</h3>
+      <div class="table-wrap">
+        <table class="calc-table">
+          <thead>
+            <tr><th>Parameter</th><th>Value</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Width of Landing Remained</td><td id="resLandingWidth">–</td></tr>
+            <tr><td>Tread Size</td><td id="resTreadSize">–</td></tr>
+            <tr><td>Riser Size</td><td id="resRiserSize">–</td></tr>
+            <tr><td>Number of Riser (Single Flight)</td><td id="resRiserCount">–</td></tr>
+            <tr><td>Number of Tread (Single Flight)</td><td id="resTreadCount">–</td></tr>
+            <tr><td>Height of Landing from Floor</td><td id="resLandingHeight">–</td></tr>
+            <tr><td>Length of Landing</td><td id="resLandingLength">–</td></tr>
+            <tr><td>Width of Stair (per flight)</td><td id="resStairWidth">–</td></tr>
+            <tr><td>Thickness of Waist Slab</td><td id="resWaistThk">–</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function formatNum(v, d) {
+    return Number(v.toFixed(d));
+  }
+
+  function calculate() {
+    const roomLengthFt = parseFloat(document.getElementById('roomLength').value) || 0;
+    const roomWidthFt = parseFloat(document.getElementById('roomWidth').value) || 0;
+    const floorHeightFt = parseFloat(document.getElementById('floorHeight').value) || 0;
+
+    let riserVal = parseFloat(document.getElementById('riserInput').value) || 0;
+    let treadVal = parseFloat(document.getElementById('treadInput').value) || 0;
+    const riserUnit = document.getElementById('riserUnit').value;
+    const treadUnit = document.getElementById('treadUnit').value;
+
+    if (riserUnit === 'mm') {
+      riserVal = riserVal / 25.4;
+    }
+    if (treadUnit === 'mm') {
+      treadVal = treadVal / 25.4;
+    }
+
+    const riserIn = riserVal;
+    const treadIn = treadVal;
+
+    const roomLengthMm = roomLengthFt * 305;
+    const floorHeightMm = floorHeightFt * 305;
+
+    const riserMm = formatNum(riserIn * 25.4, 3);
+    const treadMm = formatNum(treadIn * 25.4, 3);
+
+    const halfHeightMm = floorHeightMm / 2;
+    const risersPerFlight = halfHeightMm / riserIn / 25.4;
+    const treadsPerFlight = risersPerFlight - 1;
+    const goingMm = treadsPerFlight * treadMm;
+    const landingWidthRemaining = formatNum((roomLengthMm - goingMm) / 305, 3);
+
+    const riserCount = Math.round(risersPerFlight);
+    const treadCount = Math.round(treadsPerFlight);
+
+    const landingHeightFt = floorHeightFt / 2;
+    const landingLengthFt = roomWidthFt;
+    const stairWidthFt = roomWidthFt / 2;
+    const waistThkIn = 4;
+
+    let statusLanding = '';
+    if (landingWidthRemaining < 3) {
+      statusLanding = 'Design failed in Landing width!!';
+    } else if (landingWidthRemaining > 4.5) {
+      statusLanding = 'Design failed in Landing width!!';
+    } else {
+      statusLanding = 'Design Passed in Landing width!!';
+    }
+
+    let statusRiser = '';
+    if (riserIn > 7.5) {
+      statusRiser = 'Design failed in Riser!!';
+    } else if (riserIn < 5) {
+      statusRiser = 'Design failed in Riser!!';
+    } else {
+      statusRiser = 'Design Passed in Riser!!';
+    }
+
+    let statusTread = '';
+    if (treadIn < 9) {
+      statusTread = 'Design failed in Tread!!';
+    } else if (treadIn > 12) {
+      statusTread = 'Design failed in Tread!!';
+    } else {
+      statusTread = 'Design Passed in Tread!!';
+    }
+
+    function setStatus(elId, text) {
+      const el = document.getElementById(elId);
+      el.textContent = text;
+      el.className = 'status-badge';
+      if (text.includes('Passed')) {
+        el.classList.add('passed');
+      } else {
+        el.classList.add('failed');
+      }
+    }
+
+    setStatus('statusLanding', statusLanding);
+    setStatus('statusRiser', statusRiser);
+    setStatus('statusTread', statusTread);
+
+    document.getElementById('resLandingWidth').textContent = landingWidthRemaining + ' Feet';
+    document.getElementById('resTreadSize').textContent = treadMm + ' mm';
+    document.getElementById('resRiserSize').textContent = riserMm + ' mm';
+    document.getElementById('resRiserCount').textContent = riserCount + ' Nos.';
+    document.getElementById('resTreadCount').textContent = treadCount + ' Nos.';
+    document.getElementById('resLandingHeight').textContent = formatNum(landingHeightFt, 2) + ' Feet';
+    document.getElementById('resLandingLength').textContent = formatNum(landingLengthFt, 2) + ' Feet';
+    document.getElementById('resStairWidth').textContent = formatNum(stairWidthFt, 3) + ' Feet';
+    document.getElementById('resWaistThk').textContent = waistThkIn + ' Inch';
+
+    document.getElementById('resultsSection').style.display = 'block';
+  }
+
+  function resetForm() {
+    const defaults = {
+      roomLength: '12',
+      roomWidth: '8',
+      floorHeight: '10',
+      riserInput: '6',
+      treadInput: '10',
+      riserUnit: 'inch',
+      treadUnit: 'inch'
+    };
+    for (const [id, val] of Object.entries(defaults)) {
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    }
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('input').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .input-with-unit select {
+    width: 90px;
+    flex-shrink: 0;
+  }
+
+  .unit-label {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .status-badge {
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .status-badge.passed {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+
+  .status-badge.failed {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+  }
+
+  .calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-top: 12px;
+  }
+
+  .calc-table th,
+  .calc-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .calc-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .calc-table td:last-child {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+</style>

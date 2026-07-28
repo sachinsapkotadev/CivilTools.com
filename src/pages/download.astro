@@ -1,0 +1,355 @@
+---
+import Layout from "../layouts/Layout.astro";
+import versionContent from "../apps/version.txt?raw";
+
+const appVersion = versionContent.trim();
+const apkFileName = "Civil-Tools.apk";
+---
+
+<Layout>
+  <section class="page-header">
+    <div class="band-inner">
+      <div class="version-badge">
+        <span class="version-tag">v{appVersion}</span>
+        <span class="version-label">Android App</span>
+      </div>
+      <h1 class="page-title">Civil Tools for Android.</h1>
+      <p class="page-desc">Take your engineering calculators on the go. The full power of Civil Tools &mdash; now in your pocket.</p>
+      
+      <div class="download-actions">
+        <a
+          href={"/downloads/" + apkFileName}
+          download
+          class="btn-primary btn-large"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Download APK
+        </a>
+        <span class="meta-tag">Android 7.0+ (Nougat) or higher</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="features-section">
+    <div class="band-inner">
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="4" width="16" height="16" rx="2" ry="2"/>
+              <rect x="9" y="9" width="6" height="6"/>
+              <line x1="9" y1="1" x2="9" y2="4"/>
+              <line x1="15" y1="1" x2="15" y2="4"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Offline First</h3>
+          <p class="feature-desc">All calculators work without an internet connection. No data, no problem.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">All Tools Included</h3>
+          <p class="feature-desc">Same powerful suite of calculators from the web app &mdash; fully native and optimized.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Privacy Focused</h3>
+          <p class="feature-desc">The app requires no special permissions and doesn't track your data. Just install and use.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="install-section">
+    <div class="band-inner">
+      <h2 class="section-title center">How to install.</h2>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">01</div>
+          <h3 class="step-title">Download APK</h3>
+          <p class="step-desc">Tap the download button above to get the latest version of Civil Tools.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">02</div>
+          <h3 class="step-title">Allow Sources</h3>
+          <p class="step-desc">Enable "Install from Unknown Sources" in your device security settings.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">03</div>
+          <h3 class="step-title">Install & Run</h3>
+          <p class="step-desc">Open the downloaded file and follow the on-screen instructions to finish.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-light">
+    <div class="band-inner center">
+      <h2 class="section-title">Keep up to date</h2>
+      <p class="section-body">
+        Current Version: <span class="font-mono">v{appVersion}</span>. Updates are simple &mdash; just re-download and install over the existing app.
+      </p>
+      <a href={"/downloads/" + apkFileName} download class="btn-primary">Download v{appVersion}</a>
+    </div>
+  </section>
+</Layout>
+
+<style is:global>
+  .page-header {
+    background: var(--bg-surface);
+    padding: 96px 0 64px;
+    text-align: center;
+  }
+
+  .version-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-hover);
+    padding: 6px 14px;
+    border-radius: 9999px;
+    margin-bottom: 24px;
+  }
+
+  .version-tag {
+    font-family: JetBrains Mono, ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .version-label {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .page-title {
+    font-size: 48px;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+  }
+
+  .page-desc {
+    font-size: 18px;
+    line-height: 28px;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto 40px;
+  }
+
+  .download-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .btn-large {
+    height: 56px;
+    padding: 0 32px;
+    font-size: 16px;
+    gap: 12px;
+  }
+
+  .meta-tag {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .features-section {
+    background: var(--bg-page);
+    padding: 80px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .feature-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  }
+
+  .feature-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+
+  .feature-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 12px;
+    color: var(--text-primary);
+  }
+
+  .feature-desc {
+    font-size: 14px;
+    line-height: 22px;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .install-section {
+    padding: 100px 0;
+    background: var(--bg-card);
+  }
+
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 56px;
+  }
+
+  .step-card {
+    background: var(--bg-page);
+    border: 1px solid var(--border);
+    padding: 32px;
+    border-radius: 12px;
+    text-align: left;
+  }
+
+  .step-number {
+    font-family: JetBrains Mono, monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .step-title {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0 0 10px;
+    color: var(--text-primary);
+  }
+
+  .step-desc {
+    font-size: 14px;
+    line-height: 22px;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .cta-light {
+    background: var(--bg-page);
+    padding: 96px 0;
+    text-align: center;
+    border-top: 1px solid var(--border);
+  }
+
+  .section-title {
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+  }
+
+  .section-title.center {
+    text-align: center;
+  }
+
+  .section-body {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    font-weight: 500;
+    border-radius: 9999px;
+    text-decoration: none;
+    padding: 0 24px;
+    height: 48px;
+    transition: opacity 0.2s;
+  }
+
+  .btn-primary:hover {
+    opacity: 0.9;
+  }
+
+  .band-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .font-mono {
+    font-family: JetBrains Mono, ui-monospace, monospace;
+  }
+
+  @media (max-width: 1024px) {
+    .steps-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .page-header { padding: 72px 0 44px; }
+    .page-title { font-size: 36px; }
+    .page-desc { font-size: 16px; }
+    .features-section { padding: 48px 0; }
+    .features-grid { grid-template-columns: 1fr; }
+    .feature-card { padding: 24px; }
+    .install-section { padding: 64px 0; }
+    .steps-grid { gap: 16px; }
+    .step-card { padding: 24px; }
+    .cta-light { padding: 64px 0; }
+    .band-inner { padding: 0 16px; }
+  }
+
+  @media (max-width: 480px) {
+    .page-title { font-size: 28px; }
+    .btn-large { width: 100%; }
+    .version-badge { flex-wrap: wrap; justify-content: center; }
+  }
+
+  @media (max-width: 360px) {
+    .page-title { font-size: 24px; }
+    .page-desc { font-size: 15px; line-height: 24px; margin-bottom: 32px; }
+    .section-title { font-size: 22px; }
+    .page-header { padding: 64px 0 36px; }
+    .features-section { padding: 36px 0; }
+    .install-section { padding: 48px 0; }
+    .cta-light { padding: 48px 0; }
+    .feature-card { padding: 20px; }
+    .step-card { padding: 20px; }
+    .band-inner { padding: 0 12px; }
+  }
+</style>

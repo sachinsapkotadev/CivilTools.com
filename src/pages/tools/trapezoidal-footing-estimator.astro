@@ -1,0 +1,404 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Trapezoidal Footing Estimator" 
+  description="Estimate concrete volume, materials, and tipper requirements for trapezoidal footings including the raft, trapezium portion, and column."
+  eyebrow="Estimation Tool"
+>
+  <div class="calculator-card">
+    <div class="input-grid">
+      <div class="input-group">
+        <label>1) Number of Footing</label>
+        <input type="number" id="numFooting" value="1" step="1" min="1" />
+      </div>
+    </div>
+
+    <h2 class="section-title">2) Size of Raft</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Input value of (a) — Raft Thickness</label>
+        <div class="input-with-unit">
+          <input type="number" id="raftThk" value="4" step="any" />
+          <select id="raftThkUnit">
+            <option value="inch">inch</option>
+            <option value="feet">feet</option>
+            <option value="meter">meter</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Input value of (b) — Raft Length</label>
+        <div class="input-with-unit">
+          <input type="number" id="raftLength" value="6" step="any" />
+          <select id="raftLenUnit">
+            <option value="feet">feet</option>
+            <option value="meter">meter</option>
+            <option value="inch">inch</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Input value of (c) — Raft Width</label>
+        <div class="input-with-unit">
+          <input type="number" id="raftWidth" value="6" step="any" />
+          <select id="raftWidUnit">
+            <option value="feet">feet</option>
+            <option value="meter">meter</option>
+            <option value="inch">inch</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">3) Height of Trapezium</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Input value of (h)</label>
+        <div class="input-with-unit">
+          <input type="number" id="trapHeight" value="2" step="any" />
+          <select id="trapHtUnit">
+            <option value="feet">feet</option>
+            <option value="meter">meter</option>
+            <option value="inch">inch</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">4) Size of Column</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Input value of (d) — Column Width</label>
+        <div class="input-with-unit">
+          <input type="number" id="colWidth" value="10" step="any" />
+          <select id="colWidUnit">
+            <option value="inch">inch</option>
+            <option value="feet">feet</option>
+            <option value="meter">meter</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Input value of (e) — Column Depth</label>
+        <div class="input-with-unit">
+          <input type="number" id="colDepth" value="12" step="any" />
+          <select id="colDepUnit">
+            <option value="inch">inch</option>
+            <option value="feet">feet</option>
+            <option value="meter">meter</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Input value of (f) — Column Height</label>
+        <div class="input-with-unit">
+          <input type="number" id="colHeight" value="24" step="any" />
+          <select id="colHtUnit">
+            <option value="feet">feet</option>
+            <option value="meter">meter</option>
+            <option value="inch">inch</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">5) Mix Ratio &amp; Factors</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Cement : Sand : Aggregate Ratio</label>
+        <div class="triple-input">
+          <input type="number" id="mixCement" value="1" step="1" min="1" />
+          <span class="split-sep">:</span>
+          <input type="number" id="mixSand" value="2" step="1" min="1" />
+          <span class="split-sep">:</span>
+          <input type="number" id="mixAgg" value="3" step="1" min="1" />
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Volume of Tipper/Tractor</label>
+        <div class="input-with-unit">
+          <input type="number" id="tipperVol" value="2.5" step="0.1" min="0.1" />
+          <span class="unit-label">m³</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Conversion Factor</label>
+        <div class="input-with-unit">
+          <input type="number" id="dryFactor" value="1.54" step="0.01" min="1" />
+          <span class="unit-label">Dry = Wet × factor</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Calculate Estimate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <h3 class="table-heading">Results</h3>
+      <div class="table-wrap">
+      <table class="calc-table">
+        <thead>
+          <tr><th>Item</th><th>Value</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Wet Volume of Concrete Required</td><td id="resWetVol">–</td></tr>
+          <tr><td>Dry Volume Of Concrete Required</td><td id="resDryVol">–</td></tr>
+          <tr><td>Volume Of Cement Required</td><td id="resCementVol">–</td></tr>
+          <tr><td>Volume Of Sand Required</td><td id="resSandVol">–</td></tr>
+          <tr><td>Volume Of Aggregate Required</td><td id="resAggVol">–</td></tr>
+          <tr><td>Weight Of Cement Required</td><td id="resCementWt">–</td></tr>
+          <tr><td>No. Bags Of Cement Required</td><td id="resCementBags">–</td></tr>
+          <tr><td>No. of Tipper/Tractor — Tip of Sand</td><td id="resSandTip">–</td></tr>
+          <tr><td>No. of Tipper/Tractor — Tip of Aggregate</td><td id="resAggTip">–</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function toFeet(val, unit) {
+    if (unit === 'inch') return val / 12;
+    if (unit === 'meter') return val * 3.28084;
+    return val;
+  }
+
+  function ft3ToM3(ft3) {
+    return ft3 * 0.0283168;
+  }
+
+  function formatNum(v, d) {
+    return v.toFixed(d);
+  }
+
+  function calculate() {
+    const numFtg = parseFloat(document.getElementById('numFooting').value) || 1;
+
+    const raftThkRaw = parseFloat(document.getElementById('raftThk').value) || 0;
+    const raftThkUnit = document.getElementById('raftThkUnit').value;
+    const raftLenRaw = parseFloat(document.getElementById('raftLength').value) || 0;
+    const raftLenUnit = document.getElementById('raftLenUnit').value;
+    const raftWidRaw = parseFloat(document.getElementById('raftWidth').value) || 0;
+    const raftWidUnit = document.getElementById('raftWidUnit').value;
+
+    const raftThkFt = toFeet(raftThkRaw, raftThkUnit);
+    const raftLenFt = toFeet(raftLenRaw, raftLenUnit);
+    const raftWidFt = toFeet(raftWidRaw, raftWidUnit);
+
+    const trapHtRaw = parseFloat(document.getElementById('trapHeight').value) || 0;
+    const trapHtUnit = document.getElementById('trapHtUnit').value;
+    const trapHtFt = toFeet(trapHtRaw, trapHtUnit);
+
+    const colWidRaw = parseFloat(document.getElementById('colWidth').value) || 0;
+    const colWidUnit = document.getElementById('colWidUnit').value;
+    const colDepRaw = parseFloat(document.getElementById('colDepth').value) || 0;
+    const colDepUnit = document.getElementById('colDepUnit').value;
+    const colHtRaw = parseFloat(document.getElementById('colHeight').value) || 0;
+    const colHtUnit = document.getElementById('colHtUnit').value;
+
+    const colWidFt = toFeet(colWidRaw, colWidUnit);
+    const colDepFt = toFeet(colDepRaw, colDepUnit);
+    const colHtFt = toFeet(colHtRaw, colHtUnit);
+
+    const mixC = parseFloat(document.getElementById('mixCement').value) || 1;
+    const mixS = parseFloat(document.getElementById('mixSand').value) || 1;
+    const mixA = parseFloat(document.getElementById('mixAgg').value) || 1;
+    const tipperVol = parseFloat(document.getElementById('tipperVol').value) || 2.5;
+    const dryFactor = parseFloat(document.getElementById('dryFactor').value) || 1.54;
+
+    const totalParts = mixC + mixS + mixA;
+
+    const raftVolFt3 = raftLenFt * raftWidFt * raftThkFt;
+
+    const a1 = raftLenFt * raftWidFt;
+    const a2 = colWidFt * colDepFt;
+    const trapVolFt3 = (trapHtFt / 3) * (a1 + a2 + Math.sqrt(a1 * a2));
+
+    const colVolFt3 = colWidFt * colDepFt * colHtFt;
+
+    const totalVolFt3 = (raftVolFt3 + trapVolFt3 + colVolFt3) * numFtg;
+
+    const wetVolM3 = ft3ToM3(totalVolFt3);
+    const dryVolM3 = wetVolM3 * dryFactor;
+
+    const cementVol = totalParts > 0 ? (mixC / totalParts) * dryVolM3 : 0;
+    const sandVol = totalParts > 0 ? (mixS / totalParts) * dryVolM3 : 0;
+    const aggVol = totalParts > 0 ? (mixA / totalParts) * dryVolM3 : 0;
+    const cementWt = cementVol * 1440;
+    const cementBags = cementWt / 50;
+    const sandTip = tipperVol > 0 ? sandVol / tipperVol : 0;
+    const aggTip = tipperVol > 0 ? aggVol / tipperVol : 0;
+
+    document.getElementById('resWetVol').textContent = formatNum(wetVolM3, 3) + ' m³';
+    document.getElementById('resDryVol').textContent = formatNum(dryVolM3, 3) + ' m³';
+    document.getElementById('resCementVol').textContent = formatNum(cementVol, 3) + ' m³';
+    document.getElementById('resSandVol').textContent = formatNum(sandVol, 3) + ' m³';
+    document.getElementById('resAggVol').textContent = formatNum(aggVol, 3) + ' m³';
+    document.getElementById('resCementWt').textContent = formatNum(cementWt, 2) + ' Kg';
+    document.getElementById('resCementBags').textContent = formatNum(cementBags, 3) + ' Nos.';
+    document.getElementById('resSandTip').textContent = formatNum(sandTip, 2) + ' Nos.';
+    document.getElementById('resAggTip').textContent = formatNum(aggTip, 2) + ' Nos.';
+
+    document.getElementById('resultsSection').style.display = 'block';
+  }
+
+  function resetForm() {
+    const vals = {
+      numFooting: '1',
+      raftThk: '4', raftThkUnit: 'inch',
+      raftLength: '6', raftLenUnit: 'feet',
+      raftWidth: '6', raftWidUnit: 'feet',
+      trapHeight: '2', trapHtUnit: 'feet',
+      colWidth: '10', colWidUnit: 'inch',
+      colDepth: '12', colDepUnit: 'inch',
+      colHeight: '24', colHtUnit: 'feet',
+      mixCement: '1', mixSand: '2', mixAgg: '3',
+      tipperVol: '2.5', dryFactor: '1.54'
+    };
+    for (const [id, val] of Object.entries(vals)) {
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    }
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .input-with-unit select {
+    width: 90px;
+    flex-shrink: 0;
+  }
+
+  .unit-label {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .triple-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .triple-input input {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+  }
+
+  .split-sep {
+    font-size: 14px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .table-heading {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 24px 0 12px;
+  }
+
+  .calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .calc-table th,
+  .calc-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .calc-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .calc-table td:last-child {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+</style>

@@ -1,0 +1,218 @@
+---
+import Layout from './Layout.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  eyebrow?: string;
+  canonical?: string;
+  ogImage?: string;
+  ogType?: string;
+  noIndex?: boolean;
+  keywords?: string;
+  schema?: string | Record<string, any> | Array<Record<string, any>>;
+}
+
+const {
+  title,
+  description,
+  eyebrow = "Engineering Tool",
+  canonical,
+  ogImage,
+  ogType,
+  noIndex,
+  keywords,
+  schema,
+} = Astro.props;
+---
+
+<Layout
+  title={title}
+  description={description}
+  canonical={canonical}
+  ogImage={ogImage}
+  ogType={ogType}
+  noIndex={noIndex}
+  keywords={keywords}
+  schema={schema}
+>
+  <div class="tool-page">
+    <section class="tool-header">
+      <div class="band-inner">
+        <p class="eyebrow-mono">{eyebrow}</p>
+        <h1 class="page-title">{title}</h1>
+        <p class="page-desc">{description}</p>
+      </div>
+    </section>
+
+    <section class="tool-content">
+      <div class="band-inner">
+        <slot />
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<style is:global>
+  .tool-page {
+    background: var(--bg-page);
+    min-height: calc(100vh - 64px);
+  }
+
+  .tool-header {
+    background: var(--bg-surface);
+    padding: 64px 0 48px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .eyebrow-mono {
+    font-family: JetBrains Mono, ui-monospace, monospace;
+    font-size: 12px;
+    font-weight: 400;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 12px;
+    letter-spacing: 0.05em;
+  }
+
+  .page-title {
+    font-size: 36px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin: 0 0 12px;
+  }
+
+  .page-desc {
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .tool-content {
+    padding: 48px 0 96px;
+  }
+
+  .band-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* Shared Tool Styling */
+  .calculator-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  }
+
+  .input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .input-group label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .input-group input, 
+  .input-group select {
+    height: 44px;
+    padding: 0 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--text-primary);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
+
+  .input-group input:focus, 
+  .input-group select:focus {
+    outline: none;
+    border-color: var(--border-strong);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+  }
+
+  .results-section {
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+
+  .result-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .result-item:last-child {
+    border-bottom: none;
+  }
+
+  .result-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .result-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .result-value.large {
+    font-size: 24px;
+    color: var(--link-blue);
+  }
+
+  @media (max-width: 768px) {
+    .page-title { font-size: 28px; }
+    .page-desc { font-size: 15px; }
+    .tool-header { padding: 48px 0 32px; }
+    .tool-content { padding: 32px 0 64px; }
+    .calculator-card { padding: 20px; border-radius: 12px; }
+    .input-grid { grid-template-columns: 1fr; gap: 16px; }
+    .result-item { flex-direction: column; align-items: flex-start; gap: 4px; }
+    .result-value.large { font-size: 20px; }
+    .band-inner { padding: 0 16px; }
+  }
+
+  @media (max-width: 480px) {
+    .page-title { font-size: 24px; }
+    .calculator-card { padding: 16px; border-radius: 10px; }
+    .input-grid { gap: 12px; }
+  }
+
+  @media (max-width: 360px) {
+    .page-title { font-size: 20px; }
+    .page-desc { font-size: 14px; line-height: 22px; }
+    .tool-header { padding: 32px 0 24px; }
+    .tool-content { padding: 24px 0 48px; }
+    .calculator-card { padding: 12px; border-radius: 8px; }
+    .input-group input, .input-group select { font-size: 16px; height: 40px; }
+    .input-group label { font-size: 13px; }
+    .band-inner { padding: 0 12px; }
+    .eyebrow-mono { font-size: 11px; }
+  }
+</style>

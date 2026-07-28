@@ -1,0 +1,256 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+
+const pageTitle = "Weight to Volume of Cement Converter | CivilTools.com";
+const pageDesc = "Convert cement quantity from bags or weight in kg to volume (m³, ft³) based on the standard dry cement density of 1440 kg/m³.";
+const keywords = "cement weight to volume, convert cement bags to cubic feet, cement volume calculator, density of cement, volume of 50kg cement bag, cft of cement";
+const canonicalUrl = "/tools/cement-converter";
+
+const appSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Weight to Volume of Cement Converter",
+  "url": "https://www.civiltools.com/tools/cement-converter",
+  "description": pageDesc,
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "All",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is the standard density of dry cement?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The standard loose bulk density of ordinary Portland cement (OPC) is 1440 kilograms per cubic meter (kg/m³) or 90 pounds per cubic foot (lb/ft³)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the volume of a 50 kg cement bag?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The volume of a standard 50 kg cement bag is approximately 0.0347 cubic meters (m³) or 1.226 cubic feet (cft) based on a density of 1440 kg/m³."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do you calculate cement volume from weight?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The formula to calculate volume is: Volume (m³) = Weight (kg) / Density (1440 kg/m³). To convert this to cubic feet (ft³), multiply the resulting volume in m³ by 35.3147."
+      }
+    }
+  ]
+};
+
+const pageSchemas = [appSchema, faqSchema];
+---
+
+<ToolLayout 
+  title="Weight to Volume of Cement Converter" 
+  description={pageDesc}
+  eyebrow="Conversion Tool"
+  canonical={canonicalUrl}
+  keywords={keywords}
+  schema={pageSchemas}
+>
+  <div class="calculator-card">
+    <div class="input-grid">
+      <div class="input-group">
+        <label for="inputType">Input Type</label>
+        <select id="inputType">
+          <option value="bags">Number of Bags (50kg each)</option>
+          <option value="weight">Total Weight (kg)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="inputValue">Quantity</label>
+        <input type="number" id="inputValue" value="1" step="any" />
+      </div>
+    </div>
+
+    <div class="results-section">
+      <div class="result-display">
+        <div class="main-result">
+          <span class="label">Total Volume</span>
+          <div id="resVolumeCum" class="result-value large">0.0347 m³</div>
+        </div>
+        <div class="sub-results">
+          <div class="res-box">
+            <span class="val" id="resVolumeCuft">1.226</span>
+            <span class="unit">Cubic Feet (ft³)</span>
+          </div>
+          <div class="res-box">
+            <span class="val" id="resWeight">50</span>
+            <span class="unit">Weight (kg)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <h3>Key Assumptions</h3>
+      <ul>
+        <li><strong>Density of Cement:</strong> 1440 kg/m³ (Standard dry bulk density)</li>
+        <li><strong>Standard Bag Weight:</strong> 50 kg</li>
+        <li><strong>Volume of 1 Bag:</strong> ~0.0347 m³ or 1.226 ft³ (cft)</li>
+      </ul>
+    </div>
+
+    <!-- Educational Content for SEO and AEO -->
+    <article class="seo-article" style="margin-top: 40px; border-top: 1px solid var(--border); padding-top: 40px; line-height: 1.6; font-size: 15px;">
+      <h2 style="color: var(--text-primary); font-size: 22px; margin-bottom: 16px; font-weight: 600;">How to Convert Cement Weight to Volume</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 20px;">
+        During building construction or concrete mix design, cement quantity is often estimated in kilograms (kg) or bags. However, when batching materials on-site, measuring by volume (such as in gauge boxes or cubic feet) is common practice. This tool helps you quickly convert the weight of cement to its corresponding volume based on dry Portland cement's standard bulk density.
+      </p>
+
+      <h3 style="color: var(--text-primary); font-size: 18px; margin-top: 24px; margin-bottom: 12px; font-weight: 600;">The Formula for Cement Weight to Volume Conversion</h3>
+      <p style="color: var(--text-secondary); margin-bottom: 20px;">
+        To calculate the volume of cement from weight, we use the standard bulk density of cement:
+      </p>
+      <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border); font-family: monospace; font-size: 14px; margin-bottom: 20px; color: var(--text-primary); max-width: max-content;">
+        Volume (m³) = Weight (kg) / 1440 kg/m³
+      </div>
+      <p style="color: var(--text-secondary); margin-bottom: 20px;">
+        To convert the volume to cubic feet (cft), we multiply the volume in cubic meters by 35.3147:
+      </p>
+      <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border); font-family: monospace; font-size: 14px; margin-bottom: 20px; color: var(--text-primary); max-width: max-content;">
+        Volume (ft³) = Volume (m³) * 35.3147
+      </div>
+
+      <h3 style="color: var(--text-primary); font-size: 18px; margin-top: 24px; margin-bottom: 16px; font-weight: 600;">Frequently Asked Questions (FAQ)</h3>
+      <div class="faq-section" style="display: flex; flex-direction: column; gap: 20px;">
+        <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+          <h4 style="color: var(--text-primary); font-size: 15px; margin-bottom: 8px; font-weight: 600;">What is the standard density of dry cement?</h4>
+          <p style="color: var(--text-secondary); margin: 0;">
+            The standard loose bulk density of ordinary Portland cement (OPC) is 1440 kilograms per cubic meter (kg/m³) or 90 pounds per cubic foot (lb/ft³).
+          </p>
+        </div>
+        <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+          <h4 style="color: var(--text-primary); font-size: 15px; margin-bottom: 8px; font-weight: 600;">What is the volume of a 50 kg cement bag?</h4>
+          <p style="color: var(--text-secondary); margin: 0;">
+            The volume of a standard 50 kg cement bag is approximately 0.0347 cubic meters (m³) or 1.226 cubic feet (cft) based on a density of 1440 kg/m³.
+          </p>
+        </div>
+        <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+          <h4 style="color: var(--text-primary); font-size: 15px; margin-bottom: 8px; font-weight: 600;">Why do we use dry bulk density for cement conversions?</h4>
+          <p style="color: var(--text-secondary); margin: 0;">
+            Cement contains voids between particles when stored loosely in bags or silos. Dry bulk density (1440 kg/m³) accounts for these voids, which is necessary for correct on-site volumetric proportioning.
+          </p>
+        </div>
+      </div>
+    </article>
+  </div>
+</ToolLayout>
+
+<script>
+  const inputType = document.getElementById('inputType') as HTMLSelectElement;
+  const inputValue = document.getElementById('inputValue') as HTMLInputElement;
+
+  function update() {
+    const val = parseFloat(inputValue.value) || 0;
+    const type = inputType.value;
+    
+    let kg = 0;
+    if (type === 'bags') {
+      kg = val * 50;
+    } else {
+      kg = val;
+    }
+
+    const m3 = kg / 1440;
+    const ft3 = m3 * 35.3147;
+
+    document.getElementById('resVolumeCum')!.textContent = m3.toLocaleString(undefined, {maximumFractionDigits: 4}) + ' m³';
+    document.getElementById('resVolumeCuft')!.textContent = ft3.toLocaleString(undefined, {maximumFractionDigits: 3});
+    document.getElementById('resWeight')!.textContent = kg.toLocaleString(undefined, {maximumFractionDigits: 2});
+  }
+
+  inputType.addEventListener('change', update);
+  inputValue.addEventListener('input', update);
+  update();
+</script>
+
+<style>
+  .result-display {
+    text-align: center;
+    background: var(--result-bg);
+    border-radius: 16px;
+    padding: 32px;
+  }
+
+  .main-result {
+    margin-bottom: 24px;
+  }
+
+  .main-result .label {
+    font-size: 14px;
+    color: var(--result-text-muted);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .sub-results {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    border-top: 1px solid var(--result-border);
+    padding-top: 24px;
+  }
+
+  .res-box {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .res-box .val {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .res-box .unit {
+    font-size: 12px;
+    color: var(--result-text-muted);
+    margin-top: 4px;
+  }
+
+  .info-grid {
+    margin-top: 48px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .info-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .info-card h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+  }
+  .info-card ul {
+    margin: 0;
+    padding-left: 20px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+</style>

@@ -1,0 +1,872 @@
+---
+const authCookie = Astro.cookies.get('auth_state');
+const isLoggedIn = authCookie?.value === 'in';
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  ogImage?: string;
+  ogType?: string;
+  noIndex?: boolean;
+  keywords?: string;
+  schema?: string | Record<string, any> | Array<Record<string, any>>;
+}
+
+const {
+  title = 'Civil Engineering Tools & Calculators | CivilTools.com',
+  description = 'Free online civil engineering tools and calculators for concrete, steel, brick, plaster, roofing, and building cost estimation. Professional construction calculators for engineers, architects, and contractors.',
+  canonical,
+  ogImage = '',
+  ogType = 'website',
+  noIndex = false,
+  keywords = "Civil Engineering Tools, Civil Tools, Civil Engineering Calculators, Construction Calculators, Civil Calculator, Engineering Calculator, Online Civil Engineering Tools, Structural Engineering Tools, Construction Estimation Tools, Building Construction Calculator, Quantity Estimation Calculator, Concrete Calculator, Brick Calculator, Steel Weight Calculator, Building Cost Calculator Nepal, Ropani to Square Feet, Land Area Converter Nepal, Construction Cost Calculator",
+  schema,
+} = Astro.props;
+
+const siteTitle = title;
+const siteDescription = description;
+const siteURL = 'https://www.civiltools.com';
+const currentPagePath = Astro.url.pathname;
+const siteUrl = canonical && canonical.startsWith('http')
+  ? canonical
+  : (canonical ? `${siteURL}${canonical}` : `${siteURL}${currentPagePath}`);
+---
+<!doctype html>
+<html lang="en" class={isLoggedIn ? 'auth-in' : ''}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{siteTitle}</title>
+    <meta name="description" content={siteDescription} />
+    <meta name="keywords" content={keywords} />
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Civil Tools" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="generator" content={Astro.generator} />
+
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href={siteUrl} />
+
+    <!-- Robots -->
+    {noIndex && <meta name="robots" content="noindex, nofollow" />}
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={siteTitle} />
+    <meta property="og:description" content={siteDescription} />
+    <meta property="og:url" content={siteUrl} />
+    <meta property="og:site_name" content="CivilTools.com" />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    {ogImage && <meta property="og:image:width" content="1200" />}
+    {ogImage && <meta property="og:image:height" content="630" />}
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={siteTitle} />
+    <meta name="twitter:description" content={siteDescription} />
+    {ogImage && <meta name="twitter:image" content={ogImage} />}
+
+    <!-- JSON-LD Structured Data: Organization -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "CivilTools.com",
+        "url": "https://www.civiltools.com",
+        "logo": "https://www.civiltools.com/favicon-96x96.png",
+        "description": "Free online civil engineering tools and calculators for construction estimation, structural design, quantity surveying, and building cost analysis.",
+        "sameAs": []
+      }
+    </script>
+
+    <!-- JSON-LD Structured Data: WebSite -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "CivilTools.com",
+        "url": "https://www.civiltools.com",
+        "description": "Free online civil engineering tools and calculators.",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://www.civiltools.com/tools?q={search_term_string}"
+          },
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
+
+    {schema && (
+      typeof schema === 'string'
+        ? <Fragment set:html={schema} />
+        : (Array.isArray(schema)
+            ? schema.map(s => <script type="application/ld+json" set:html={JSON.stringify(s)} />)
+            : <script type="application/ld+json" set:html={JSON.stringify(schema)} />)
+    )}
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="relative min-h-screen flex flex-col" style="position: relative; min-h: 100vh; display: flex; flex-direction: column;">
+      <!-- Ambient Glow Gradients inspired by nepdate.com -->
+      <div
+        class="absolute inset-x-0 top-0 w-full h-[600px] pointer-events-none opacity-[0.06] dark:opacity-[0.15]"
+        style="position: absolute; left: 0; right: 0; top: 0; width: 100%; height: 600px; pointer-events: none; opacity: 0.06; background: radial-gradient(ellipse 80% 60% at 50% 0%, #007cf0 0%, #00dfd8 20%, #7928ca 40%, #ff0080 60%, #ff4d4d 80%, #f9cb28 100%); filter: blur(80px); z-index: 0;"
+      >
+      </div>
+      <div
+        class="absolute inset-x-0 bottom-0 w-full h-[600px] pointer-events-none opacity-[0.02] dark:opacity-[0.1]"
+        style="position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 600px; pointer-events: none; opacity: 0.02; background: radial-gradient(ellipse 80% 60% at 50% 100%, #f9cb28 0%, #ff4d4d 20%, #ff0080 40%, #7928ca 60%, #00dfd8 80%, #007cf0 100%); filter: blur(80px); z-index: 0;"
+      >
+      </div>
+
+      <header class="relative z-50" style="position: relative; z-index: 50;">
+        <nav class="nav-bar" style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
+          <div class="nav-inner">
+            <a href="/" class="logo" style="display: flex; align-items: center; gap: 8px;">
+              <div class="w-8 h-8 rounded-md flex items-center justify-center transition-transform duration-200 hover:scale-105" style="background: var(--text-primary); width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px;">
+                <span class="text-canvas font-bold text-lg leading-none" style="color: var(--bg-surface); font-weight: bold;">C</span>
+              </div>
+              <span class="font-bold tracking-tight">CivilTools</span>
+            </a>
+            <button class="hamburger" id="hamburger-btn" aria-label="Menu">
+              <span class="hamburger-line"></span>
+              <span class="hamburger-line"></span>
+              <span class="hamburger-line"></span>
+            </button>
+            <div class="nav-links" id="nav-links">
+              <a href="/" class="nav-link">Home</a>
+              <a href="/tools" class="nav-link">Tools</a>
+              <a href="/download" class="nav-link">Download</a>
+              <a href="/resources" class="nav-link">Resources</a>
+              <a href="/about" class="nav-link">About</a>
+            </div>
+            <div class="nav-actions">
+              <div id="nav-actions-signed-out" style={{ display: isLoggedIn ? 'none' : 'flex' }}>
+                <a href="/login" class="nav-cta-signup">Sign in</a>
+              </div>
+              <div id="nav-actions-signed-in" style={{ display: isLoggedIn ? 'flex' : 'none' }}>
+                <a href="/dashboard" class="nav-link nav-auth-link" id="nav-dashboard-link">Dashboard</a>
+                <button id="nav-logout-btn" class="nav-cta-signup nav-logout-btn">Sign out</button>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+      <main style="flex-grow: 1; position: relative; z-index: 10;">
+        <slot />
+      </main>
+
+      <footer class="footer" style="position: relative; z-index: 10; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
+        <div class="footer-inner">
+          <div class="footer-col">
+            <span class="footer-label">Products</span>
+            <a href="/tools">Tools</a>
+            <a href="/download">Download</a>
+          </div>
+          <div class="footer-col">
+            <span class="footer-label">Resources</span>
+            <a href="/resources">NBC Codes</a>
+          </div>
+          <div class="footer-col">
+            <span class="footer-label">Company</span>
+            <a href="/about">About</a>
+            <a href="mailto:sachin.sapkota.dev@gmail.com">Contact</a>
+          </div>
+          <div class="footer-col">
+            <span class="footer-label">Legal</span>
+            <a href="/privacy">Privacy</a>
+            <a href="/terms">Terms</a>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; {new Date().getFullYear()} CivilTools. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+    const signedOutEl = document.getElementById('nav-actions-signed-out');
+    const signedInEl = document.getElementById('nav-actions-signed-in');
+
+    let nullTimer = null;
+
+    function setAuthUI(loggedIn) {
+      signedOutEl.style.display = loggedIn ? 'none' : 'flex';
+      signedInEl.style.display = loggedIn ? 'flex' : 'none';
+      document.cookie = `auth_state=${loggedIn ? 'in' : 'out'}; path=/; max-age=2592000; SameSite=Lax`;
+    }
+
+    (async () => {
+      try {
+        const { auth } = await import('../lib/firebase-auth');
+        const { onAuthStateChanged, signOut } = await import('firebase/auth');
+
+        onAuthStateChanged(auth, (user) => {
+          if (user) {
+            clearTimeout(nullTimer);
+            setAuthUI(true);
+          } else if (signedInEl.style.display === 'flex') {
+            clearTimeout(nullTimer);
+            nullTimer = setTimeout(() => {
+              setAuthUI(false);
+            }, 500);
+          }
+        });
+
+        document.getElementById('nav-logout-btn')?.addEventListener('click', async () => {
+          await signOut(auth);
+          window.location.href = '/';
+        });
+      } catch (err) {
+        console.error('Auth init failed:', err);
+      }
+    })();
+
+    const hamburger = document.getElementById('hamburger-btn');
+    const navLinks = document.getElementById('nav-links');
+    hamburger?.addEventListener('click', () => {
+      hamburger.classList.toggle('active');
+      navLinks?.classList.toggle('open');
+    });
+    document.querySelectorAll('#nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger?.classList.remove('active');
+        navLinks?.classList.remove('open');
+      });
+    });
+
+    // Announcement bar dismiss (if element exists)
+    const announcementBar = document.getElementById('announcement-bar');
+    const dismissBtn = document.getElementById('announcement-dismiss');
+    if (announcementBar && dismissBtn) {
+      if (localStorage.getItem('announcement_dismissed') === 'true') {
+        announcementBar.style.display = 'none';
+      }
+      dismissBtn.addEventListener('click', () => {
+        announcementBar.style.display = 'none';
+        localStorage.setItem('announcement_dismissed', 'true');
+      });
+    }
+
+  </script>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --text-primary: #171717;
+    --text-secondary: #4d4d4d;
+    --text-tertiary: #888888;
+    --text-muted: #a1a1a1;
+    --bg-page: #fafafa;
+    --bg-card: #ffffff;
+    --bg-surface: #ffffff;
+    --bg-subtle: #fafafa;
+    --bg-hover: #f5f5f5;
+    --border: #ebebeb;
+    --border-input: #d4d4d4;
+    --border-strong: #171717;
+    --btn-primary-bg: #171717;
+    --btn-primary-text: #ffffff;
+    --btn-secondary-bg: #ffffff;
+    --btn-secondary-text: #171717;
+    --btn-secondary-border: #ebebeb;
+    --hamburger-color: #171717;
+    --hero-badge-bg: #f5f5f5;
+    --feature-icon-bg: #f5f5f5;
+    --faq-border: #ebebeb;
+    --link-blue: #2563eb;
+    --link-blue-hover: #1d4ed8;
+    --color-success: #059669;
+    --color-danger: #dc2626;
+    --color-info: #2563eb;
+    --table-header-bg: #f1f5f9;
+    --result-bg: #f8fafc;
+    --result-border: #e2e8f0;
+    --result-text-muted: #64748b;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
+    font-family: Inter, system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--text-primary);
+    background: var(--bg-page);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  main {
+    flex: 1;
+    padding-top: 64px;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .nav-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+  }
+
+  .nav-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 24px;
+  }
+
+  .logo {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.6px;
+    color: var(--text-primary);
+    white-space: nowrap;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .nav-link {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    padding: 8px 12px;
+    border-radius: 9999px;
+    transition: color 0.2s;
+    white-space: nowrap;
+  }
+
+  .nav-link:hover {
+    color: var(--text-primary);
+  }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  #nav-actions-signed-out {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  #nav-actions-signed-in {
+    display: none;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav-auth-link {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    padding: 8px 12px;
+    border-radius: 9999px;
+    transition: color 0.2s;
+    white-space: nowrap;
+  }
+
+  .nav-auth-link:hover {
+    color: var(--text-primary);
+  }
+
+  .nav-logout-btn {
+    background: transparent !important;
+    color: var(--text-secondary) !important;
+    border: 1px solid var(--border-input) !important;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+  }
+
+  .nav-logout-btn:hover {
+    background: var(--bg-hover) !important;
+    opacity: 1 !important;
+  }
+
+  .nav-cta-signup {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    color: var(--btn-primary-text);
+    background: var(--btn-primary-bg);
+    padding: 0 12px;
+    height: 32px;
+    border-radius: 6px;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+
+  .nav-cta-signup:hover {
+    opacity: 0.85;
+  }
+
+
+
+  .footer {
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border);
+    padding: 64px 24px 24px;
+  }
+
+  .footer-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+  }
+
+  .footer-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .footer-label {
+    font-family: JetBrains Mono, ui-monospace, monospace;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0;
+  }
+
+  .footer-col a {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    color: var(--text-secondary);
+    transition: color 0.2s;
+  }
+
+  .footer-col a:hover {
+    color: var(--text-primary);
+  }
+
+  .footer-bottom {
+    max-width: 1400px;
+    margin: 48px auto 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .footer-bottom p {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    color: var(--text-tertiary);
+    margin: 0;
+  }
+
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 36px;
+    height: 36px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    margin-right: auto;
+    z-index: 101;
+  }
+
+  .hamburger-line {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: var(--hamburger-color);
+    border-radius: 2px;
+    transition: transform 0.2s, opacity 0.2s;
+  }
+
+  .hamburger.active .hamburger-line:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .hamburger.active .hamburger-line:nth-child(2) {
+    opacity: 0;
+  }
+
+  .hamburger.active .hamburger-line:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  @media (max-width: 768px) {
+    .hamburger {
+      display: flex;
+    }
+
+    .nav-links {
+      position: fixed;
+      top: 64px;
+      left: 0;
+      right: 0;
+      background: var(--bg-surface);
+      flex-direction: column;
+      padding: 12px 24px 24px;
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+      transform: translateY(-120%);
+      opacity: 0;
+      transition: transform 0.25s ease, opacity 0.2s ease;
+      z-index: 99;
+      gap: 2px;
+    }
+
+    .nav-links.open {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .nav-links .nav-link {
+      font-size: 16px;
+      padding: 12px 12px;
+    }
+
+    .footer-inner {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .footer-inner {
+      grid-template-columns: 1fr;
+    }
+    .nav-auth-link {
+      display: none;
+    }
+    .nav-inner {
+      gap: 8px;
+    }
+    .nav-actions {
+      gap: 4px;
+    }
+  }
+
+  /* Global responsive table wrapper */
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table-wrap table {
+    min-width: 480px;
+  }
+
+  /* Responsive images */
+  img, svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Better touch targets on mobile */
+  @media (pointer: coarse) {
+    a, button, input, select, textarea {
+      min-height: 44px;
+    }
+  }
+
+  /* Responsive inputs - prevents iOS zoom on focus */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
+  /* Tool page common pattern: triple-input */
+  @media (max-width: 480px) {
+    .triple-input {
+      flex-wrap: wrap;
+    }
+    .triple-input input {
+      min-width: 60px;
+      flex: 1;
+    }
+  }
+
+  /* Tool page common pattern: btn-row */
+  @media (max-width: 480px) {
+    .btn-row {
+      flex-direction: column;
+    }
+    .btn-row .btn-primary,
+    .btn-row .btn-secondary {
+      width: 100%;
+    }
+  }
+
+  /* Tool page common pattern: input-with-unit select width */
+  @media (max-width: 480px) {
+    .input-with-unit select {
+      width: 70px !important;
+      font-size: 13px !important;
+    }
+  }
+
+  /* Tool page common pattern: calc-table cells */
+  @media (max-width: 600px) {
+    .calc-table th,
+    .calc-table td,
+    .result-table th,
+    .result-table td,
+    .breakdown-table th,
+    .breakdown-table td {
+      padding: 8px 10px !important;
+      font-size: 13px !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .calc-table th,
+    .calc-table td,
+    .result-table th,
+    .result-table td,
+    .breakdown-table th,
+    .breakdown-table td {
+      padding: 6px 8px !important;
+      font-size: 12px !important;
+    }
+    .btn-primary,
+    .btn-secondary {
+      width: 100%;
+    }
+    .results-section {
+      margin-top: 24px !important;
+      padding-top: 24px !important;
+    }
+    .section-title:not(:first-child) {
+      margin-top: 24px !important;
+    }
+    .table-heading {
+      margin: 16px 0 10px !important;
+    }
+    .result-display {
+      padding: 20px !important;
+    }
+    .unit-label {
+      font-size: 12px !important;
+    }
+    .input-with-unit select {
+      width: 70px !important;
+      font-size: 13px !important;
+    }
+    .sub-section-title {
+      font-size: 15px !important;
+    }
+    .info-grid {
+      margin-top: 32px !important;
+    }
+    .main-result {
+      margin-bottom: 24px !important;
+    }
+    .breakdown-container {
+      margin-top: 24px !important;
+      padding-top: 24px !important;
+    }
+    .input-table td {
+      padding: 8px 10px !important;
+    }
+    .td-label {
+      white-space: normal !important;
+      width: auto !important;
+      min-width: 100px;
+    }
+    .inline-input {
+      min-width: 60px !important;
+      font-size: 13px !important;
+      height: 32px !important;
+    }
+    .inline-select {
+      min-width: 100px !important;
+      font-size: 13px !important;
+      height: 32px !important;
+    }
+    .inline-unit-select {
+      width: 75px !important;
+      font-size: 12px !important;
+      height: 32px !important;
+    }
+    .input-table-wrap {
+      overflow-x: auto;
+    }
+    #quickRefs {
+      grid-template-columns: 1fr !important;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .calc-table th,
+    .calc-table td,
+    .result-table th,
+    .result-table td,
+    .breakdown-table th,
+    .breakdown-table td {
+      padding: 5px 6px !important;
+      font-size: 11px !important;
+    }
+    .calculator-card {
+      padding: 12px !important;
+      border-radius: 8px !important;
+    }
+    .input-grid {
+      gap: 12px !important;
+    }
+    .results-section {
+      margin-top: 20px !important;
+      padding-top: 20px !important;
+    }
+    .section-title {
+      font-size: 14px !important;
+    }
+    .page-title {
+      font-size: 20px !important;
+    }
+    .result-display {
+      padding: 16px !important;
+    }
+    .btn-primary,
+    .btn-secondary {
+      height: 40px !important;
+      font-size: 13px !important;
+    }
+  }
+
+  /* Breakdown table responsive */
+  @media (max-width: 600px) {
+    .breakdown-table th,
+    .breakdown-table td {
+      padding: 8px 10px !important;
+      font-size: 13px !important;
+    }
+  }
+
+  /* Announcement bar */
+  .announcement-bar {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 20px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    z-index: 200;
+    max-width: calc(100vw - 48px);
+    white-space: nowrap;
+    animation: announcement-slide-up 0.4s ease-out;
+  }
+
+  @keyframes announcement-slide-up {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  }
+
+  .announcement-text {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    color: var(--text-primary);
+  }
+
+  .announcement-highlight {
+    color: var(--color-info);
+    font-weight: 600;
+  }
+
+  .announcement-dismiss {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    font-size: 14px;
+    transition: color 0.2s, background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .announcement-dismiss:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
+  }
+
+  @media (max-width: 480px) {
+    .announcement-bar {
+      bottom: 16px;
+      padding: 10px 16px;
+      gap: 12px;
+      max-width: calc(100vw - 32px);
+    }
+    .announcement-text {
+      font-size: 13px;
+    }
+  }
+</style>

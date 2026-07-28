@@ -1,0 +1,431 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Square Pipe Weight Calculator"
+  description="Hollow rectangular pipe weight calculator. Calculate the weight and cost of square steel pipes based on outer side length, thickness, length, quantity, and cost per kg."
+  eyebrow="Steel Weight Tool"
+>
+  <div class="calculator-card">
+    <div class="table-wrap">
+      <table class="input-table">
+        <thead>
+          <tr>
+            <th>S.N</th>
+            <th>Discription</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Outer side length of Square Pipe:</td>
+            <td>
+              <div class="inline-unit-input">
+                <input type="number" id="sideLength" class="inline-input" value="75" step="any" min="0" />
+                <select id="sideUnit" class="inline-unit-select">
+                  <option value="mm">mm</option>
+                  <option value="cm">cm</option>
+                  <option value="inch">inch</option>
+                  <option value="ft">ft</option>
+                  <option value="m">m</option>
+                </select>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Thickness of Square Pipe:</td>
+            <td>
+              <div class="inline-unit-input">
+                <input type="number" id="thickness" class="inline-input" value="6" step="any" min="0" />
+                <select id="thicknessUnit" class="inline-unit-select">
+                  <option value="mm">mm</option>
+                  <option value="cm">cm</option>
+                  <option value="inch">inch</option>
+                  <option value="ft">ft</option>
+                  <option value="m">m</option>
+                </select>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Length of Square Pipe:</td>
+            <td>
+              <div class="inline-unit-input">
+                <input type="number" id="pipeLength" class="inline-input" value="1" step="any" min="0" />
+                <select id="lengthUnit" class="inline-unit-select">
+                  <option value="m">m</option>
+                  <option value="mm">mm</option>
+                  <option value="cm">cm</option>
+                  <option value="inch">inch</option>
+                  <option value="ft">ft</option>
+                </select>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Quantity of Square Pipe:</td>
+            <td>
+              <div class="inline-unit-input">
+                <input type="number" id="quantity" class="inline-input" value="1" step="1" min="1" />
+                <span class="unit-label">Nos.</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>Cost of Square Pipe per Kg:</td>
+            <td>
+              <div class="inline-unit-input">
+                <input type="number" id="costPerKg" class="inline-input" value="155" step="any" min="0" />
+                <span class="unit-label">Rs.</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>Density of Steel:</td>
+            <td>
+              <div class="inline-unit-input">
+                <input type="number" id="density" class="inline-input" value="7850" step="any" min="0" />
+                <span class="unit-label">Kg/m&sup3;</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection">
+      <h2 class="section-title">Results</h2>
+      <div class="table-wrap">
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Weight of Single Square Pipe:</td>
+              <td><span id="resSingleWeight">0</span> Kg</td>
+            </tr>
+            <tr>
+              <td>Weight of Total Square Pipe:</td>
+              <td><span id="resTotalWeight">0</span> Kg</td>
+            </tr>
+            <tr>
+              <td>Cost of Single Square Pipe:</td>
+              <td><span id="resSingleCost">0</span> Rs.</td>
+            </tr>
+            <tr>
+              <td>Cost of Total Steel Pipe:</td>
+              <td><span id="resTotalCost">0</span> Rs.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function toMeters(val, unit) {
+    switch (unit) {
+      case 'mm': return val / 1000;
+      case 'cm': return val / 100;
+      case 'inch': return val * 0.0254;
+      case 'ft': return val * 0.3048;
+      default: return val;
+    }
+  }
+
+  function formatNum(v) {
+    return Math.round(v * 100) / 100;
+  }
+
+  function calculate() {
+    const sideRaw = parseFloat(document.getElementById('sideLength').value) || 0;
+    const sideUnit = document.getElementById('sideUnit').value;
+    const thickRaw = parseFloat(document.getElementById('thickness').value) || 0;
+    const thickUnit = document.getElementById('thicknessUnit').value;
+    const lenRaw = parseFloat(document.getElementById('pipeLength').value) || 0;
+    const lenUnit = document.getElementById('lengthUnit').value;
+    const qty = parseInt(document.getElementById('quantity').value) || 1;
+    const costPerKg = parseFloat(document.getElementById('costPerKg').value) || 0;
+    const density = parseFloat(document.getElementById('density').value) || 7850;
+
+    const sideM = toMeters(sideRaw, sideUnit);
+    const thickM = toMeters(thickRaw, thickUnit);
+    const lenM = toMeters(lenRaw, lenUnit);
+
+    if (sideM <= 0 || thickM <= 0 || lenM <= 0 || thickM >= sideM / 2) {
+      document.getElementById('resSingleWeight').textContent = '0';
+      document.getElementById('resTotalWeight').textContent = '0';
+      document.getElementById('resSingleCost').textContent = '0';
+      document.getElementById('resTotalCost').textContent = '0';
+      return;
+    }
+
+    const outerArea = sideM * sideM;
+    const innerSide = sideM - 2 * thickM;
+    const innerArea = innerSide * innerSide;
+    const crossArea = outerArea - innerArea;
+    const volume = crossArea * lenM;
+    const singleWeight = volume * density;
+    const totalWeight = singleWeight * qty;
+    const singleCost = singleWeight * costPerKg;
+    const totalCost = totalWeight * costPerKg;
+
+    document.getElementById('resSingleWeight').textContent = formatNum(singleWeight);
+    document.getElementById('resTotalWeight').textContent = formatNum(totalWeight);
+    document.getElementById('resSingleCost').textContent = formatNum(singleCost);
+    document.getElementById('resTotalCost').textContent = formatNum(totalCost);
+  }
+
+  function resetForm() {
+    document.getElementById('sideLength').value = '75';
+    document.getElementById('sideUnit').value = 'mm';
+    document.getElementById('thickness').value = '6';
+    document.getElementById('thicknessUnit').value = 'mm';
+    document.getElementById('pipeLength').value = '1';
+    document.getElementById('lengthUnit').value = 'm';
+    document.getElementById('quantity').value = '1';
+    document.getElementById('costPerKg').value = '155';
+    document.getElementById('density').value = '7850';
+    calculate();
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('.inline-input').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .input-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .input-table th,
+  .input-table td {
+    padding: 10px 12px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  .input-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .input-table th:first-child,
+  .input-table td:first-child {
+    width: 50px;
+    text-align: center;
+    color: var(--text-tertiary);
+    font-weight: 500;
+  }
+
+  .input-table td:nth-child(2) {
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+  }
+
+  .input-table td:nth-child(3) {
+    min-width: 220px;
+  }
+
+  .inline-unit-input {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .inline-input {
+    flex: 1;
+    height: 36px;
+    padding: 0 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-input);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    min-width: 80px;
+  }
+
+  .inline-input:focus {
+    outline: none;
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+  }
+
+  .inline-unit-select {
+    width: 80px;
+    height: 36px;
+    padding: 0 4px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-input);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color 0.2s;
+  }
+
+  .inline-unit-select:focus {
+    outline: none;
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+  }
+
+  .unit-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .results-section {
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+
+  .result-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .result-table th,
+  .result-table td {
+    padding: 12px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .result-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .result-table td:first-child {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .result-table td:last-child {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 768px) {
+    .input-table td:nth-child(3) {
+      min-width: 160px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .input-table th,
+    .input-table td {
+      padding: 8px 8px;
+      font-size: 13px;
+    }
+
+    .input-table td:first-child {
+      width: 36px;
+    }
+
+    .inline-input {
+      font-size: 13px;
+      height: 32px;
+      min-width: 60px;
+    }
+
+    .inline-unit-select {
+      width: 65px;
+      height: 32px;
+      font-size: 12px;
+    }
+
+    .btn-row {
+      flex-direction: column;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+      width: 100%;
+    }
+  }
+</style>

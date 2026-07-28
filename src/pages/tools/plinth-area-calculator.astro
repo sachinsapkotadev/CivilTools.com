@@ -1,0 +1,169 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Allowable Plinth Area Calculator" 
+  description="Calculate the maximum buildable plinth area for your house after deducting road setbacks and following municipality regulations."
+  eyebrow="Estimation Tool"
+>
+  <div class="calculator-card">
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Total Plot Area</label>
+        <div class="input-with-unit">
+          <input type="number" id="plotArea" value="1000" step="0.01" />
+          <select id="plotUnit">
+            <option value="sqft">Sq. Ft</option>
+            <option value="sqm">Sq. Meter</option>
+            <option value="aana">Aana (Nepal)</option>
+            <option value="katha">Katha (Nepal)</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Ground Coverage (%)</label>
+        <input type="number" id="groundCoverage" value="70" step="1" min="0" max="100" />
+      </div>
+    </div>
+
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Plot Front Width (ft)</label>
+        <input type="number" id="plotWidth" value="40" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label>Front Setback (ft)</label>
+        <input type="number" id="frontSetback" value="5" step="0.1" />
+      </div>
+    </div>
+
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Existing Road Width (ft)</label>
+        <input type="number" id="existingRoad" value="10" step="0.1" />
+      </div>
+      <div class="input-group">
+        <label>Municipal Road Width (ft)</label>
+        <input type="number" id="municipalRoad" value="20" step="0.1" />
+      </div>
+    </div>
+
+    <div class="results-section">
+      <div class="result-display">
+        <div class="main-result">
+          <span class="label">Allowable Plinth Area</span>
+          <div id="resPlinthArea" class="result-value large">0.00 sq.ft</div>
+          <p class="sub-text" id="resBHK">Suggested: 2BHK</p>
+        </div>
+        
+        <div class="sub-results">
+          <div class="res-box">
+            <span class="val" id="resNetArea">0.00 sq.ft</span>
+            <span class="unit">Net Buildable Land</span>
+          </div>
+          <div class="res-box">
+            <span class="val" id="resRoadDed">0.00 sq.ft</span>
+            <span class="unit">Road Deduction</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function update() {
+    const plotAreaInput = document.getElementById('plotArea') as HTMLInputElement;
+    const plotUnit = (document.getElementById('plotUnit') as HTMLSelectElement).value;
+    const groundCoverage = parseFloat((document.getElementById('groundCoverage') as HTMLInputElement).value) || 0;
+    const plotWidth = parseFloat((document.getElementById('plotWidth') as HTMLInputElement).value) || 0;
+    const frontSetback = parseFloat((document.getElementById('frontSetback') as HTMLInputElement).value) || 0;
+    const existingRoad = parseFloat((document.getElementById('existingRoad') as HTMLInputElement).value) || 0;
+    const municipalRoad = parseFloat((document.getElementById('municipalRoad') as HTMLInputElement).value) || 0;
+
+    let areaSqft = parseFloat(plotAreaInput.value) || 0;
+    if (plotUnit === 'sqm') areaSqft *= 10.7639;
+    if (plotUnit === 'aana') areaSqft *= 342.25;
+    if (plotUnit === 'katha') areaSqft *= 3645;
+
+    // Road Deduction: Half of the difference between municipal and existing road width
+    const roadDiff = municipalRoad - existingRoad;
+    const roadDeductionWidth = roadDiff > 0 ? roadDiff / 2 : 0;
+    const roadDeductionArea = plotWidth * roadDeductionWidth;
+
+    // Setback Deduction
+    const setbackDeductionArea = plotWidth * frontSetback;
+
+    // Net Area
+    const netArea = Math.max(0, areaSqft - roadDeductionArea - setbackDeductionArea);
+    const plinthArea = netArea * (groundCoverage / 100);
+
+    document.getElementById('resPlinthArea')!.textContent = plinthArea.toLocaleString(undefined, {maximumFractionDigits: 2}) + ' sq.ft';
+    document.getElementById('resNetArea')!.textContent = netArea.toLocaleString(undefined, {maximumFractionDigits: 2}) + ' sq.ft';
+    document.getElementById('resRoadDed')!.textContent = roadDeductionArea.toLocaleString(undefined, {maximumFractionDigits: 2}) + ' sq.ft';
+
+    let bhk = "Studio";
+    if (plinthArea > 1500) bhk = "4BHK+";
+    else if (plinthArea > 1000) bhk = "3BHK";
+    else if (plinthArea > 700) bhk = "2BHK";
+    else if (plinthArea > 400) bhk = "1BHK";
+    
+    document.getElementById('resBHK')!.textContent = `Suggested: ${bhk}`;
+  }
+
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('input', update);
+  });
+
+  update();
+</script>
+
+<style>
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+  }
+  .input-with-unit input {
+    flex: 1;
+  }
+  .input-with-unit select {
+    width: 120px;
+  }
+  .result-display {
+    background: var(--result-bg);
+    padding: 32px;
+    border-radius: 12px;
+    text-align: center;
+  }
+  .main-result {
+    margin-bottom: 24px;
+  }
+  .main-result .label {
+    font-size: 14px;
+    color: var(--result-text-muted);
+    margin-bottom: 8px;
+    display: block;
+  }
+  .sub-results {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--result-border);
+  }
+  .res-box {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .res-box .val {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .res-box .unit {
+    font-size: 12px;
+    color: var(--result-text-muted);
+  }
+</style>

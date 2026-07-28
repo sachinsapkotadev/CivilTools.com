@@ -1,0 +1,341 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Rate Analysis of Plaster Works Calculator" 
+  description="Calculate the cost of plaster works including mortar materials, manpower, and total rate per m² based on mix ratio, plaster thickness, and prevailing rates."
+  eyebrow="Rate Analysis Tool"
+>
+  <div class="calculator-card">
+    <h2 class="section-title">Inputs</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Area of Plaster (m²)</label>
+        <input type="number" id="plasterArea" value="1" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Mix Ratio (Cement : Sand)</label>
+        <div class="pair-input">
+          <input type="number" id="mixCement" value="1" step="0.5" min="0.5" />
+          <span class="split-sep">:</span>
+          <input type="number" id="mixSand" value="4" step="0.5" min="0" />
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Thickness of Mortar (mm)</label>
+        <input type="number" id="mortarThk" value="12" step="1" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Mason per m² (By IS Code)</label>
+        <input type="number" id="masonReq" value="0.15" step="0.01" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Labour per m² (By IS Code)</label>
+        <input type="number" id="labourReq" value="0.2" step="0.01" min="0" />
+      </div>
+    </div>
+
+    <h2 class="section-title">Rates (Rs.)</h2>
+    <div class="input-grid rates-grid">
+      <div class="input-group">
+        <label>Mason rate per day (Rs)</label>
+        <input type="number" id="rateMason" value="700" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Labour rate per day (Rs)</label>
+        <input type="number" id="rateLabour" value="500" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Cement per bag (Rs)</label>
+        <input type="number" id="rateCement" value="750" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Sand per m³ (Rs)</label>
+        <input type="number" id="rateSand" value="2500" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Water per liter (Rs)</label>
+        <input type="number" id="rateWater" value="0.1" step="0.01" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Overhead & Profit (%)</label>
+        <input type="number" id="overheadPct" value="15" step="0.5" min="0" />
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <h2 class="section-title">Rate Analysis Table</h2>
+      <div class="table-wrap">
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th>S.N.</th>
+              <th>Particular</th>
+              <th>Description</th>
+              <th>Unit</th>
+              <th>Quantity</th>
+              <th>Rate/day/No. (Rs)</th>
+              <th>Amount (Rs)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td rowspan="2">1</td><td rowspan="2">Manpower</td><td>No. of Mason required</td><td>Nos.</td><td id="resMasonQty">–</td><td id="resMasonRate">–</td><td id="resMasonAmt">–</td></tr>
+            <tr><td>No. of Labour required</td><td>Nos.</td><td id="resLabourQty">–</td><td id="resLabourRate">–</td><td id="resLabourAmt">–</td></tr>
+            <tr><td rowspan="3">2</td><td rowspan="3">Materials</td><td>Dry Volume of Mortar</td><td>m³</td><td id="resDryMortar">–</td><td>–</td><td>–</td></tr>
+            <tr><td>Bags of Cement</td><td>Nos.</td><td id="resCementBags">–</td><td id="resCementRate">–</td><td id="resCementAmt">–</td></tr>
+            <tr><td>Volume of Sand</td><td>m³</td><td id="resSandVol">–</td><td id="resSandRate">–</td><td id="resSandAmt">–</td></tr>
+            <tr><td>3</td><td></td><td>Water Required</td><td>Liters</td><td id="resWaterQty">–</td><td id="resWaterRate">–</td><td id="resWaterAmt">–</td></tr>
+            <tr class="subtotal-row"><td colspan="6">Sub-Total</td><td id="resSubtotal">–</td></tr>
+            <tr><td colspan="6">Overhead and Profit (%)</td><td id="resOverheadPct">–</td><td id="resOverheadAmt">–</td></tr>
+            <tr class="total-row"><td colspan="6">Total Cost</td><td id="resTotal">–</td></tr>
+            <tr class="rate-row"><td colspan="6">Rate/m² Plaster</td><td id="resRatePerM2">–</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  const DRY_FACTOR = 1.5;
+
+  function formatNum(v, d) {
+    return v.toFixed(d);
+  }
+
+  function calculate() {
+    const area = parseFloat(document.getElementById('plasterArea').value) || 0;
+    const mixC = parseFloat(document.getElementById('mixCement').value) || 1;
+    const mixS = parseFloat(document.getElementById('mixSand').value) || 0;
+    const mortarThk = (parseFloat(document.getElementById('mortarThk').value) || 0) / 1000;
+    const masonReq = parseFloat(document.getElementById('masonReq').value) || 0;
+    const labourReq = parseFloat(document.getElementById('labourReq').value) || 0;
+
+    const rMason = parseFloat(document.getElementById('rateMason').value) || 0;
+    const rLabour = parseFloat(document.getElementById('rateLabour').value) || 0;
+    const rCement = parseFloat(document.getElementById('rateCement').value) || 0;
+    const rSand = parseFloat(document.getElementById('rateSand').value) || 0;
+    const rWater = parseFloat(document.getElementById('rateWater').value) || 0;
+    const overheadPct = parseFloat(document.getElementById('overheadPct').value) || 0;
+
+    const wetMortar = area * mortarThk;
+    const dryMortar = wetMortar * DRY_FACTOR;
+    const totalParts = mixC + mixS;
+
+    let cementBags = 0, sandVol = 0, waterL = 0;
+    if (totalParts > 0 && dryMortar > 0) {
+      const cementVol = (mixC / totalParts) * dryMortar;
+      const cementMass = cementVol * 1440;
+      cementBags = cementMass / 50;
+      sandVol = (mixS / totalParts) * dryMortar;
+      waterL = cementBags * 25;
+    }
+
+    const masonQty = area * masonReq;
+    const labourQty = area * labourReq;
+
+    const masonAmt = masonQty * rMason;
+    const labourAmt = labourQty * rLabour;
+    const cementAmt = cementBags * rCement;
+    const sandAmt = sandVol * rSand;
+    const waterAmt = waterL * rWater;
+
+    const subtotal = masonAmt + labourAmt + cementAmt + sandAmt + waterAmt;
+    const overheadAmt = subtotal * (overheadPct / 100);
+    const totalCost = subtotal + overheadAmt;
+    const ratePerM2 = area > 0 ? totalCost / area : 0;
+
+    document.getElementById('resMasonQty').textContent = formatNum(masonQty, 3);
+    document.getElementById('resMasonRate').textContent = formatNum(rMason, 0);
+    document.getElementById('resMasonAmt').textContent = formatNum(masonAmt, 2);
+
+    document.getElementById('resLabourQty').textContent = formatNum(labourQty, 3);
+    document.getElementById('resLabourRate').textContent = formatNum(rLabour, 0);
+    document.getElementById('resLabourAmt').textContent = formatNum(labourAmt, 2);
+
+    document.getElementById('resDryMortar').textContent = formatNum(dryMortar, 3);
+    document.getElementById('resCementBags').textContent = formatNum(cementBags, 3);
+    document.getElementById('resCementRate').textContent = formatNum(rCement, 0);
+    document.getElementById('resCementAmt').textContent = formatNum(cementAmt, 2);
+
+    document.getElementById('resSandVol').textContent = formatNum(sandVol, 3);
+    document.getElementById('resSandRate').textContent = formatNum(rSand, 0);
+    document.getElementById('resSandAmt').textContent = formatNum(sandAmt, 2);
+
+    document.getElementById('resWaterQty').textContent = formatNum(waterL, 3);
+    document.getElementById('resWaterRate').textContent = formatNum(rWater, 2);
+    document.getElementById('resWaterAmt').textContent = formatNum(waterAmt, 2);
+
+    document.getElementById('resSubtotal').textContent = formatNum(subtotal, 2);
+    document.getElementById('resOverheadPct').textContent = formatNum(overheadPct, 0);
+    document.getElementById('resOverheadAmt').textContent = formatNum(overheadAmt, 2);
+    document.getElementById('resTotal').textContent = formatNum(totalCost, 2);
+    document.getElementById('resRatePerM2').textContent = formatNum(ratePerM2, 2);
+
+    document.getElementById('resultsSection').style.display = 'block';
+  }
+
+  function resetForm() {
+    const vals = {
+      plasterArea: '1',
+      mixCement: '1', mixSand: '4',
+      mortarThk: '12',
+      masonReq: '0.15', labourReq: '0.2',
+      rateMason: '700', rateLabour: '500',
+      rateCement: '750', rateSand: '2500',
+      rateWater: '0.1', overheadPct: '15'
+    };
+    for (const [id, val] of Object.entries(vals)) {
+      document.getElementById(id).value = val;
+    }
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('input').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .pair-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pair-input input {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+  }
+
+  .split-sep {
+    font-size: 14px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+  }
+
+  .rates-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .result-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .result-table th,
+  .result-table td {
+    padding: 10px 14px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .result-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .result-table td:nth-child(5),
+  .result-table td:nth-child(7) {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  .result-table td:nth-child(6) {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .result-table td:last-child {
+    text-align: right;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .subtotal-row td {
+    font-weight: 600;
+    color: var(--text-primary);
+    border-top: 2px solid var(--border);
+  }
+
+  .total-row td {
+    font-weight: 700;
+    color: var(--text-primary);
+    border-top: 2px solid var(--border-strong);
+    font-size: 15px;
+  }
+
+  .rate-row td {
+    font-weight: 700;
+    color: var(--color-info);
+    font-size: 16px;
+    background: var(--table-header-bg);
+  }
+</style>

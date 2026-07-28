@@ -1,0 +1,278 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+
+const pageTitle = "Concrete Block Weight Calculator | Solid & Hollow Blocks";
+const pageDesc = "Estimate the physical weight of concrete blocks (hollow or solid) based on custom or standard dimensions, void percentage, and concrete type (AAC, normal, lightweight).";
+const keywords = "concrete block weight calculator, block weight calculator, standard block weight, hollow block weight, aac block density, concrete block calculation";
+const canonicalUrl = "/tools/block-calculator";
+
+const appSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Concrete Block Weight Calculator",
+  "url": "https://www.civiltools.com/tools/block-calculator",
+  "description": pageDesc,
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "All",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How do you calculate the weight of a concrete block?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The weight of a concrete block is calculated by: Net Solid Volume * Concrete Density. The Net Solid Volume is the Gross Volume (Length * Width * Height) minus the volume of the hollow cores/voids."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the weight of a standard 8x8x16 inch (200x200x400 mm) concrete block?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A standard solid 200x200x400 mm normal weight concrete block weighs approximately 38.4 kg (84.6 lbs). If the block has a standard 50% void space (hollow core), it weighs approximately 19.2 kg (42.3 lbs)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the density of Autoclaved Aerated Concrete (AAC) blocks?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "AAC blocks have a standard dry bulk density of approximately 600 to 800 kg/m³, which is about one-third the weight of conventional concrete blocks."
+      }
+    }
+  ]
+};
+
+const pageSchemas = [appSchema, faqSchema];
+---
+
+<ToolLayout 
+  title="Concrete Block Weight Calculator" 
+  description={pageDesc}
+  eyebrow="Estimation Tool"
+  canonical={canonicalUrl}
+  keywords={keywords}
+  schema={pageSchemas}
+>
+  <div class="calculator-card">
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Block Type / Size</label>
+        <select id="blockPreset">
+          <option value="custom">Custom Size</option>
+          <option value="400x200x200">Standard (400x200x200 mm)</option>
+          <option value="400x200x150">Standard (400x200x150 mm)</option>
+          <option value="400x200x100">Standard (400x200x100 mm)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Concrete Type</label>
+        <select id="concreteType">
+          <option value="2400">Normal Weight (2400 kg/m³)</option>
+          <option value="2000">Structural Lightweight (2000 kg/m³)</option>
+          <option value="1800">Lightweight (1800 kg/m³)</option>
+          <option value="800">AAC Block (800 kg/m³)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="input-grid" id="customDims">
+      <div class="input-group">
+        <label>Length (mm)</label>
+        <input type="number" id="blockLength" value="400" step="1" />
+      </div>
+      <div class="input-group">
+        <label>Width (mm)</label>
+        <input type="number" id="blockWidth" value="200" step="1" />
+      </div>
+      <div class="input-group">
+        <label>Height (mm)</label>
+        <input type="number" id="blockHeight" value="200" step="1" />
+      </div>
+    </div>
+
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Quantity (Nos)</label>
+        <input type="number" id="blockQty" value="1" step="1" />
+      </div>
+      <div class="input-group">
+        <label>Void Percentage (%)</label>
+        <input type="number" id="blockVoid" value="0" step="1" min="0" max="90" />
+      </div>
+    </div>
+
+    <div class="results-section">
+      <div class="result-display">
+        <div class="main-result">
+          <span class="label">Total Weight</span>
+          <div id="resTotalWeight" class="result-value large">0.00 kg</div>
+          <p class="sub-text" id="resWeightLbs">0.00 lbs</p>
+        </div>
+        
+        <div class="sub-results">
+          <div class="res-box">
+            <span class="val" id="resUnitWeight">0.00 kg</span>
+            <span class="unit">Weight per Block</span>
+          </div>
+          <div class="res-box">
+            <span class="val" id="resTotalVol">0.000 m³</span>
+            <span class="unit">Total Solid Volume</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Educational Content for SEO and AEO -->
+  <article class="seo-article" style="margin-top: 40px; border-top: 1px solid var(--border); padding-top: 40px; line-height: 1.6; font-size: 15px;">
+    <h2 style="color: var(--text-primary); font-size: 22px; margin-bottom: 16px; font-weight: 600;">How to Calculate Concrete Block Weight</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+      Estimating concrete block weights is essential for determining structural dead loads on beams, columns, and foundations. Blocks can be either solid or hollow. Hollow blocks contain voids/cores that significantly reduce their physical weight compared to solid blocks.
+    </p>
+
+    <h3 style="color: var(--text-primary); font-size: 18px; margin-top: 24px; margin-bottom: 12px; font-weight: 600;">Concrete Block Weight Formula</h3>
+    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+      The weight is determined by calculating the net solid volume of the block and multiplying by the material density:
+    </p>
+    <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border); font-family: monospace; font-size: 14px; margin-bottom: 20px; color: var(--text-primary); max-width: max-content;">
+      Gross Volume = Length &times; Width &times; Height
+    </div>
+    <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border); font-family: monospace; font-size: 14px; margin-bottom: 20px; color: var(--text-primary); max-width: max-content;">
+      Net Volume = Gross Volume &times; (1 - Void Percentage / 100)
+    </div>
+    <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border); font-family: monospace; font-size: 14px; margin-bottom: 20px; color: var(--text-primary); max-width: max-content;">
+      Weight = Net Volume &times; Concrete Density &times; Quantity
+    </div>
+
+    <h3 style="color: var(--text-primary); font-size: 18px; margin-top: 24px; margin-bottom: 12px; font-weight: 600;">Standard Concrete Block Densities</h3>
+    <ul style="color: var(--text-secondary); margin-bottom: 20px; padding-left: 20px;">
+      <li style="margin-bottom: 8px;"><strong>Normal Weight Concrete:</strong> 2400 kg/m³ (Standard sand/gravel blocks).</li>
+      <li style="margin-bottom: 8px;"><strong>Lightweight Concrete:</strong> 1800 - 2000 kg/m³ (Using pumice, slag, or expanded clay aggregates).</li>
+      <li style="margin-bottom: 8px;"><strong>AAC (Autoclaved Aerated Concrete):</strong> 600 - 800 kg/m³ (Highly porous, thermal-insulating blocks).</li>
+    </ul>
+
+    <h3 style="color: var(--text-primary); font-size: 18px; margin-top: 24px; margin-bottom: 16px; font-weight: 600;">Frequently Asked Questions (FAQ)</h3>
+    <div class="faq-section" style="display: flex; flex-direction: column; gap: 20px;">
+      <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+        <h4 style="color: var(--text-primary); font-size: 15px; margin-bottom: 8px; font-weight: 600;">How much does a hollow 8x8x16 inch (200x200x400 mm) block weigh?</h4>
+        <p style="color: var(--text-secondary); margin: 0;">
+          A standard 8x8x16 inch hollow concrete block with a typical 50% void space weighs about 19.2 kg (42.3 lbs) when cast with normal-weight concrete.
+        </p>
+      </div>
+      <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+        <h4 style="color: var(--text-primary); font-size: 15px; margin-bottom: 8px; font-weight: 600;">Why do builders use AAC blocks?</h4>
+        <p style="color: var(--text-secondary); margin: 0;">
+          AAC blocks are lightweight (about 800 kg/m³), meaning they reduce the overall dead load of the structure, are easier and faster to install, and offer superior sound insulation and thermal performance.
+        </p>
+      </div>
+    </div>
+  </article>
+</ToolLayout>
+
+<script>
+  function update() {
+    const preset = (document.getElementById('blockPreset') as HTMLSelectElement).value;
+    const lInput = document.getElementById('blockLength') as HTMLInputElement;
+    const wInput = document.getElementById('blockWidth') as HTMLInputElement;
+    const hInput = document.getElementById('blockHeight') as HTMLInputElement;
+
+    if (preset !== 'custom') {
+      const parts = preset.split('x').map(Number);
+      lInput.value = parts[0].toString();
+      wInput.value = parts[1].toString();
+      hInput.value = parts[2].toString();
+      lInput.disabled = true;
+      wInput.disabled = true;
+      hInput.disabled = true;
+    } else {
+      lInput.disabled = false;
+      wInput.disabled = false;
+      hInput.disabled = false;
+    }
+
+    const l = parseFloat(lInput.value) / 1000;
+    const w = parseFloat(wInput.value) / 1000;
+    const h = parseFloat(hInput.value) / 1000;
+    const q = parseFloat((document.getElementById('blockQty') as HTMLInputElement).value) || 0;
+    const v = parseFloat((document.getElementById('blockVoid') as HTMLInputElement).value) || 0;
+    const d = parseFloat((document.getElementById('concreteType') as HTMLSelectElement).value) || 0;
+
+    const grossVol = l * w * h;
+    const netVol = grossVol * (1 - (v / 100));
+    const totalVol = netVol * q;
+    const unitWeight = netVol * d;
+    const totalWeight = totalVol * d;
+
+    document.getElementById('resTotalWeight')!.textContent = totalWeight.toLocaleString(undefined, {maximumFractionDigits: 2}) + ' kg';
+    document.getElementById('resWeightLbs')!.textContent = (totalWeight * 2.20462).toLocaleString(undefined, {maximumFractionDigits: 2}) + ' lbs';
+    document.getElementById('resUnitWeight')!.textContent = unitWeight.toLocaleString(undefined, {maximumFractionDigits: 2}) + ' kg';
+    document.getElementById('resTotalVol')!.textContent = totalVol.toFixed(4) + ' m³';
+  }
+
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('input', update);
+  });
+
+  update();
+</script>
+
+<style>
+  .result-display {
+    background: var(--result-bg);
+    padding: 32px;
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .main-result {
+    margin-bottom: 24px;
+  }
+
+  .main-result .label {
+    font-size: 14px;
+    color: var(--result-text-muted);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .sub-text {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-top: 8px;
+  }
+
+  .sub-results {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--result-border);
+  }
+
+  .res-box {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .res-box .val {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .res-box .unit {
+    font-size: 12px;
+    color: var(--result-text-muted);
+  }
+</style>

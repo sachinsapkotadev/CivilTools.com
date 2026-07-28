@@ -1,0 +1,467 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Rebar Percentage Calculator"
+  description="Calculate the reinforcement steel percentage for a concrete cross-section. Input member dimensions and bar groups to get the provided steel area and rebar ratio."
+  eyebrow="Detailing of Rebars"
+>
+  <div class="calculator-card">
+    <h2 class="section-title">Member Dimensions</h2>
+    <div class="input-table-wrap">
+      <table class="input-table">
+        <tbody>
+          <tr>
+            <td class="td-label">Member width</td>
+            <td>
+              <div class="inline-unit-input">
+                <input type="number" id="memberWidth" class="inline-input" value="300" step="any" min="0" />
+                <span class="unit-label">mm</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td-label">Member depth</td>
+            <td>
+              <div class="inline-unit-input">
+                <input type="number" id="memberDepth" class="inline-input" value="300" step="any" min="0" />
+                <span class="unit-label">mm</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 class="section-title">Bar Groups</h2>
+    <div class="input-table-wrap">
+      <table class="input-table bar-group-table">
+        <thead>
+          <tr>
+            <th>Bar Group</th>
+            <th>Diameter</th>
+            <th>No. of Bars</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-label">Bar group A</td>
+            <td>
+              <div class="inline-unit-input">
+                <select id="diaA" class="inline-select">
+                  <option value="6">6 mm</option>
+                  <option value="8" selected>8 mm</option>
+                  <option value="10">10 mm</option>
+                  <option value="12">12 mm</option>
+                  <option value="16">16 mm</option>
+                  <option value="20">20 mm</option>
+                  <option value="25">25 mm</option>
+                  <option value="28">28 mm</option>
+                  <option value="32">32 mm</option>
+                </select>
+              </div>
+            </td>
+            <td>
+              <input type="number" id="qtyA" class="inline-input" value="4" step="1" min="0" />
+            </td>
+          </tr>
+          <tr>
+            <td class="td-label">Bar group B</td>
+            <td>
+              <div class="inline-unit-input">
+                <select id="diaB" class="inline-select">
+                  <option value="6">6 mm</option>
+                  <option value="8" selected>8 mm</option>
+                  <option value="10">10 mm</option>
+                  <option value="12">12 mm</option>
+                  <option value="16">16 mm</option>
+                  <option value="20">20 mm</option>
+                  <option value="25">25 mm</option>
+                  <option value="28">28 mm</option>
+                  <option value="32">32 mm</option>
+                </select>
+              </div>
+            </td>
+            <td>
+              <input type="number" id="qtyB" class="inline-input" value="4" step="1" min="0" />
+            </td>
+          </tr>
+          <tr>
+            <td class="td-label">Bar group C</td>
+            <td>
+              <div class="inline-unit-input">
+                <select id="diaC" class="inline-select">
+                  <option value="6">6 mm</option>
+                  <option value="8" selected>8 mm</option>
+                  <option value="10">10 mm</option>
+                  <option value="12">12 mm</option>
+                  <option value="16">16 mm</option>
+                  <option value="20">20 mm</option>
+                  <option value="25">25 mm</option>
+                  <option value="28">28 mm</option>
+                  <option value="32">32 mm</option>
+                </select>
+              </div>
+            </td>
+            <td>
+              <input type="number" id="qtyC" class="inline-input" value="0" step="1" min="0" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 class="section-title">Result Unit</h2>
+    <div class="input-table-wrap">
+      <table class="input-table">
+        <tbody>
+          <tr>
+            <td class="td-label">Result unit</td>
+            <td>
+              <div class="inline-unit-input">
+                <select id="resultUnit" class="inline-select">
+                  <option value="mm2">mm&sup2;</option>
+                  <option value="cm2">cm&sup2;</option>
+                  <option value="m2">m&sup2;</option>
+                </select>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection">
+      <h2 class="section-title">Rebar Percentage Calculator &ndash; Calculation</h2>
+      <div class="table-wrap">
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Cross sectional area (A<sub>C</sub>)</td>
+              <td><span id="resAc">0.00</span></td>
+            </tr>
+            <tr>
+              <td>Provided steel area (A<sub>S</sub>)</td>
+              <td><span id="resAs">0.00</span></td>
+            </tr>
+            <tr class="total-row">
+              <td>Total rebar percentage</td>
+              <td><span id="resPct">0.000</span> %</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function fmt(v, d) { return Number(v).toFixed(d); }
+
+  function calculate() {
+    const width = parseFloat(document.getElementById('memberWidth').value) || 0;
+    const depth = parseFloat(document.getElementById('memberDepth').value) || 0;
+    const diaA = parseFloat(document.getElementById('diaA').value) || 0;
+    const qtyA = parseInt(document.getElementById('qtyA').value) || 0;
+    const diaB = parseFloat(document.getElementById('diaB').value) || 0;
+    const qtyB = parseInt(document.getElementById('qtyB').value) || 0;
+    const diaC = parseFloat(document.getElementById('diaC').value) || 0;
+    const qtyC = parseInt(document.getElementById('qtyC').value) || 0;
+    const unit = document.getElementById('resultUnit').value;
+
+    const Ac = width * depth;
+
+    const areaA = qtyA * (Math.PI * diaA * diaA / 4);
+    const areaB = qtyB * (Math.PI * diaB * diaB / 4);
+    const areaC = qtyC * (Math.PI * diaC * diaC / 4);
+    const As = areaA + areaB + areaC;
+
+    const pct = Ac > 0 ? (As / Ac) * 100 : 0;
+
+    let divisor = 1;
+    let unitLabel = 'mm&sup2;';
+    if (unit === 'cm2') { divisor = 100; unitLabel = 'cm&sup2;'; }
+    else if (unit === 'm2') { divisor = 1000000; unitLabel = 'm&sup2;'; }
+
+    document.getElementById('resAc').innerHTML = fmt(Ac / divisor, 2) + ' ' + unitLabel;
+    document.getElementById('resAs').innerHTML = fmt(As / divisor, 2) + ' ' + unitLabel;
+    document.getElementById('resPct').textContent = fmt(pct, 3);
+  }
+
+  function resetForm() {
+    document.getElementById('memberWidth').value = '300';
+    document.getElementById('memberDepth').value = '300';
+    document.getElementById('diaA').value = '8';
+    document.getElementById('qtyA').value = '4';
+    document.getElementById('diaB').value = '8';
+    document.getElementById('qtyB').value = '4';
+    document.getElementById('diaC').value = '8';
+    document.getElementById('qtyC').value = '0';
+    document.getElementById('resultUnit').value = 'mm2';
+    calculate();
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.getElementById('resultUnit').addEventListener('change', calculate);
+  document.querySelectorAll('.input-table .inline-input, .input-table .inline-select').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+    el.addEventListener('input', calculate);
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .input-table-wrap { overflow-x: auto; }
+
+  .input-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .input-table td,
+  .input-table th {
+    padding: 10px 12px;
+    border: 1px solid var(--result-border);
+    vertical-align: middle;
+  }
+
+  .input-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+    text-align: left;
+  }
+
+  .td-label {
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    width: 40%;
+  }
+
+  .inline-unit-input {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .inline-input {
+    flex: 1;
+    height: 36px;
+    padding: 0 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-input);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    min-width: 80px;
+  }
+
+  .inline-input:focus {
+    outline: none;
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+  }
+
+  .inline-select {
+    height: 36px;
+    padding: 0 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-input);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    min-width: 120px;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  .inline-select:focus {
+    outline: none;
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+  }
+
+  .unit-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .results-section {
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+
+  .result-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .result-table th,
+  .result-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .result-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .result-table td:first-child {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .result-table td:last-child {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .total-row td {
+    background: var(--bg-page);
+    border-top: 2px solid var(--result-border);
+  }
+
+  .total-row td:last-child {
+    font-size: 16px;
+  }
+
+  .bar-group-table td:first-child {
+    font-weight: 500;
+  }
+
+  @media (max-width: 768px) {
+    .result-table td {
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .btn-row { flex-direction: column; }
+    .btn-primary, .btn-secondary { width: 100%; }
+
+    .inline-input {
+      font-size: 13px;
+      height: 32px;
+      min-width: 60px;
+    }
+
+    .inline-select {
+      height: 32px;
+      font-size: 13px;
+      min-width: 100px;
+    }
+
+    .td-label {
+      white-space: normal;
+      width: auto;
+      min-width: 100px;
+    }
+
+    .input-table td {
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .input-table td {
+      padding: 6px 8px;
+      font-size: 12px;
+    }
+    .inline-input {
+      font-size: 12px;
+      height: 28px;
+      min-width: 50px;
+    }
+    .inline-select {
+      height: 28px;
+      font-size: 12px;
+      min-width: 80px;
+    }
+    .unit-label {
+      font-size: 12px;
+    }
+    .td-label {
+      font-size: 13px;
+    }
+  }
+</style>

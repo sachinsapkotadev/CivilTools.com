@@ -1,0 +1,490 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Rebar Calculator for Slab"
+  description="Calculate the number of rebars, cutting length, and total weight of steel required for a slab based on dimensions, bar diameter, spacing, and clear cover."
+  eyebrow="Steel Weight Tool"
+>
+  <div class="calculator-card">
+    <h2 class="section-title">Input:</h2>
+    <div class="input-table-wrap">
+      <table class="input-table">
+        <tbody>
+          <tr>
+            <td class="td-label">Length of Slab (A-A):</td>
+            <td>
+              <div class="inline-unit-input">
+                <input type="number" id="slabLength" class="inline-input" value="5" step="any" min="0" />
+                <select id="lengthUnit" class="inline-unit-select">
+                  <option value="m">meter</option>
+                  <option value="ft">feet</option>
+                  <option value="inch">inch</option>
+                  <option value="mm">mm</option>
+                </select>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td-label">Width of Slab (B-B):</td>
+            <td>
+              <div class="inline-unit-input">
+                <input type="number" id="slabWidth" class="inline-input" value="3" step="any" min="0" />
+                <select id="widthUnit" class="inline-unit-select">
+                  <option value="m">meter</option>
+                  <option value="ft">feet</option>
+                  <option value="inch">inch</option>
+                  <option value="mm">mm</option>
+                </select>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td-label">Dia. of Rebar in A-A direction:</td>
+            <td>
+              <div class="inline-unit-input">
+                <select id="diaAA" class="inline-select">
+                  <option value="8">8 mm</option>
+                  <option value="10">10 mm</option>
+                  <option value="12" selected>12 mm</option>
+                  <option value="16">16 mm</option>
+                  <option value="20">20 mm</option>
+                  <option value="25">25 mm</option>
+                </select>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td-label">Spacing of Rebar in A-A direction:</td>
+            <td>
+              <div class="inline-unit-input">
+                <input type="number" id="spacingAA" class="inline-input" value="350" step="any" min="0" />
+                <span class="unit-label">mm</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td-label">Dia. of Rebar in B-B direction:</td>
+            <td>
+              <div class="inline-unit-input">
+                <select id="diaBB" class="inline-select">
+                  <option value="8">8 mm</option>
+                  <option value="10">10 mm</option>
+                  <option value="12" selected>12 mm</option>
+                  <option value="16">16 mm</option>
+                  <option value="20">20 mm</option>
+                  <option value="25">25 mm</option>
+                </select>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td-label">Spacing of Rebar in B-B direction:</td>
+            <td>
+              <div class="inline-unit-input">
+                <input type="number" id="spacingBB" class="inline-input" value="350" step="any" min="0" />
+                <span class="unit-label">mm</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td-label">Number of Rebar Mesh:</td>
+            <td>
+              <div class="inline-unit-input">
+                <select id="meshCount" class="inline-select">
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                </select>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td-label">Clear Cover of Slab:</td>
+            <td>
+              <div class="inline-unit-input">
+                <input type="number" id="cover" class="inline-input" value="25" step="any" min="0" />
+                <span class="unit-label">mm</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection">
+      <h2 class="section-title">Results:</h2>
+      <div class="table-wrap">
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>No. of Rebar in A-A Direction</td>
+              <td><span id="resNoAA">0</span></td>
+            </tr>
+            <tr>
+              <td>Cutting Length of Single Rebar in A-A Direction</td>
+              <td><span id="resCLAA">0</span> Feet</td>
+            </tr>
+            <tr>
+              <td>No. of Rebar in B-B Direction</td>
+              <td><span id="resNoBB">0</span></td>
+            </tr>
+            <tr>
+              <td>Cutting Length of Single Steel in B-B Direction</td>
+              <td><span id="resCLBB">0</span> Feet</td>
+            </tr>
+            <tr class="total-row">
+              <td>Total Weight of Rebar:</td>
+              <td><span id="resTotalWt">0</span> Kg</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function toMm(val, unit) {
+    switch (unit) {
+      case 'm': return val * 1000;
+      case 'ft': return val * 304.8;
+      case 'inch': return val * 25.4;
+      default: return val;
+    }
+  }
+
+  function fmt(v, d) { return Number(v).toFixed(d); }
+
+  function calcRebarWeight(diaMm, lenM) {
+    return (diaMm * diaMm * lenM) / 162.162;
+  }
+
+  function calculate() {
+    const lenRaw = parseFloat(document.getElementById('slabLength').value) || 0;
+    const lenUnit = document.getElementById('lengthUnit').value;
+    const widRaw = parseFloat(document.getElementById('slabWidth').value) || 0;
+    const widUnit = document.getElementById('widthUnit').value;
+    const diaAA = parseInt(document.getElementById('diaAA').value) || 12;
+    const spAA = parseFloat(document.getElementById('spacingAA').value) || 0;
+    const diaBB = parseInt(document.getElementById('diaBB').value) || 12;
+    const spBB = parseFloat(document.getElementById('spacingBB').value) || 0;
+    const mesh = parseInt(document.getElementById('meshCount').value) || 1;
+    const coverMm = parseFloat(document.getElementById('cover').value) || 0;
+
+    const lenMm = toMm(lenRaw, lenUnit);
+    const widMm = toMm(widRaw, widUnit);
+
+    if (lenMm <= 0 || widMm <= 0 || spAA <= 0 || spBB <= 0) return;
+
+    const noAA = widMm / spAA;
+    const noBB = lenMm / spBB;
+
+    const clAAMm = lenMm - 2 * coverMm;
+    const clBBMm = widMm - 2 * coverMm;
+
+    const clAAFt = clAAMm / 304.8;
+    const clBBFt = clBBMm / 304.8;
+
+    const clAAM = clAAMm / 1000;
+    const clBBM = clBBMm / 1000;
+
+    const wtAA = noAA * clAAM * calcRebarWeight(diaAA, 1);
+    const wtBB = noBB * clBBM * calcRebarWeight(diaBB, 1);
+    const totalWt = (wtAA + wtBB) * mesh;
+
+    document.getElementById('resNoAA').textContent = fmt(noAA, 1);
+    document.getElementById('resCLAA').textContent = fmt(clAAFt, 3);
+    document.getElementById('resNoBB').textContent = fmt(noBB, 1);
+    document.getElementById('resCLBB').textContent = fmt(clBBFt, 3);
+    document.getElementById('resTotalWt').textContent = fmt(totalWt, 3);
+  }
+
+  function resetForm() {
+    document.getElementById('slabLength').value = '5';
+    document.getElementById('lengthUnit').value = 'm';
+    document.getElementById('slabWidth').value = '3';
+    document.getElementById('widthUnit').value = 'm';
+    document.getElementById('diaAA').value = '12';
+    document.getElementById('spacingAA').value = '350';
+    document.getElementById('diaBB').value = '12';
+    document.getElementById('spacingBB').value = '350';
+    document.getElementById('meshCount').value = '1';
+    document.getElementById('cover').value = '25';
+    calculate();
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('.input-table .inline-input, .input-table .inline-select').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .input-table-wrap { overflow-x: auto; }
+
+  .input-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .input-table td {
+    padding: 10px 12px;
+    border: 1px solid var(--result-border);
+    vertical-align: middle;
+  }
+
+  .td-label {
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    width: 55%;
+  }
+
+  .inline-unit-input {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .inline-input {
+    flex: 1;
+    height: 36px;
+    padding: 0 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-input);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    min-width: 80px;
+  }
+
+  .inline-input:focus {
+    outline: none;
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+  }
+
+  .inline-select {
+    height: 36px;
+    padding: 0 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-input);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    min-width: 120px;
+    transition: border-color 0.2s;
+  }
+
+  .inline-select:focus {
+    outline: none;
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+  }
+
+  .inline-unit-select {
+    width: 90px;
+    height: 36px;
+    padding: 0 4px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-input);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color 0.2s;
+  }
+
+  .inline-unit-select:focus {
+    outline: none;
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+  }
+
+  .unit-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .results-section {
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+
+  .result-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .result-table th,
+  .result-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .result-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .result-table td:first-child {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .result-table td:last-child {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .total-row td {
+    background: var(--bg-page);
+    border-top: 2px solid var(--result-border);
+  }
+
+  .total-row td:last-child {
+    font-size: 16px;
+  }
+
+  @media (max-width: 768px) {
+    .result-table td {
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .btn-row { flex-direction: column; }
+    .btn-primary, .btn-secondary { width: 100%; }
+
+    .inline-input {
+      font-size: 13px;
+      height: 32px;
+      min-width: 60px;
+    }
+
+    .inline-unit-select {
+      width: 75px;
+      height: 32px;
+      font-size: 12px;
+    }
+
+    .inline-select {
+      height: 32px;
+      font-size: 13px;
+      min-width: 100px;
+    }
+
+    .td-label {
+      white-space: normal;
+      width: auto;
+      min-width: 100px;
+    }
+
+    .input-table td {
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .input-table td {
+      padding: 6px 8px;
+      font-size: 12px;
+    }
+    .inline-input {
+      font-size: 12px;
+      height: 28px;
+      min-width: 50px;
+    }
+    .inline-unit-select {
+      width: 65px;
+      height: 28px;
+      font-size: 11px;
+    }
+    .inline-select {
+      height: 28px;
+      font-size: 12px;
+      min-width: 80px;
+    }
+    .unit-label {
+      font-size: 12px;
+    }
+    .td-label {
+      font-size: 13px;
+    }
+  }
+</style>

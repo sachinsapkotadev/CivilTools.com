@@ -1,0 +1,275 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Super Elevation Calculator"
+  description="Calculate the required super elevation (banking) for horizontal curves on highways and roads as per IRC standards."
+  eyebrow="Transportation Tool"
+>
+  <div class="calculator-card">
+    <h2 class="section-title">Input Parameters</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Design Speed (V)</label>
+        <div class="input-with-unit">
+          <input type="number" id="speed" value="80" step="1" min="1" />
+          <span class="unit-label">km/h</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Radius of Curve (R)</label>
+        <div class="input-with-unit">
+          <input type="number" id="radius" value="300" step="any" min="1" />
+          <span class="unit-label">m</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Terrain / Road Type</label>
+        <select id="terrainType">
+          <option value="plain">Plain &amp; Rolling Terrain</option>
+          <option value="mountainous">Mountainous Terrain</option>
+          <option value="urban">Urban Road</option>
+          <option value="steep">Steep Terrain (Hilly)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Lane Width (W)</label>
+        <div class="input-with-unit">
+          <input type="number" id="laneWidth" value="3.5" step="0.1" min="1" />
+          <span class="unit-label">m</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Rate of Change of SE (N)</label>
+        <div class="input-with-unit">
+          <input type="number" id="seRate" value="150" step="10" min="50" />
+          <span class="unit-label">1 in N</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Coefficient of Lateral Friction (f)</label>
+        <div class="input-with-unit">
+          <input type="number" id="friction" value="0.15" step="0.01" min="0" max="0.5" />
+          <span class="unit-label">–</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <h2 class="section-title">Results</h2>
+      <div class="result-item">
+        <span class="result-label">Required Super Elevation (e)</span>
+        <span class="result-value" id="resE">–</span>
+      </div>
+      <div class="result-item">
+        <span class="result-label">Required Super Elevation</span>
+        <span class="result-value" id="resEPercent">–</span>
+      </div>
+      <div class="result-item">
+        <span class="result-label">Max. Allowable Super Elevation (e<sub>max</sub>)</span>
+        <span class="result-value" id="resEMax">–</span>
+      </div>
+      <div class="result-item">
+        <span class="result-label">Status</span>
+        <span class="result-value" id="resStatus">–</span>
+      </div>
+      <div class="result-item">
+        <span class="result-label">Super Elevation to Provide (e<sub>provided</sub>)</span>
+        <span class="result-value" id="resEProvided">–</span>
+      </div>
+      <div class="result-item">
+        <span class="result-label">Rise of Outer Edge (W × e<sub>provided</sub>)</span>
+        <span class="result-value" id="resRise">–</span>
+      </div>
+      <div class="result-item">
+        <span class="result-label">Transition Curve Length (L)</span>
+        <span class="result-value" id="resTransLen">–</span>
+      </div>
+      <div class="result-item">
+        <span class="result-label">Friction Utilised (f)</span>
+        <span class="result-value" id="resFriction">–</span>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <strong>Formula:</strong> e = V² / (225R)  (mixed traffic, IRC) &nbsp;|&nbsp; 
+      e + f = V² / (127R)  (general)
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function formatNum(v, d) {
+    if (d === undefined) d = 4;
+    return v.toFixed(d);
+  }
+
+  function calculate() {
+    const speed = parseFloat(document.getElementById('speed').value) || 0;
+    const radius = parseFloat(document.getElementById('radius').value) || 0;
+    const terrain = document.getElementById('terrainType').value;
+    const laneWidth = parseFloat(document.getElementById('laneWidth').value) || 3.5;
+    const seRate = parseFloat(document.getElementById('seRate').value) || 150;
+    const friction = parseFloat(document.getElementById('friction').value) || 0.15;
+
+    if (speed <= 0 || radius <= 0) {
+      alert('Please enter valid Speed and Radius values.');
+      return;
+    }
+
+    const maxE = { plain: 0.07, mountainous: 0.10, urban: 0.06, steep: 0.10 }[terrain] || 0.07;
+
+    const eRequired = speed * speed / (225 * radius);
+    const frictionNeeded = (speed * speed / (127 * radius)) - Math.min(eRequired, maxE);
+
+    const eProvided = Math.min(eRequired, maxE);
+    const riseMm = eProvided * laneWidth * 1000;
+    const transLen = (eProvided * laneWidth * seRate);
+    const frictionActual = Math.max(0, (speed * speed / (127 * radius)) - eProvided);
+
+    document.getElementById('resE').textContent = formatNum(eRequired, 4);
+    document.getElementById('resEPercent').textContent = formatNum(eRequired * 100, 2) + ' %';
+
+    if (eRequired <= maxE) {
+      document.getElementById('resStatus').textContent = '✓ Within limit — provide calculated e';
+      document.getElementById('resStatus').className = 'status-success';
+    } else {
+      document.getElementById('resStatus').textContent = '⚠ Exceeds max — restrict speed or increase radius';
+      document.getElementById('resStatus').className = 'status-danger';
+    }
+
+    document.getElementById('resEMax').textContent = formatNum(maxE, 4) + ' (' + formatNum(maxE * 100, 2) + ' %)';
+    document.getElementById('resEProvided').textContent = formatNum(eProvided, 4) + ' (' + formatNum(eProvided * 100, 2) + ' %)';
+    document.getElementById('resRise').textContent = formatNum(riseMm, 1) + ' mm';
+    document.getElementById('resTransLen').textContent = formatNum(transLen, 2) + ' m';
+
+    if (frictionActual > 0) {
+      document.getElementById('resFriction').textContent = formatNum(frictionActual, 4) + (frictionActual > friction ? ' (exceeds assumed f)' : ' (within assumed f)');
+    } else {
+      document.getElementById('resFriction').textContent = '0 (super elevation alone is sufficient)';
+    }
+
+    document.getElementById('resultsSection').style.display = 'block';
+  }
+
+  function resetForm() {
+    const vals = {
+      speed: '80', radius: '300', terrainType: 'plain',
+      laneWidth: '3.5', seRate: '150', friction: '0.15'
+    };
+    for (const [id, val] of Object.entries(vals)) {
+      document.getElementById(id).value = val;
+    }
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  .btn-primary {
+    padding: 10px 24px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover {
+    background: var(--bg-hover);
+  }
+
+  .btn-secondary {
+    padding: 10px 24px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-secondary:hover {
+    background: var(--bg-hover);
+  }
+
+  .input-with-unit {
+    display: flex;
+    gap: 0;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .input-with-unit .unit-label {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 12px;
+    background: var(--bg-hover);
+    border: 1px solid var(--border-input);
+    border-left: none;
+    border-radius: 0 8px 8px 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  .results-section .result-item .result-value {
+    font-size: 16px;
+  }
+
+  .status-success { color: var(--color-success); }
+  .status-danger { color: var(--color-danger); }
+
+  .note-box {
+    margin-top: 24px;
+    padding: 16px;
+    background: var(--bg-page);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  @media (max-width: 600px) {
+    .btn-row { flex-direction: column; }
+    .btn-primary, .btn-secondary { width: 100%; text-align: center; }
+    .note-box { font-size: 12px; }
+  }
+</style>

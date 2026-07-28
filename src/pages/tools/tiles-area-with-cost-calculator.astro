@@ -1,0 +1,432 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Tiles Area with Cost Calculator" 
+  description="Estimate the total area of tile/marble required, quantity of cement and sand, and total cost for tiling multiple rooms including skirting."
+  eyebrow="Estimation Tool"
+>
+  <div class="calculator-card">
+    <div class="input-grid">
+      <div class="input-group">
+        <label>1) Tile Installation Storey Upto?</label>
+        <div class="input-with-unit">
+          <input type="number" id="storey" value="1" step="1" min="1" />
+          <span class="unit-label">Floor</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">2) Size of Bed Room (Example-12×12)</h2>
+    <div class="room-grid">
+      <div class="room-group">
+        <label>Room no.1</label>
+        <div class="dual-input">
+          <input type="number" id="br1w" value="10" step="any" />
+          <span class="split-sep">×</span>
+          <input type="number" id="br1l" value="12" step="any" />
+          <span class="unit-label-inline">feet</span>
+        </div>
+      </div>
+      <div class="room-group">
+        <label>Room no.2</label>
+        <div class="dual-input">
+          <input type="number" id="br2w" value="0" step="any" />
+          <span class="split-sep">×</span>
+          <input type="number" id="br2l" value="0" step="any" />
+          <span class="unit-label-inline">feet</span>
+        </div>
+      </div>
+      <div class="room-group">
+        <label>Room no.3</label>
+        <div class="dual-input">
+          <input type="number" id="br3w" value="0" step="any" />
+          <span class="split-sep">×</span>
+          <input type="number" id="br3l" value="0" step="any" />
+          <span class="unit-label-inline">feet</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">3) Size of Kitchen (Example-8×12)</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <div class="dual-input">
+          <input type="number" id="kitchenW" value="8" step="any" />
+          <span class="split-sep">×</span>
+          <input type="number" id="kitchenL" value="12" step="any" />
+          <span class="unit-label-inline">feet</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">4) Size of Toilet/Bathroom (Example-6×12)</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <div class="dual-input">
+          <input type="number" id="toiletW" value="6" step="any" />
+          <span class="split-sep">×</span>
+          <input type="number" id="toiletL" value="8" step="any" />
+          <span class="unit-label-inline">feet</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">5) Size of Porch (Example-6×12)</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <div class="dual-input">
+          <input type="number" id="porchW" value="8" step="any" />
+          <span class="split-sep">×</span>
+          <input type="number" id="porchL" value="12" step="any" />
+          <span class="unit-label-inline">feet</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">6) Size of Living Room?</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <div class="dual-input">
+          <input type="number" id="livingW" value="12" step="any" />
+          <span class="split-sep">×</span>
+          <input type="number" id="livingL" value="14" step="any" />
+          <span class="unit-label-inline">feet</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">7) Size of Passage</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <div class="dual-input">
+          <input type="number" id="passageW" value="0" step="any" />
+          <span class="split-sep">×</span>
+          <input type="number" id="passageL" value="0" step="any" />
+          <span class="unit-label-inline">feet</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">8) Will you do skirting?</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <select id="skirting">
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+    </div>
+
+    <h2 class="section-title">9) Rate &amp; Extra</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Rate of Tile per Square feet</label>
+        <div class="input-with-unit">
+          <input type="number" id="tileRate" value="140" step="any" min="0" />
+          <span class="unit-label">Rs.</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Rate of labour per square feet</label>
+        <div class="input-with-unit">
+          <input type="number" id="labourRate" value="35" step="any" min="0" />
+          <span class="unit-label">Rs.</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Extra Expense</label>
+        <div class="input-with-unit">
+          <input type="number" id="extraPct" value="2.5" step="0.1" min="0" />
+          <span class="unit-label">%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <h3 class="table-heading">Results</h3>
+      <div class="table-wrap">
+      <table class="calc-table">
+        <thead>
+          <tr><th>Item</th><th>Value</th><th>Unit</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Total Cost of Tile/Marble</td><td id="resTotalArea">–</td><td>Square feet</td></tr>
+          <tr><td>Quantity of Cement</td><td id="resCement">–</td><td>Bags</td></tr>
+          <tr><td>Quantity of Sand</td><td id="resSand">–</td><td>Tractors</td></tr>
+          <tr><td>Approx. Estimate</td><td id="resEstimate">–</td><td>Rs.</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function formatNum(v, d) {
+    return v.toFixed(d);
+  }
+
+  function calculate() {
+    const br1w = parseFloat(document.getElementById('br1w').value) || 0;
+    const br1l = parseFloat(document.getElementById('br1l').value) || 0;
+    const br2w = parseFloat(document.getElementById('br2w').value) || 0;
+    const br2l = parseFloat(document.getElementById('br2l').value) || 0;
+    const br3w = parseFloat(document.getElementById('br3w').value) || 0;
+    const br3l = parseFloat(document.getElementById('br3l').value) || 0;
+    const kitchenW = parseFloat(document.getElementById('kitchenW').value) || 0;
+    const kitchenL = parseFloat(document.getElementById('kitchenL').value) || 0;
+    const toiletW = parseFloat(document.getElementById('toiletW').value) || 0;
+    const toiletL = parseFloat(document.getElementById('toiletL').value) || 0;
+    const porchW = parseFloat(document.getElementById('porchW').value) || 0;
+    const porchL = parseFloat(document.getElementById('porchL').value) || 0;
+    const livingW = parseFloat(document.getElementById('livingW').value) || 0;
+    const livingL = parseFloat(document.getElementById('livingL').value) || 0;
+    const passageW = parseFloat(document.getElementById('passageW').value) || 0;
+    const passageL = parseFloat(document.getElementById('passageL').value) || 0;
+
+    const tileRate = parseFloat(document.getElementById('tileRate').value) || 0;
+    const labourRate = parseFloat(document.getElementById('labourRate').value) || 0;
+    const extraPct = parseFloat(document.getElementById('extraPct').value) || 0;
+    const skirting = document.getElementById('skirting').value;
+
+    const bed1 = br1w * br1l;
+    const bed2 = br2w * br2l;
+    const bed3 = br3w * br3l;
+    const kitchen = kitchenW * kitchenL;
+    const toilet = toiletW * toiletL;
+    const porch = porchW * porchL;
+    const living = livingW * livingL;
+    const passage = passageW * passageL;
+
+    let totalArea = bed1 + bed2 + bed3 + kitchen + toilet + porch + living + passage;
+
+    if (skirting === 'yes') {
+      totalArea *= 1.1;
+    }
+
+    const rateSqFt = tileRate + labourRate;
+    const subtotal = totalArea * rateSqFt;
+    const extraAmt = subtotal * (extraPct / 100);
+    const totalEstimate = subtotal + extraAmt;
+
+    const cementBags = totalArea * 0.019;
+    const sandTractor = totalArea * 0.00158;
+
+    document.getElementById('resTotalArea').textContent = formatNum(totalArea, 1);
+    document.getElementById('resCement').textContent = formatNum(cementBags, 1);
+    document.getElementById('resSand').textContent = formatNum(sandTractor, 2);
+    document.getElementById('resEstimate').textContent = formatNum(totalEstimate, 2);
+
+    document.getElementById('resultsSection').style.display = 'block';
+  }
+
+  function resetForm() {
+    const vals = {
+      storey: '1',
+      br1w: '10', br1l: '12',
+      br2w: '0', br2l: '0',
+      br3w: '0', br3l: '0',
+      kitchenW: '8', kitchenL: '12',
+      toiletW: '6', toiletL: '8',
+      porchW: '8', porchL: '12',
+      livingW: '12', livingL: '14',
+      passageW: '0', passageL: '0',
+      skirting: 'yes',
+      tileRate: '140', labourRate: '35', extraPct: '2.5'
+    };
+    for (const [id, val] of Object.entries(vals)) {
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    }
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .unit-label {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .unit-label-inline {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .dual-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dual-input input {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+  }
+
+  .split-sep {
+    font-size: 14px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+  }
+
+  .room-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .room-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .room-group label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .room-group input,
+  .room-group select {
+    height: 44px;
+    padding: 0 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .table-heading {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 24px 0 12px;
+  }
+
+  .calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .calc-table th,
+  .calc-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .calc-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .calc-table td:last-child {
+    color: var(--text-tertiary);
+    font-size: 13px;
+  }
+
+  .calc-table td:nth-child(2) {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 768px) {
+    .room-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

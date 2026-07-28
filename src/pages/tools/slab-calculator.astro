@@ -1,0 +1,268 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+
+const pageTitle = "Concrete Slab Weight Calculator | Volume & Weight Estimator";
+const pageDesc = "Estimate the physical weight and concrete volume of a slab based on its length, width, thickness, and concrete density. Supports RCC, PCC, and custom densities.";
+const keywords = "concrete slab weight calculator, concrete slab weight, weight of concrete slab, slab volume calculator, slab weight estimator, rcc slab density";
+const canonicalUrl = "/tools/slab-calculator";
+
+const appSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Concrete Slab Weight Calculator",
+  "url": "https://www.civiltools.com/tools/slab-calculator",
+  "description": pageDesc,
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "All",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How do you calculate the weight of a concrete slab?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The weight of a concrete slab is calculated by multiplying its volume (Length * Width * Thickness) by the density of the concrete. Weight = Volume * Density."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the standard density of Reinforced Cement Concrete (RCC)?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The standard density of RCC is 2400 kilograms per cubic meter (kg/m³) or approximately 150 pounds per cubic foot (lb/ft³) to account for the steel reinforcement."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How much does a 10ft x 10ft concrete slab of 4-inch thickness weigh?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "For a 10ft x 10ft slab with a thickness of 4 inches (0.333 ft), the volume is 33.33 cubic feet. Using an RCC density of 150 lbs/cu.ft, the total slab weight is 33.33 * 150 ≈ 5,000 lbs (or 2,268 kg)."
+      }
+    }
+  ]
+};
+
+const pageSchemas = [appSchema, faqSchema];
+---
+
+<ToolLayout 
+  title="Concrete Slab Weight Calculator" 
+  description={pageDesc}
+  eyebrow="Estimation Tool"
+  canonical={canonicalUrl}
+  keywords={keywords}
+  schema={pageSchemas}
+>
+  <div class="calculator-card">
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Length (m)</label>
+        <input type="number" id="slabLength" value="5" step="any" />
+      </div>
+      <div class="input-group">
+        <label>Width (m)</label>
+        <input type="number" id="slabWidth" value="4" step="any" />
+      </div>
+      <div class="input-group">
+        <label>Thickness (m)</label>
+        <input type="number" id="slabThick" value="0.15" step="any" />
+      </div>
+      <div class="input-group">
+        <label>Quantity (Nos)</label>
+        <input type="number" id="slabQty" value="1" step="1" />
+      </div>
+    </div>
+
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Concrete Density (kg/m³)</label>
+        <select id="slabDensitySelect">
+          <option value="2400">RCC (2400 kg/m³)</option>
+          <option value="2300">PCC (2300 kg/m³)</option>
+          <option value="2000">Lightweight (2000 kg/m³)</option>
+          <option value="7850">Steel (7850 kg/m³)</option>
+          <option value="custom">Custom Density...</option>
+        </select>
+      </div>
+      <div class="input-group" id="customDensityGroup" style="display: none;">
+        <label>Enter Density (kg/m³)</label>
+        <input type="number" id="slabDensity" value="2400" step="1" />
+      </div>
+    </div>
+
+    <div class="results-section">
+      <div class="result-display-grid">
+        <div class="result-box-large">
+          <span class="label">Total Weight</span>
+          <div id="resTotalWeight" class="result-value large">0.00 kg</div>
+          <span class="sub-val" id="resTotalWeightTon">0.00 Metric Tons</span>
+        </div>
+        
+        <div class="result-box-small">
+          <div class="item">
+            <span class="label">Total Volume</span>
+            <span class="val" id="resTotalVol">0.00 m³</span>
+          </div>
+          <div class="item">
+            <span class="label">Weight per Slab</span>
+            <span class="val" id="resUnitWeight">0.00 kg</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Educational Content for SEO and AEO -->
+  <article class="seo-article" style="margin-top: 40px; border-top: 1px solid var(--border); padding-top: 40px; line-height: 1.6; font-size: 15px;">
+    <h2 style="color: var(--text-primary); font-size: 22px; margin-bottom: 16px; font-weight: 600;">How to Calculate Concrete Slab Weight</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+      Estimating the weight of a concrete slab is critical for structural load calculations, formwork design, and transport logistics. Plain Cement Concrete (PCC) and Reinforced Cement Concrete (RCC) have different densities, which directly impacts the overall weight.
+    </p>
+
+    <h3 style="color: var(--text-primary); font-size: 18px; margin-top: 24px; margin-bottom: 12px; font-weight: 600;">Concrete Slab Weight Calculation Formula</h3>
+    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+      To find the slab weight, first calculate the volume, then multiply by the material density:
+    </p>
+    <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border); font-family: monospace; font-size: 14px; margin-bottom: 20px; color: var(--text-primary); max-width: max-content;">
+      Volume (m³) = Length (m) &times; Width (m) &times; Thickness (m) &times; Quantity
+    </div>
+    <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border); font-family: monospace; font-size: 14px; margin-bottom: 20px; color: var(--text-primary); max-width: max-content;">
+      Weight (kg) = Volume (m³) &times; Concrete Density (kg/m³)
+    </div>
+
+    <h3 style="color: var(--text-primary); font-size: 18px; margin-top: 24px; margin-bottom: 12px; font-weight: 600;">Standard Concrete Densities</h3>
+    <ul style="color: var(--text-secondary); margin-bottom: 20px; padding-left: 20px;">
+      <li style="margin-bottom: 8px;"><strong>Reinforced Cement Concrete (RCC):</strong> 2400 kg/m³ (approx. 150 lbs/cu.ft). Includes steel reinforcement weight.</li>
+      <li style="margin-bottom: 8px;"><strong>Plain Cement Concrete (PCC):</strong> 2300 kg/m³ (approx. 145 lbs/cu.ft). Used for slabs without reinforcement.</li>
+      <li style="margin-bottom: 8px;"><strong>Lightweight Concrete:</strong> 1800 - 2000 kg/m³. Used for insulating or non-structural decks.</li>
+    </ul>
+
+    <h3 style="color: var(--text-primary); font-size: 18px; margin-top: 24px; margin-bottom: 16px; font-weight: 600;">Frequently Asked Questions (FAQ)</h3>
+    <div class="faq-section" style="display: flex; flex-direction: column; gap: 20px;">
+      <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+        <h4 style="color: var(--text-primary); font-size: 15px; margin-bottom: 8px; font-weight: 600;">How much does a standard concrete slab weigh?</h4>
+        <p style="color: var(--text-secondary); margin: 0;">
+          A standard concrete slab made of RCC weighs 2400 kg per cubic meter (or 150 lbs per cubic foot).
+        </p>
+      </div>
+      <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+        <h4 style="color: var(--text-primary); font-size: 15px; margin-bottom: 8px; font-weight: 600;">Does the slab weight include steel reinforcement?</h4>
+        <p style="color: var(--text-secondary); margin: 0;">
+          Yes, structural engineers typically use 2400 kg/m³ (or 150 lbs/cft) for RCC weight calculations, which accounts for the standard ratio of steel reinforcement rebars embedded in the concrete.
+        </p>
+      </div>
+    </div>
+  </article>
+</ToolLayout>
+
+<script>
+  function update() {
+    const l = parseFloat((document.getElementById('slabLength') as HTMLInputElement).value) || 0;
+    const w = parseFloat((document.getElementById('slabWidth') as HTMLInputElement).value) || 0;
+    const t = parseFloat((document.getElementById('slabThick') as HTMLInputElement).value) || 0;
+    const q = parseFloat((document.getElementById('slabQty') as HTMLInputElement).value) || 0;
+    
+    const densitySelect = document.getElementById('slabDensitySelect') as HTMLSelectElement;
+    const customGroup = document.getElementById('customDensityGroup') as HTMLElement;
+    const densityInput = document.getElementById('slabDensity') as HTMLInputElement;
+
+    let d = 2400;
+    if (densitySelect.value === 'custom') {
+      customGroup.style.display = 'flex';
+      d = parseFloat(densityInput.value) || 0;
+    } else {
+      customGroup.style.display = 'none';
+      d = parseFloat(densitySelect.value);
+      densityInput.value = d.toString();
+    }
+
+    const unitVol = l * w * t;
+    const totalVol = unitVol * q;
+    const unitWeight = unitVol * d;
+    const totalWeight = totalVol * d;
+
+    document.getElementById('resTotalWeight')!.textContent = totalWeight.toLocaleString(undefined, {maximumFractionDigits: 2}) + ' kg';
+    document.getElementById('resTotalWeightTon')!.textContent = (totalWeight / 1000).toFixed(3) + ' Metric Tons';
+    document.getElementById('resTotalVol')!.textContent = totalVol.toFixed(3) + ' m³';
+    document.getElementById('resUnitWeight')!.textContent = unitWeight.toLocaleString(undefined, {maximumFractionDigits: 2}) + ' kg';
+  }
+
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('input', update);
+  });
+
+  update();
+</script>
+
+<style>
+  .result-display-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .result-box-large {
+    background: var(--result-bg);
+    padding: 32px;
+    border-radius: 12px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .result-box-large .label {
+    font-size: 14px;
+    color: var(--result-text-muted);
+    margin-bottom: 8px;
+  }
+
+  .sub-val {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-top: 8px;
+  }
+
+  .result-box-small {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .result-box-small .item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .result-box-small .item .label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .result-box-small .item .val {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  @media (max-width: 768px) {
+    .result-display-grid { grid-template-columns: 1fr; }
+  }
+</style>

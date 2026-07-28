@@ -1,0 +1,474 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Chequered Plate Weight Calculator"
+  description="Calculate the weight and cost of chequered steel plates based on length, width, thickness, quantity, and rate per kg."
+  eyebrow="Steel Weight Tool"
+>
+  <div class="calculator-card">
+    <h2 class="section-title">Plate dimensions and rates</h2>
+    <div class="input-table-wrap">
+      <table class="input-table">
+        <tbody>
+          <tr>
+            <td class="td-sn">1)</td>
+            <td class="td-label">Length of plate</td>
+            <td>
+              <div class="inline-unit-input">
+                <input type="number" id="plateLength" class="inline-input" value="2000" step="any" min="0" />
+                <select id="lengthUnit" class="inline-unit-select">
+                  <option value="mm">mm</option>
+                  <option value="cm">cm</option>
+                  <option value="inch">inch</option>
+                  <option value="ft">ft</option>
+                  <option value="m">m</option>
+                </select>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td-sn">2)</td>
+            <td class="td-label">Width of plate</td>
+            <td>
+              <div class="inline-unit-input">
+                <input type="number" id="plateWidth" class="inline-input" value="1000" step="any" min="0" />
+                <select id="widthUnit" class="inline-unit-select">
+                  <option value="mm">mm</option>
+                  <option value="cm">cm</option>
+                  <option value="inch">inch</option>
+                  <option value="ft">ft</option>
+                  <option value="m">m</option>
+                </select>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td-sn">3)</td>
+            <td class="td-label">Thickness of plate</td>
+            <td>
+              <div class="inline-unit-input">
+                <input type="number" id="plateThickness" class="inline-input" value="10" step="any" min="0" />
+                <select id="thicknessUnit" class="inline-unit-select">
+                  <option value="mm">mm</option>
+                  <option value="cm">cm</option>
+                  <option value="inch">inch</option>
+                  <option value="ft">ft</option>
+                  <option value="m">m</option>
+                </select>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td-sn">4)</td>
+            <td class="td-label">Quantity of plates</td>
+            <td>
+              <div class="inline-unit-input">
+                <input type="number" id="plateQty" class="inline-input" value="1" step="1" min="1" />
+                <span class="unit-label">Nos</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td-sn">5)</td>
+            <td class="td-label">Steel rate per kg, Rs</td>
+            <td>
+              <div class="inline-unit-input">
+                <input type="number" id="steelRate" class="inline-input" value="155" step="any" min="0" />
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Re-Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection">
+      <h2 class="section-title">Chequered Plate Weight Calculator &ndash; Calculation</h2>
+
+      <h3 class="table-heading">Inputs summary</h3>
+      <div class="table-wrap">
+        <table class="calc-table result-group">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Value</th>
+              <th>Unit</th>
+              <th>Converted</th>
+            </tr>
+          </thead>
+          <tbody id="inputSummaryBody">
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="table-heading">Geometry and volume</h3>
+      <div class="table-wrap">
+        <table class="calc-table result-group">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Value</th>
+              <th>Unit</th>
+            </tr>
+          </thead>
+          <tbody id="geoBody">
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="table-heading">Weight</h3>
+      <div class="table-wrap">
+        <table class="calc-table result-group">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Value</th>
+              <th>Unit</th>
+            </tr>
+          </thead>
+          <tbody id="weightBody">
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="table-heading">Cost</h3>
+      <div class="table-wrap">
+        <table class="calc-table result-group">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Value</th>
+              <th>Unit</th>
+            </tr>
+          </thead>
+          <tbody id="costBody">
+          </tbody>
+        </table>
+      </div>
+
+      <p class="assumption-note">Assumptions. Density of steel 7850 kg per m&sup3;. All dimensions are converted to meters before volume. Costs use your entered rate per kg.</p>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function toMeters(val, unit) {
+    switch (unit) {
+      case 'mm': return val / 1000;
+      case 'cm': return val / 100;
+      case 'inch': return val * 0.0254;
+      case 'ft': return val * 0.3048;
+      default: return val;
+    }
+  }
+
+  function formatNum(v, d) {
+    return Number(v).toFixed(d);
+  }
+
+  function calculate() {
+    const lenRaw = parseFloat(document.getElementById('plateLength').value) || 0;
+    const lenUnit = document.getElementById('lengthUnit').value;
+    const widRaw = parseFloat(document.getElementById('plateWidth').value) || 0;
+    const widUnit = document.getElementById('widthUnit').value;
+    const thkRaw = parseFloat(document.getElementById('plateThickness').value) || 0;
+    const thkUnit = document.getElementById('thicknessUnit').value;
+    const qty = parseInt(document.getElementById('plateQty').value) || 1;
+    const rate = parseFloat(document.getElementById('steelRate').value) || 0;
+
+    const lenM = toMeters(lenRaw, lenUnit);
+    const widM = toMeters(widRaw, widUnit);
+    const thkM = toMeters(thkRaw, thkUnit);
+
+    const area = lenM * widM;
+    const volSingle = area * thkM;
+    const volTotal = volSingle * qty;
+    const density = 7850;
+    const wtSingle = volSingle * density;
+    const wtTotal = volTotal * density;
+    const wtTonne = wtTotal / 1000;
+    const costSingle = wtSingle * rate;
+    const costTotal = wtTotal * rate;
+
+    const lenDisplay = toMeters(1, lenUnit) > 0 ? (lenRaw / (1 / toMeters(1, lenUnit))).toFixed(3) : lenRaw;
+
+    document.getElementById('inputSummaryBody').innerHTML = `
+      <tr><td>Length</td><td>${formatNum(lenRaw, 0)}</td><td>${lenUnit}</td><td>${formatNum(lenM, 3)} m</td></tr>
+      <tr><td>Width</td><td>${formatNum(widRaw, 0)}</td><td>${widUnit}</td><td>${formatNum(widM, 3)} m</td></tr>
+      <tr><td>Thickness</td><td>${formatNum(thkRaw, 0)}</td><td>${thkUnit}</td><td>${formatNum(thkM, 3)} m</td></tr>
+      <tr><td>Quantity</td><td>${qty}</td><td>Nos</td><td>&ndash;</td></tr>
+      <tr><td>Rate</td><td>${formatNum(rate, 2)}</td><td>Rs per kg</td><td>&ndash;</td></tr>
+    `;
+
+    document.getElementById('geoBody').innerHTML = `
+      <tr><td>Area of one plate</td><td>${formatNum(area, 3)}</td><td>m&sup2;</td></tr>
+      <tr><td>Volume of one plate</td><td>${formatNum(volSingle, 6)}</td><td>m&sup3;</td></tr>
+      <tr><td>Volume of all plates</td><td>${formatNum(volTotal, 6)}</td><td>m&sup3;</td></tr>
+    `;
+
+    document.getElementById('weightBody').innerHTML = `
+      <tr><td>Weight of one plate</td><td>${formatNum(wtSingle, 2)}</td><td>kg</td></tr>
+      <tr><td>Total weight</td><td>${formatNum(wtTotal, 2)}</td><td>kg</td></tr>
+      <tr><td>Total weight</td><td>${formatNum(wtTonne, 3)}</td><td>tonne</td></tr>
+    `;
+
+    document.getElementById('costBody').innerHTML = `
+      <tr><td>Cost of one plate</td><td>Rs. ${formatNum(costSingle, 2)}</td><td>&ndash;</td></tr>
+      <tr><td>Total cost</td><td>Rs. ${formatNum(costTotal, 2)}</td><td>&ndash;</td></tr>
+    `;
+  }
+
+  function resetForm() {
+    document.getElementById('plateLength').value = '2000';
+    document.getElementById('lengthUnit').value = 'mm';
+    document.getElementById('plateWidth').value = '1000';
+    document.getElementById('widthUnit').value = 'mm';
+    document.getElementById('plateThickness').value = '10';
+    document.getElementById('thicknessUnit').value = 'mm';
+    document.getElementById('plateQty').value = '1';
+    document.getElementById('steelRate').value = '155';
+    calculate();
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('.input-table .inline-input').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .input-table-wrap {
+    overflow-x: auto;
+  }
+
+  .input-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .input-table td {
+    padding: 10px 12px;
+    border: 1px solid var(--result-border);
+    vertical-align: middle;
+  }
+
+  .td-sn {
+    width: 40px;
+    text-align: center;
+    color: var(--text-tertiary);
+    font-weight: 500;
+  }
+
+  .td-label {
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+  }
+
+  .inline-unit-input {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .inline-input {
+    flex: 1;
+    height: 36px;
+    padding: 0 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-input);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    min-width: 80px;
+  }
+
+  .inline-input:focus {
+    outline: none;
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+  }
+
+  .inline-unit-select {
+    width: 80px;
+    height: 36px;
+    padding: 0 4px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-input);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color 0.2s;
+  }
+
+  .inline-unit-select:focus {
+    outline: none;
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+  }
+
+  .unit-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .results-section {
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+
+  .table-heading {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 24px 0 12px;
+  }
+
+  .calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .calc-table th,
+  .calc-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .calc-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .calc-table td:first-child {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .calc-table td:last-child {
+    color: var(--text-tertiary);
+    font-size: 13px;
+  }
+
+  .calc-table td:nth-child(2) {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .assumption-note {
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--text-tertiary);
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 768px) {
+    .calc-table th,
+    .calc-table td {
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .btn-row {
+      flex-direction: column;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+      width: 100%;
+    }
+
+    .calc-table th,
+    .calc-table td {
+      padding: 6px 8px;
+      font-size: 12px;
+    }
+
+    .inline-input {
+      font-size: 13px;
+      height: 32px;
+      min-width: 60px;
+    }
+
+    .inline-unit-select {
+      width: 65px;
+      height: 32px;
+      font-size: 12px;
+    }
+  }
+</style>

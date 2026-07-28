@@ -1,0 +1,161 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Terms of Use | CivilTools.com"
+  description="Terms of use for CivilTools.com — a solo project providing free civil engineering calculators and tools for estimation and educational purposes."
+  canonical="https://www.civiltools.com/terms"
+>
+  <section class="page-header">
+    <div class="band-inner">
+      <p class="eyebrow-mono">Legal</p>
+      <h1 class="page-title">Terms of Use.</h1>
+      <p class="page-desc">Last updated: July 2026</p>
+    </div>
+  </section>
+
+  <section class="story-section">
+    <div class="band-inner">
+      <div class="prose-content">
+        <h2 class="section-title">Using CivilTools</h2>
+        <p class="story-text">
+          By using CivilTools.com ("the site"), you agree to the following terms. If you do not agree, do not use the site.
+        </p>
+
+        <h3 class="prose-h3">Tools for estimation only</h3>
+        <p class="story-text">
+          All calculators and tools on this site are provided for <strong>educational and estimation purposes only</strong>. They are not a substitute for professional engineering judgment, detailed structural analysis, or site-specific design by a qualified engineer. Always verify results independently before using them in real-world projects.
+        </p>
+
+        <h3 class="prose-h3">No warranty</h3>
+        <p class="story-text">
+          The tools are provided "as is" without any warranty, express or implied. I make no guarantees about the accuracy, completeness, or reliability of the results. Use at your own risk.
+        </p>
+
+        <h3 class="prose-h3">Limitation of liability</h3>
+        <p class="story-text">
+          To the fullest extent permitted by law, I am not liable for any damages arising from your use of the site or reliance on its tools and calculators.
+        </p>
+
+        <h3 class="prose-h3">Account responsibility</h3>
+        <p class="story-text">
+          If you create an account, you are responsible for keeping your credentials secure. You may delete your account at any time from the dashboard.
+        </p>
+
+        <h3 class="prose-h3">Contact</h3>
+        <p class="story-text">
+          For questions about these terms, email <a href="mailto:sachin.sapkota.dev@gmail.com" class="inline-link">sachin.sapkota.dev@gmail.com</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style is:global>
+  .page-header {
+    background: var(--bg-surface);
+    padding: 96px 0 64px;
+    text-align: center;
+  }
+
+  .eyebrow-mono {
+    font-family: JetBrains Mono, ui-monospace, monospace;
+    font-size: 12px;
+    font-weight: 400;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 16px;
+    letter-spacing: 0.05em;
+  }
+
+  .page-title {
+    font-size: 48px;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+  }
+
+  .page-desc {
+    font-size: 18px;
+    line-height: 28px;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .story-section {
+    background: var(--bg-page);
+    padding: 100px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .prose-content {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .section-title {
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 24px;
+    letter-spacing: -0.02em;
+  }
+
+  .prose-h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 40px 0 12px;
+    letter-spacing: -0.01em;
+  }
+
+  .story-text {
+    font-size: 16px;
+    line-height: 28px;
+    color: var(--text-secondary);
+    margin: 0 0 16px;
+  }
+
+  .inline-link {
+    color: var(--link-blue);
+    text-decoration: underline;
+  }
+
+  .inline-link:hover {
+    color: var(--link-blue-hover);
+  }
+
+  .band-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  @media (max-width: 768px) {
+    .page-header { padding: 72px 0 44px; }
+    .page-title { font-size: 36px; }
+    .page-desc { font-size: 16px; }
+    .story-section { padding: 64px 0; }
+    .band-inner { padding: 0 16px; }
+  }
+
+  @media (max-width: 480px) {
+    .page-title { font-size: 28px; }
+    .section-title { font-size: 24px; }
+    .prose-h3 { font-size: 16px; }
+  }
+
+  @media (max-width: 360px) {
+    .page-title { font-size: 24px; }
+    .page-desc { font-size: 15px; line-height: 24px; }
+    .section-title { font-size: 21px; }
+    .page-header { padding: 64px 0 36px; }
+    .story-section { padding: 48px 0; }
+    .band-inner { padding: 0 12px; }
+  }
+</style>

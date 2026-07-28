@@ -1,0 +1,336 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Stair Granite Estimator" 
+  description="Estimate the granite area, material cost, labor cost, and railing cost for staircases including treads, risers, sides, nosing, and landings."
+  eyebrow="Estimation Tool"
+>
+  <div class="calculator-card">
+    <h2 class="section-title">Stair Parts</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>1. No. of Steps</label>
+        <input type="number" id="numSteps" value="16" step="1" min="1" />
+      </div>
+      <div class="input-group">
+        <label>2. Tread Length</label>
+        <div class="input-with-unit">
+          <input type="number" id="treadLength" value="3.5" step="any" />
+          <span class="unit-label">ft</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>3. Tread Width</label>
+        <div class="input-with-unit">
+          <input type="number" id="treadWidth" value="1" step="any" />
+          <span class="unit-label">ft</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>4. Riser Width</label>
+        <div class="input-with-unit">
+          <input type="number" id="riserWidth" value="3.5" step="any" />
+          <span class="unit-label">ft</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>5. Riser Height</label>
+        <div class="input-with-unit">
+          <input type="number" id="riserHeight" value="0.5" step="any" />
+          <span class="unit-label">ft</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>6. Side Height</label>
+        <div class="input-with-unit">
+          <input type="number" id="sideHeight" value="0.33" step="any" />
+          <span class="unit-label">ft</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>7. Side Length</label>
+        <div class="input-with-unit">
+          <input type="number" id="sideLength" value="1" step="any" />
+          <span class="unit-label">ft</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>8. Nosing Width</label>
+        <div class="input-with-unit">
+          <input type="number" id="nosingWidth" value="0.2" step="any" />
+          <span class="unit-label">ft</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Landing</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>9. No. of Landings</label>
+        <input type="number" id="numLandings" value="1" step="1" min="0" />
+      </div>
+      <div class="input-group">
+        <label>10. Landing Length</label>
+        <div class="input-with-unit">
+          <input type="number" id="landingLength" value="7" step="any" />
+          <span class="unit-label">ft</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>11. Landing Width</label>
+        <div class="input-with-unit">
+          <input type="number" id="landingWidth" value="3" step="any" />
+          <span class="unit-label">ft</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Rates &amp; Railing</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Granite Rate</label>
+        <div class="input-with-unit">
+          <input type="number" id="graniteRate" value="430" step="any" min="0" />
+          <span class="unit-label">Rs/ft²</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Labor Rate</label>
+        <div class="input-with-unit">
+          <input type="number" id="labourRate" value="46" step="any" min="0" />
+          <span class="unit-label">Rs/ft²</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Railing Length</label>
+        <div class="input-with-unit">
+          <input type="number" id="railingLength" value="21" step="any" min="0" />
+          <span class="unit-label">ft</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Railing Rate</label>
+        <div class="input-with-unit">
+          <input type="number" id="railingRate" value="1200" step="any" min="0" />
+          <span class="unit-label">Rs/ft</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Wastage</label>
+        <div class="input-with-unit">
+          <input type="number" id="wastage" value="10" step="1" min="0" />
+          <span class="unit-label">%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Calculate Estimate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <h3 class="table-heading">Results</h3>
+      <div class="table-wrap">
+      <table class="calc-table">
+        <thead>
+          <tr><th>Item</th><th>Value</th><th>Unit</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Net Granite Area (incl. wastage)</td><td id="resNetArea">–</td><td>ft²</td></tr>
+          <tr><td>Granite Cost</td><td id="resGraniteCost">–</td><td>Rs.</td></tr>
+          <tr><td>Labor Cost</td><td id="resLabourCost">–</td><td>Rs.</td></tr>
+          <tr><td>Railing Cost</td><td id="resRailingCost">–</td><td>Rs.</td></tr>
+          <tr><td>Total Estimated Cost</td><td id="resTotalCost">–</td><td>Rs.</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function formatNum(v, d) {
+    return v.toFixed(d);
+  }
+
+  function calculate() {
+    const numSteps = parseFloat(document.getElementById('numSteps').value) || 0;
+    const treadLength = parseFloat(document.getElementById('treadLength').value) || 0;
+    const treadWidth = parseFloat(document.getElementById('treadWidth').value) || 0;
+    const riserWidth = parseFloat(document.getElementById('riserWidth').value) || 0;
+    const riserHeight = parseFloat(document.getElementById('riserHeight').value) || 0;
+    const sideHeight = parseFloat(document.getElementById('sideHeight').value) || 0;
+    const sideLength = parseFloat(document.getElementById('sideLength').value) || 0;
+    const nosingWidth = parseFloat(document.getElementById('nosingWidth').value) || 0;
+    const numLandings = parseFloat(document.getElementById('numLandings').value) || 0;
+    const landingLength = parseFloat(document.getElementById('landingLength').value) || 0;
+    const landingWidth = parseFloat(document.getElementById('landingWidth').value) || 0;
+    const graniteRate = parseFloat(document.getElementById('graniteRate').value) || 0;
+    const labourRate = parseFloat(document.getElementById('labourRate').value) || 0;
+    const railingLength = parseFloat(document.getElementById('railingLength').value) || 0;
+    const railingRate = parseFloat(document.getElementById('railingRate').value) || 0;
+    const wastage = parseFloat(document.getElementById('wastage').value) || 0;
+
+    const treadArea = treadLength * treadWidth * numSteps;
+    const riserArea = riserWidth * riserHeight * numSteps;
+    const sideArea = sideHeight * sideLength * numSteps;
+    const nosingArea = treadLength * nosingWidth * numSteps;
+
+    const stepArea = treadArea + riserArea + sideArea + nosingArea;
+    const landingArea = landingLength * landingWidth * numLandings;
+
+    const totalNetArea = stepArea + landingArea;
+    const areaWithWastage = totalNetArea * (1 + wastage / 100);
+    const graniteCost = areaWithWastage * graniteRate;
+    const labourCost = areaWithWastage * labourRate;
+    const railingCost = railingLength * railingRate;
+    const totalCost = graniteCost + labourCost + railingCost;
+
+    document.getElementById('resNetArea').textContent = formatNum(areaWithWastage, 2);
+    document.getElementById('resGraniteCost').textContent = Math.round(graniteCost).toString();
+    document.getElementById('resLabourCost').textContent = Math.round(labourCost).toString();
+    document.getElementById('resRailingCost').textContent = Math.round(railingCost).toString();
+    document.getElementById('resTotalCost').textContent = Math.round(totalCost).toString();
+
+    document.getElementById('resultsSection').style.display = 'block';
+  }
+
+  function resetForm() {
+    const vals = {
+      numSteps: '16',
+      treadLength: '3.5', treadWidth: '1',
+      riserWidth: '3.5', riserHeight: '0.5',
+      sideHeight: '0.33', sideLength: '1',
+      nosingWidth: '0.2',
+      numLandings: '1', landingLength: '7', landingWidth: '3',
+      graniteRate: '430', labourRate: '46',
+      railingLength: '21', railingRate: '1200',
+      wastage: '10'
+    };
+    for (const [id, val] of Object.entries(vals)) {
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    }
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('input').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .unit-label {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .table-heading {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 24px 0 12px;
+  }
+
+  .calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .calc-table th,
+  .calc-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .calc-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .calc-table td:last-child {
+    color: var(--text-tertiary);
+    font-size: 13px;
+  }
+
+  .calc-table td:nth-child(2) {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+</style>

@@ -1,0 +1,417 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+
+const pageTitle = "Concrete Column Calculator | Volume & Materials Estimator";
+const pageDesc = "Calculate the volume of concrete required for rectangular and circular columns. Get a precise material breakdown of cement bags, sand, and aggregate based on standard mix designs.";
+const keywords = "concrete column calculator, column concrete volume, cement sand aggregate calculator, circular column concrete, rectangular column calculator, civil estimator";
+const canonicalUrl = "/tools/column-calculator";
+
+const appSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Concrete Column Calculator",
+  "url": "https://www.civiltools.com/tools/column-calculator",
+  "description": pageDesc,
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "All",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How do you calculate the concrete volume of a rectangular column?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The formula is: Volume = Length * Width * Height. For example, a rectangular column of 1 ft by 1 ft and 10 ft height has a volume of 1 * 1 * 10 = 10 cubic feet (cu.ft)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do you calculate the concrete volume of a circular column?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The formula is: Volume = π * (Diameter / 2)² * Height. For example, a circular column of 1 ft diameter and 10 ft height has a volume of 3.14159 * (0.5)² * 10 ≈ 7.854 cubic feet (cu.ft)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why is dry volume concrete calculated with a factor of 1.54?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "When dry ingredients (cement, sand, and aggregate) are mixed with water, the volume decreases due to the filling of voids. To get the required wet volume of concrete, we must multiply the dry ingredients by a factor of 1.54 (an increase of 54%)."
+      }
+    }
+  ]
+};
+
+const pageSchemas = [appSchema, faqSchema];
+---
+
+<ToolLayout 
+  title="Concrete Column Calculator" 
+  description={pageDesc}
+  eyebrow="Estimation Tool"
+  canonical={canonicalUrl}
+  keywords={keywords}
+  schema={pageSchemas}
+>
+  <div class="calculator-card">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="rectangular">Rectangular</button>
+      <button class="tab-btn" data-tab="circular">Circular</button>
+    </div>
+
+    <div class="tab-content active" id="rectangular-inputs">
+      <div class="input-grid">
+        <div class="input-group">
+          <label>Length (ft)</label>
+          <input type="number" id="rectLength" value="1" step="any" />
+        </div>
+        <div class="input-group">
+          <label>Width (ft)</label>
+          <input type="number" id="rectWidth" value="1" step="any" />
+        </div>
+        <div class="input-group">
+          <label>Height (ft)</label>
+          <input type="number" id="rectHeight" value="10" step="any" />
+        </div>
+        <div class="input-group">
+          <label>Quantity (Nos)</label>
+          <input type="number" id="rectQty" value="1" step="1" />
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="circular-inputs">
+      <div class="input-grid">
+        <div class="input-group">
+          <label>Diameter (ft)</label>
+          <input type="number" id="circDiam" value="1" step="any" />
+        </div>
+        <div class="input-group">
+          <label>Height (ft)</label>
+          <input type="number" id="circHeight" value="10" step="any" />
+        </div>
+        <div class="input-group">
+          <label>Quantity (Nos)</label>
+          <input type="number" id="circQty" value="1" step="1" />
+        </div>
+      </div>
+    </div>
+
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Concrete Mix Ratio</label>
+        <select id="mixRatioSelect">
+          <option value="1:1.5:3">M20 (1 : 1.5 : 3)</option>
+          <option value="1:2:4">M15 (1 : 2 : 4)</option>
+          <option value="1:1:2">M25 (1 : 1 : 2)</option>
+          <option value="1:3:6">M10 (1 : 3 : 6)</option>
+          <option value="1:4:8">M7.5 (1 : 4 : 8)</option>
+          <option value="1:5:10">M5 (1 : 5 : 10)</option>
+          <option value="custom">Custom Ratio...</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="input-grid" id="customMixGroup" style="display: none;">
+      <div class="input-group">
+        <label>Cement</label>
+        <input type="number" id="mixCement" value="1" step="any" />
+      </div>
+      <div class="input-group">
+        <label>Sand</label>
+        <input type="number" id="mixSand" value="1.5" step="any" />
+      </div>
+      <div class="input-group">
+        <label>Aggregate</label>
+        <input type="number" id="mixAggr" value="3" step="any" />
+      </div>
+    </div>
+
+    <div class="results-section">
+      <div class="total-volume-box">
+        <span class="label">Total Wet Volume</span>
+        <div id="resWetVol" class="result-value large">0.00 cu.ft</div>
+        <span class="dry-vol" id="resDryVol">Dry Volume (x1.54): 0.00 cu.ft</span>
+      </div>
+
+      <div class="material-breakdown">
+        <h3>Material Requirements (Estimated)</h3>
+        <div class="breakdown-grid">
+          <div class="mat-item">
+            <span class="mat-name">Cement</span>
+            <span class="mat-val" id="resCement">0 Bags</span>
+          </div>
+          <div class="mat-item">
+            <span class="mat-name">Sand</span>
+            <span class="mat-val" id="resSand">0 cu.ft</span>
+          </div>
+          <div class="mat-item">
+            <span class="mat-name">Aggregate</span>
+            <span class="mat-val" id="resAggr">0 cu.ft</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Educational Content for SEO and AEO -->
+  <article class="seo-article" style="margin-top: 40px; border-top: 1px solid var(--border); padding-top: 40px; line-height: 1.6; font-size: 15px;">
+    <h2 style="color: var(--text-primary); font-size: 22px; margin-bottom: 16px; font-weight: 600;">How to Calculate Concrete Volume for Columns</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+      Concrete columns are critical load-bearing structural members. Accurately estimating the required concrete volume and its constituents (cement, sand, and aggregate) is essential to avoid material shortage and maintain structural integrity. This calculator supports rectangular (square) and circular column shapes.
+    </p>
+
+    <h3 style="color: var(--text-primary); font-size: 18px; margin-top: 24px; margin-bottom: 12px; font-weight: 600;">Column Concrete Volume Calculation Formulas</h3>
+    <ul style="color: var(--text-secondary); margin-bottom: 20px; padding-left: 20px;">
+      <li style="margin-bottom: 8px;">
+        <strong>Rectangular Column:</strong>
+        <br />
+        <code style="font-family: monospace; font-size: 14px; background: var(--bg-hover); padding: 2px 6px; border-radius: 4px; color: var(--text-primary);">Volume = Length &times; Width &times; Height &times; Quantity</code>
+      </li>
+      <li style="margin-bottom: 8px;">
+        <strong>Circular Column:</strong>
+        <br />
+        <code style="font-family: monospace; font-size: 14px; background: var(--bg-hover); padding: 2px 6px; border-radius: 4px; color: var(--text-primary);">Volume = &pi; &times; (Diameter / 2)&sup2; &times; Height &times; Quantity</code>
+      </li>
+    </ul>
+
+    <h3 style="color: var(--text-primary); font-size: 18px; margin-top: 24px; margin-bottom: 12px; font-weight: 600;">Understanding Dry Volume and the 1.54 Factor</h3>
+    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+      Concrete ingredients are dry when mixed. When water is added, the particles compact and fill empty voids, reducing the total volume by approximately 54%. Therefore, we multiply the calculated wet volume by <strong>1.54</strong> to determine the required dry volume.
+    </p>
+    <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border); font-family: monospace; font-size: 14px; margin-bottom: 20px; color: var(--text-primary); max-width: max-content;">
+      Dry Volume = Wet Volume &times; 1.54
+    </div>
+
+    <h3 style="color: var(--text-primary); font-size: 18px; margin-top: 24px; margin-bottom: 12px; font-weight: 600;">Standard Concrete Mix Ratios (IS 456)</h3>
+    <div class="table-wrap" style="margin-bottom: 24px; overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border); background: var(--table-header-bg);">
+            <th style="padding: 12px; font-weight: 600; color: var(--text-primary);">Concrete Grade</th>
+            <th style="padding: 12px; font-weight: 600; color: var(--text-primary);">Mix Ratio (Cement:Sand:Aggregate)</th>
+            <th style="padding: 12px; font-weight: 600; color: var(--text-primary);">Characteristic Strength</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 12px; font-weight: 500; color: var(--text-primary);">M25</td>
+            <td style="padding: 12px; color: var(--text-secondary);">1 : 1 : 2</td>
+            <td style="padding: 12px; color: var(--text-secondary);">25 N/mm² (3625 PSI)</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 12px; font-weight: 500; color: var(--text-primary);">M20</td>
+            <td style="padding: 12px; color: var(--text-secondary);">1 : 1.5 : 3</td>
+            <td style="padding: 12px; color: var(--text-secondary);">20 N/mm² (2900 PSI)</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 12px; font-weight: 500; color: var(--text-primary);">M15</td>
+            <td style="padding: 12px; color: var(--text-secondary);">1 : 2 : 4</td>
+            <td style="padding: 12px; color: var(--text-secondary);">15 N/mm² (2175 PSI)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="color: var(--text-primary); font-size: 18px; margin-top: 24px; margin-bottom: 16px; font-weight: 600;">Frequently Asked Questions (FAQ)</h3>
+    <div class="faq-section" style="display: flex; flex-direction: column; gap: 20px;">
+      <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+        <h4 style="color: var(--text-primary); font-size: 15px; margin-bottom: 8px; font-weight: 600;">How many bags of cement are in M20 grade concrete per cubic yard/foot?</h4>
+        <p style="color: var(--text-secondary); margin: 0;">
+          For M20 grade concrete (1:1.5:3), about 8.2 bags of cement (50kg each) are required per cubic meter of wet concrete, which converts to approximately 0.23 bags per cubic foot.
+        </p>
+      </div>
+      <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+        <h4 style="color: var(--text-primary); font-size: 15px; margin-bottom: 8px; font-weight: 600;">What is the volume of a circular column of 1.5 ft diameter and 12 ft height?</h4>
+        <p style="color: var(--text-secondary); margin: 0;">
+          Volume = &pi; &times; (0.75)&sup2; &times; 12 ≈ 3.14159 &times; 0.5625 &times; 12 ≈ 21.21 cubic feet (cft) of wet concrete.
+        </p>
+      </div>
+    </div>
+  </article>
+</ToolLayout>
+
+<script>
+  let activeTab = 'rectangular';
+
+  function update() {
+    let wetVol = 0;
+    if (activeTab === 'rectangular') {
+      const l = parseFloat((document.getElementById('rectLength') as HTMLInputElement).value) || 0;
+      const w = parseFloat((document.getElementById('rectWidth') as HTMLInputElement).value) || 0;
+      const h = parseFloat((document.getElementById('rectHeight') as HTMLInputElement).value) || 0;
+      const q = parseFloat((document.getElementById('rectQty') as HTMLInputElement).value) || 0;
+      wetVol = l * w * h * q;
+    } else {
+      const d = parseFloat((document.getElementById('circDiam') as HTMLInputElement).value) || 0;
+      const h = parseFloat((document.getElementById('circHeight') as HTMLInputElement).value) || 0;
+      const q = parseFloat((document.getElementById('circQty') as HTMLInputElement).value) || 0;
+      wetVol = Math.PI * Math.pow(d/2, 2) * h * q;
+    }
+
+    const dryVol = wetVol * 1.54;
+    
+    const mixSelect = document.getElementById('mixRatioSelect') as HTMLSelectElement;
+    const customGroup = document.getElementById('customMixGroup') as HTMLElement;
+    
+    let mix = [1, 1.5, 3];
+    if (mixSelect.value === 'custom') {
+      customGroup.style.display = 'grid';
+      mix = [
+        parseFloat((document.getElementById('mixCement') as HTMLInputElement).value) || 0,
+        parseFloat((document.getElementById('mixSand') as HTMLInputElement).value) || 0,
+        parseFloat((document.getElementById('mixAggr') as HTMLInputElement).value) || 0
+      ];
+    } else {
+      customGroup.style.display = 'none';
+      mix = mixSelect.value.split(':').map(Number);
+      (document.getElementById('mixCement') as HTMLInputElement).value = mix[0].toString();
+      (document.getElementById('mixSand') as HTMLInputElement).value = mix[1].toString();
+      (document.getElementById('mixAggr') as HTMLInputElement).value = mix[2].toString();
+    }
+
+    const sumMix = mix.reduce((a, b) => a + b, 0);
+
+    if (sumMix > 0) {
+      const cementVol = (mix[0] / sumMix) * dryVol;
+      const sandVol = (mix[1] / sumMix) * dryVol;
+      const aggrVol = (mix[2] / sumMix) * dryVol;
+      const cementBags = cementVol / 1.226;
+
+      document.getElementById('resCement')!.textContent = Math.ceil(cementBags) + ' Bags';
+      document.getElementById('resSand')!.textContent = sandVol.toFixed(2) + ' cu.ft';
+      document.getElementById('resAggr')!.textContent = aggrVol.toFixed(2) + ' cu.ft';
+    } else {
+      document.getElementById('resCement')!.textContent = '0 Bags';
+      document.getElementById('resSand')!.textContent = '0.00 cu.ft';
+      document.getElementById('resAggr')!.textContent = '0.00 cu.ft';
+    }
+
+    document.getElementById('resWetVol')!.textContent = wetVol.toFixed(2) + ' cu.ft';
+    document.getElementById('resDryVol')!.textContent = `Dry Volume (x1.54): ${dryVol.toFixed(2)} cu.ft`;
+  }
+
+  // Tab Logic
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      activeTab = (btn as HTMLElement).dataset.tab!;
+      document.getElementById(`${activeTab}-inputs`)!.classList.add('active');
+      update();
+    });
+  });
+
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('input', update);
+  });
+
+  update();
+</script>
+
+<style>
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+  }
+
+  .tab-btn {
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+
+  .tab-btn.active {
+    background: #171717;
+    color: #ffffff;
+  }
+
+  .tab-content {
+    display: none;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+
+  .total-volume-box {
+    text-align: center;
+    background: var(--result-bg);
+    padding: 24px;
+    border-radius: 12px;
+    margin-bottom: 32px;
+  }
+
+  .total-volume-box .label {
+    font-size: 13px;
+    color: var(--result-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .dry-vol {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-top: 8px;
+    display: block;
+  }
+
+  .material-breakdown h3 {
+    font-size: 15px;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+  }
+
+  .breakdown-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .mat-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 16px;
+    border-radius: 8px;
+    text-align: center;
+  }
+
+  .mat-name {
+    font-size: 12px;
+    color: var(--text-secondary);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .mat-val {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  @media (max-width: 600px) {
+    .breakdown-grid { grid-template-columns: 1fr; }
+  }
+</style>

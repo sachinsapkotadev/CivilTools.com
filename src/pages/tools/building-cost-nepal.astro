@@ -1,0 +1,300 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Building Cost Estimator (Nepal)" 
+  description="Detailed house construction cost estimator for Nepal including material quantities (Cement, Steel, Bricks) localized for NPR."
+  eyebrow="Estimation Tool"
+>
+  <div class="calculator-card">
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Number of Storeys</label>
+        <select id="storeys">
+          <option value="1">1 Storey (Ground Only)</option>
+          <option value="2">2 Storeys (G + 1)</option>
+          <option value="3">3 Storeys (G + 2)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Base Rate (Rs. / sq.ft)</label>
+        <input type="number" id="baseRate" value="3500" step="1" />
+      </div>
+    </div>
+
+    <div class="rooms-container">
+      <div class="section-header">
+        <h3>Rooms / Areas</h3>
+        <button id="addRoom" class="btn-secondary-sm">Add Room</button>
+      </div>
+      <div id="roomList">
+        <div class="room-row">
+          <input type="text" placeholder="Room Name" value="Living Room" class="room-name" />
+          <input type="number" placeholder="L (ft)" value="12" class="room-l" />
+          <input type="number" placeholder="W (ft)" value="10" class="room-w" />
+          <button class="remove-room">×</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="results-section">
+      <div class="result-display">
+        <div class="main-result">
+          <span class="label">Estimated Total Cost</span>
+          <div id="resTotalCost" class="result-value large">Rs. 0.00</div>
+          <p class="sub-text" id="resTotalArea">Total Area: 0 sq.ft</p>
+        </div>
+        
+        <div class="material-estimates">
+          <div class="mat-box">
+            <span class="val" id="resCement">0</span>
+            <span class="unit">Cement (Bags)</span>
+          </div>
+          <div class="mat-box">
+            <span class="val" id="resSteel">0</span>
+            <span class="unit">Steel (kg)</span>
+          </div>
+          <div class="mat-box">
+            <span class="val" id="resBricks">0</span>
+            <span class="unit">Bricks (Nos)</span>
+          </div>
+        </div>
+
+        <div class="breakdown-container">
+          <h3>Cost Component Breakdown</h3>
+          <div class="table-wrap">
+          <table class="breakdown-table">
+            <thead>
+              <tr>
+                <th>S.N</th>
+                <th>Cost Component</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody id="breakdownBody">
+              <!-- Dynamically populated -->
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2">Total Construction Cost</td>
+                <td id="resBaseCostTable">Rs. 0.00</td>
+              </tr>
+              <tr>
+                <td colspan="2">Design and Consultation Fees (2%)</td>
+                <td id="resFeesTable">Rs. 0.00</td>
+              </tr>
+              <tr class="total-row">
+                <td colspan="2">Total Estimated Cost</td>
+                <td id="resFinalTotalTable">Rs. 0.00</td>
+              </tr>
+            </tfoot>
+          </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function update() {
+    const storeys = parseInt((document.getElementById('storeys') as HTMLSelectElement).value);
+    const baseRate = parseFloat((document.getElementById('baseRate') as HTMLInputElement).value) || 0;
+    
+    let totalArea = 0;
+    document.querySelectorAll('.room-row').forEach(row => {
+      const l = parseFloat((row.querySelector('.room-l') as HTMLInputElement).value) || 0;
+      const w = parseFloat((row.querySelector('.room-w') as HTMLInputElement).value) || 0;
+      totalArea += (l * w);
+    });
+
+    let multiplier = 1.0;
+    if (storeys === 2) multiplier = 1.7;
+    if (storeys === 3) multiplier = 2.4;
+
+    const baseCost = totalArea * baseRate * multiplier;
+    const fees = baseCost * 0.02;
+    const totalCost = baseCost + fees;
+
+    const matFactor = multiplier;
+    const cement = totalArea * 0.45 * matFactor;
+    const steel = totalArea * 5.5 * matFactor;
+    const bricks = totalArea * 22 * matFactor;
+
+    document.getElementById('resTotalCost')!.textContent = 'Rs. ' + totalCost.toLocaleString(undefined, {maximumFractionDigits: 2});
+    document.getElementById('resTotalArea')!.textContent = `Total Area: ${totalArea.toFixed(2)} sq.ft`;
+    
+    document.getElementById('resCement')!.textContent = Math.ceil(cement).toLocaleString();
+    document.getElementById('resSteel')!.textContent = Math.ceil(steel).toLocaleString();
+    document.getElementById('resBricks')!.textContent = Math.ceil(bricks).toLocaleString();
+
+    // Detailed Breakdown
+    const components = [
+      { name: "Labour", percent: 0.25 },
+      { name: "Cement", percent: 0.15 },
+      { name: "Sand", percent: 0.05 },
+      { name: "Steel", percent: 0.12 },
+      { name: "Bricks", percent: 0.10 },
+      { name: "Doors and Windows", percent: 0.10 },
+      { name: "Electrical Work", percent: 0.08 },
+      { name: "Plumbing Work", percent: 0.05 },
+      { name: "Finishing (Paint and Plaster)", percent: 0.05 },
+      { name: "Flooring", percent: 0.03 },
+      { name: "Miscellaneous", percent: 0.02 }
+    ];
+
+    const tbody = document.getElementById('breakdownBody')!;
+    tbody.innerHTML = '';
+    
+    components.forEach((comp, index) => {
+      const amount = baseCost * comp.percent;
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${comp.name}</td>
+        <td>Rs. ${amount.toLocaleString(undefined, {maximumFractionDigits: 2})}</td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    const contingency = baseCost * 0.05;
+    const contRow = document.createElement('tr');
+    contRow.innerHTML = `
+      <td>12</td>
+      <td>Contingency Fund (5%)</td>
+      <td>Rs. ${contingency.toLocaleString(undefined, {maximumFractionDigits: 2})}</td>
+    `;
+    tbody.appendChild(contRow);
+
+    document.getElementById('resBaseCostTable')!.textContent = 'Rs. ' + baseCost.toLocaleString(undefined, {maximumFractionDigits: 2});
+    document.getElementById('resFeesTable')!.textContent = 'Rs. ' + fees.toLocaleString(undefined, {maximumFractionDigits: 2});
+    document.getElementById('resFinalTotalTable')!.textContent = 'Rs. ' + totalCost.toLocaleString(undefined, {maximumFractionDigits: 2});
+  }
+
+  document.getElementById('addRoom')!.addEventListener('click', () => {
+    const roomList = document.getElementById('roomList')!;
+    const row = document.createElement('div');
+    row.className = 'room-row';
+    row.innerHTML = `
+      <input type="text" placeholder="Room Name" value="New Room" class="room-name" />
+      <input type="number" placeholder="L (ft)" value="10" class="room-l" />
+      <input type="number" placeholder="W (ft)" value="10" class="room-w" />
+      <button class="remove-room">×</button>
+    `;
+    roomList.appendChild(row);
+    
+    row.querySelector('.remove-room')!.addEventListener('click', () => {
+      row.remove();
+      update();
+    });
+    
+    row.querySelectorAll('input').forEach(input => {
+      input.addEventListener('input', update);
+    });
+
+    update();
+  });
+
+  document.querySelectorAll('.remove-room').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      (e.target as HTMLElement).closest('.room-row')!.remove();
+      update();
+    });
+  });
+
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('input', update);
+  });
+
+  update();
+</script>
+
+<style>
+  .rooms-container {
+    margin: 32px 0;
+    padding: 24px;
+    background: var(--bg-page);
+    border-radius: 12px;
+    border: 1px solid var(--result-border);
+  }
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .section-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+  }
+  .room-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .room-row input {
+    padding: 8px 12px;
+    border: 1px solid var(--result-border);
+    border-radius: 6px;
+  }
+  .room-name { flex: 2; }
+  .room-l, .room-w { flex: 1; }
+  .remove-room {
+    background: var(--bg-page);
+    color: var(--color-danger);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+  }
+  .btn-secondary-sm {
+    background: #171717;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .main-result {
+    margin-bottom: 24px;
+  }
+  .main-result .label {
+    font-size: 14px;
+    color: var(--result-text-muted);
+    display: block;
+    margin-bottom: 8px;
+  }
+  .result-display {
+    background: var(--result-bg);
+    padding: 32px;
+    border-radius: 12px;
+    text-align: center;
+  }
+  .material-estimates {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--result-border);
+  }
+  .mat-box {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .mat-box .val {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .mat-box .unit {
+    font-size: 12px;
+    color: var(--result-text-muted);
+  }
+</style>

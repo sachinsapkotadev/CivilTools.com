@@ -1,0 +1,248 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+
+const pageTitle = "Land Area Converter | Convert Acres, Sq Ft, Hectares";
+const pageDesc = "Easily convert land area measurements between square feet, square meters, acres, hectares, square kilometers, and square miles. Essential for real estate and civil construction.";
+const keywords = "land area converter, area unit converter, convert acres to square feet, hectares to square meters, sq ft to sqm, land area calculation";
+const canonicalUrl = "/tools/land-area-converter";
+
+const appSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Land Area Converter",
+  "url": "https://www.civiltools.com/tools/land-area-converter",
+  "description": pageDesc,
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "All",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How many square feet are in an acre?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "There are exactly 43,560 square feet in one standard acre."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the conversion factor between hectares and square meters?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "One hectare is equal to exactly 10,000 square meters."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do you convert square meters to square feet?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "To convert square meters to square feet, multiply the area value by 10.7639. Conversely, to convert square feet to square meters, multiply by 0.092903."
+      }
+    }
+  ]
+};
+
+const pageSchemas = [appSchema, faqSchema];
+---
+
+<ToolLayout 
+  title="Land Area Converter" 
+  description={pageDesc}
+  eyebrow="Conversion Tool"
+  canonical={canonicalUrl}
+  keywords={keywords}
+  schema={pageSchemas}
+>
+  <div class="calculator-card">
+    <div class="input-grid">
+      <div class="input-group">
+        <label for="fromUnit">From</label>
+        <select id="fromUnit">
+          <option value="sqm">Square Meters (m²)</option>
+          <option value="sqft">Square Feet (ft²)</option>
+          <option value="acre">Acres</option>
+          <option value="hectare">Hectares</option>
+          <option value="sqkm">Square Kilometers (km²)</option>
+          <option value="sqmi">Square Miles (mi²)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="fromValue">Value</label>
+        <input type="number" id="fromValue" value="1" step="any" />
+      </div>
+    </div>
+
+    <div class="results-section">
+      <h3>Converted Areas</h3>
+      <div class="standard-results" id="internationalResults">
+        <!-- Results will be injected here -->
+      </div>
+    </div>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <h3>Unit Equivalents</h3>
+      <ul>
+        <li>1 Acre = 43,560 Square Feet</li>
+        <li>1 Hectare = 10,000 Square Meters</li>
+        <li>1 Square Kilometer = 100 Hectares</li>
+        <li>1 Square Mile = 640 Acres</li>
+      </ul>
+    </div>
+
+    <!-- Educational Content for SEO and AEO -->
+    <article class="seo-article" style="margin-top: 40px; border-top: 1px solid var(--border); padding-top: 40px; line-height: 1.6; font-size: 15px;">
+      <h2 style="color: var(--text-primary); font-size: 22px; margin-bottom: 16px; font-weight: 600;">Understanding Land Area Measurements</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 20px;">
+        Land measurement units vary greatly across regions, ranging from imperial standards (acres, square feet) to metric standards (hectares, square meters). Knowing how to convert between these units is essential for land surveyors, civil engineers, real estate developers, and property buyers.
+      </p>
+
+      <h3 style="color: var(--text-primary); font-size: 18px; margin-top: 24px; margin-bottom: 12px; font-weight: 600;">Key Land Area Units and Conversion Factors</h3>
+      <ul style="color: var(--text-secondary); margin-bottom: 20px; padding-left: 20px;">
+        <li style="margin-bottom: 8px;"><strong>Square Meter (m²):</strong> The SI base unit of area. Used globally for engineering drawings and construction layouts.</li>
+        <li style="margin-bottom: 8px;"><strong>Square Foot (ft²):</strong> Commonly used in residential real estate, architectural design, and zoning documents in the United States, India, and the United Kingdom.</li>
+        <li style="margin-bottom: 8px;"><strong>Acre:</strong> A historical imperial unit of land. 1 Acre equals 43,560 square feet or approximately 4,046.86 square meters.</li>
+        <li style="margin-bottom: 8px;"><strong>Hectare:</strong> A metric unit equal to 10,000 square meters. Widely used for agricultural land, large tracts, and forestry.</li>
+      </ul>
+
+      <h3 style="color: var(--text-primary); font-size: 18px; margin-top: 24px; margin-bottom: 16px; font-weight: 600;">Frequently Asked Questions (FAQ)</h3>
+      <div class="faq-section" style="display: flex; flex-direction: column; gap: 20px;">
+        <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+          <h4 style="color: var(--text-primary); font-size: 15px; margin-bottom: 8px; font-weight: 600;">How many square feet are in an acre?</h4>
+          <p style="color: var(--text-secondary); margin: 0;">
+            There are exactly 43,560 square feet in one standard acre.
+          </p>
+        </div>
+        <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+          <h4 style="color: var(--text-primary); font-size: 15px; margin-bottom: 8px; font-weight: 600;">What is the difference between an acre and a hectare?</h4>
+          <p style="color: var(--text-secondary); margin: 0;">
+            A hectare is larger than an acre. Specifically, 1 hectare equals approximately 2.471 acres, while 1 acre equals approximately 0.4047 hectares.
+          </p>
+        </div>
+        <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+          <h4 style="color: var(--text-primary); font-size: 15px; margin-bottom: 8px; font-weight: 600;">How do you convert square meters to square feet?</h4>
+          <p style="color: var(--text-secondary); margin: 0;">
+            To convert square meters to square feet, multiply the area value by 10.7639. To do the reverse (sq ft to sq m), multiply by 0.092903.
+          </p>
+        </div>
+      </div>
+    </article>
+  </div>
+</ToolLayout>
+
+<script>
+  const fromUnit = document.getElementById('fromUnit') as HTMLSelectElement;
+  const fromValue = document.getElementById('fromValue') as HTMLInputElement;
+  const resultsDiv = document.getElementById('internationalResults') as HTMLElement;
+
+  const units = {
+    sqm: 1,
+    sqft: 0.09290304,
+    acre: 4046.8564224,
+    hectare: 10000,
+    sqkm: 1000000,
+    sqmi: 2589988.110336
+  };
+
+  const labels = {
+    sqm: "Square Meters (m²)",
+    sqft: "Square Feet (ft²)",
+    acre: "Acres",
+    hectare: "Hectares",
+    sqkm: "Square Kilometers (km²)",
+    sqmi: "Square Miles (mi²)"
+  };
+
+  function update() {
+    const val = parseFloat(fromValue.value) || 0;
+    const unit = fromUnit.value;
+    const sqmTotal = val * units[unit];
+
+    resultsDiv.innerHTML = '';
+    Object.keys(units).forEach(u => {
+      if (u === unit) return;
+      
+      const converted = sqmTotal / units[u];
+      const item = document.createElement('div');
+      item.className = 'result-item';
+      item.innerHTML = `
+        <span class="result-label">${labels[u]}</span>
+        <span class="result-value">${converted.toLocaleString(undefined, {maximumFractionDigits: 6})}</span>
+      `;
+      resultsDiv.appendChild(item);
+    });
+  }
+
+  fromUnit.addEventListener('change', update);
+  fromValue.addEventListener('input', update);
+  update();
+</script>
+
+<style>
+  .standard-results {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .standard-results .result-item {
+    background: var(--bg-page);
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .result-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .result-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .info-grid {
+    margin-top: 48px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .info-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .info-card h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+  }
+  .info-card ul {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+</style>

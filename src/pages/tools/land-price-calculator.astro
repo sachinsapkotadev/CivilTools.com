@@ -1,0 +1,149 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Land Price Calculator" 
+  description="Calculate the total price of land based on area and market rates. Supports various units including Aana, Katha, Ropani, Bigha, and Sq. Ft."
+  eyebrow="Estimation Tool"
+>
+  <div class="calculator-card">
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Total Land Area</label>
+        <div class="input-with-unit">
+          <input type="number" id="landArea" value="1" step="0.01" />
+          <select id="landUnit">
+            <option value="aana">Aana</option>
+            <option value="ropani">Ropani</option>
+            <option value="katha">Katha</option>
+            <option value="bigha">Bigha</option>
+            <option value="sqft">Sq. Ft</option>
+            <option value="sqm">Sq. Meter</option>
+            <option value="acre">Acre</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Rate (per unit area)</label>
+        <div class="input-with-unit">
+          <input type="number" id="landRate" value="1000000" step="1" />
+          <span class="unit-label" id="rateUnit">/ Aana</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="results-section">
+      <div class="result-display">
+        <div class="main-result">
+          <span class="label">Total Land Price</span>
+          <div id="resTotalPrice" class="result-value large">0.00</div>
+          <p class="sub-text" id="resUnitSummary">1 Aana @ 1,000,000 / Aana</p>
+        </div>
+        
+        <div class="sub-results">
+          <div class="res-box">
+            <span class="val" id="resPriceSqft">0.00</span>
+            <span class="unit">Price per Sq. Ft</span>
+          </div>
+          <div class="res-box">
+            <span class="val" id="resTotalSqft">0.00</span>
+            <span class="unit">Total Sq. Ft</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function update() {
+    const areaInput = document.getElementById('landArea') as HTMLInputElement;
+    const unitSelect = document.getElementById('landUnit') as HTMLSelectElement;
+    const rateInput = document.getElementById('landRate') as HTMLInputElement;
+    const rateUnitLabel = document.getElementById('rateUnit')!;
+
+    const area = parseFloat(areaInput.value) || 0;
+    const rate = parseFloat(rateInput.value) || 0;
+    const unit = unitSelect.value;
+    const unitLabel = unitSelect.options[unitSelect.selectedIndex].text;
+
+    rateUnitLabel.textContent = `/ ${unitLabel}`;
+
+    const totalPrice = area * rate;
+
+    // Conversion factors to sqft
+    const factors = {
+      'aana': 342.25,
+      'ropani': 5476,
+      'katha': 3645,
+      'bigha': 72900,
+      'sqft': 1,
+      'sqm': 10.7639,
+      'acre': 43560
+    };
+
+    const totalSqft = area * (factors[unit] || 1);
+    const pricePerSqft = totalPrice / (totalSqft || 1);
+
+    document.getElementById('resTotalPrice')!.textContent = totalPrice.toLocaleString(undefined, {maximumFractionDigits: 2});
+    document.getElementById('resUnitSummary')!.textContent = `${area} ${unitLabel} @ ${rate.toLocaleString()} / ${unitLabel}`;
+    document.getElementById('resPriceSqft')!.textContent = pricePerSqft.toLocaleString(undefined, {maximumFractionDigits: 2});
+    document.getElementById('resTotalSqft')!.textContent = totalSqft.toLocaleString(undefined, {maximumFractionDigits: 2}) + ' sq.ft';
+  }
+
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('input', update);
+  });
+
+  update();
+</script>
+
+<style>
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .unit-label {
+    font-size: 14px;
+    color: var(--result-text-muted);
+    white-space: nowrap;
+  }
+  .result-display {
+    background: var(--result-bg);
+    padding: 32px;
+    border-radius: 12px;
+    text-align: center;
+  }
+  .main-result {
+    margin-bottom: 24px;
+  }
+  .main-result .label {
+    font-size: 14px;
+    color: var(--result-text-muted);
+    margin-bottom: 8px;
+    display: block;
+  }
+  .sub-results {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--result-border);
+  }
+  .res-box {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .res-box .val {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .res-box .unit {
+    font-size: 12px;
+    color: var(--result-text-muted);
+  }
+</style>

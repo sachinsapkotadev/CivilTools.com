@@ -1,0 +1,386 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Rate Analysis for Brick Work Calculator" 
+  description="Calculate the cost of brick masonry works including brick quantity, mortar materials, manpower, and total rate per m³ based on brick size, mix ratio, and prevailing rates."
+  eyebrow="Rate Analysis Tool"
+>
+  <div class="calculator-card">
+    <h2 class="section-title">Inputs</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Volume of Brickwork (m³)</label>
+        <input type="number" id="brickworkVol" value="1" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Mix Ratio (Cement : Sand)</label>
+        <div class="pair-input">
+          <input type="number" id="mixCement" value="1" step="0.5" min="0.5" />
+          <span class="split-sep">:</span>
+          <input type="number" id="mixSand" value="4" step="0.5" min="0" />
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Brick Dimensions L : W : H (m)</label>
+        <div class="triple-input">
+          <input type="number" id="brickL" value="0.23" step="0.01" min="0" />
+          <span class="split-sep">:</span>
+          <input type="number" id="brickW" value="0.11" step="0.01" min="0" />
+          <span class="split-sep">:</span>
+          <input type="number" id="brickH" value="0.055" step="0.001" min="0" />
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Thickness of Mortar (mm)</label>
+        <input type="number" id="mortarThk" value="10" step="1" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Mason per m³ (By IS Code)</label>
+        <input type="number" id="masonRate" value="1.5" step="0.1" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Labour per m³ (By IS Code)</label>
+        <input type="number" id="labourRate" value="2.2" step="0.1" min="0" />
+      </div>
+    </div>
+
+    <h2 class="section-title">Rates (Rs.)</h2>
+    <div class="input-grid rates-grid">
+      <div class="input-group">
+        <label>Mason rate per day (Rs)</label>
+        <input type="number" id="rateMason" value="1200" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Labour rate per day (Rs)</label>
+        <input type="number" id="rateLabour" value="500" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Brick rate per No. (Rs)</label>
+        <input type="number" id="rateBrick" value="18" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Cement per bag (Rs)</label>
+        <input type="number" id="rateCement" value="750" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Sand per m³ (Rs)</label>
+        <input type="number" id="rateSand" value="600" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Water per liter (Rs)</label>
+        <input type="number" id="rateWater" value="0.1" step="0.01" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Overhead & Profit (%)</label>
+        <input type="number" id="overheadPct" value="15" step="0.5" min="0" />
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <h2 class="section-title">Rate Analysis Table</h2>
+      <div class="table-wrap">
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th>S.N.</th>
+              <th>Particular</th>
+              <th>Description</th>
+              <th>Unit</th>
+              <th>Quantity</th>
+              <th>Rate/day/No. (Rs)</th>
+              <th>Amount (Rs)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td rowspan="2">1</td><td rowspan="2">Manpower</td><td>No. of Mason required</td><td>Nos.</td><td id="resMasonQty">–</td><td id="resMasonRate">–</td><td id="resMasonAmt">–</td></tr>
+            <tr><td>No. of Labour required</td><td>Nos.</td><td id="resLabourQty">–</td><td id="resLabourRate">–</td><td id="resLabourAmt">–</td></tr>
+            <tr><td rowspan="4">2</td><td rowspan="4">Materials</td><td>Dry Volume of Mortar</td><td>m³</td><td id="resDryMortar">–</td><td>–</td><td>–</td></tr>
+            <tr><td>No. of Bricks</td><td>Nos.</td><td id="resBricks">–</td><td id="resBrickRate">–</td><td id="resBrickAmt">–</td></tr>
+            <tr><td>Bags of Cement</td><td>Nos.</td><td id="resCementBags">–</td><td id="resCementRate">–</td><td id="resCementAmt">–</td></tr>
+            <tr><td>Volume of Sand</td><td>m³</td><td id="resSandVol">–</td><td id="resSandRate">–</td><td id="resSandAmt">–</td></tr>
+            <tr><td>3</td><td></td><td>Water Required</td><td>Liters</td><td id="resWaterQty">–</td><td id="resWaterRate">–</td><td id="resWaterAmt">–</td></tr>
+            <tr class="subtotal-row"><td colspan="6">Sub-Total</td><td id="resSubtotal">–</td></tr>
+            <tr><td colspan="6">Overhead and Profit (%)</td><td id="resOverheadPct">–</td><td id="resOverheadAmt">–</td></tr>
+            <tr class="total-row"><td colspan="6">Total Cost</td><td id="resTotal">–</td></tr>
+            <tr class="rate-row"><td colspan="6">Rate/m³ Brickwork</td><td id="resRatePerM3">–</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  const BRICK_WASTAGE = 0.05;
+
+  function formatNum(v, d) {
+    return v.toFixed(d);
+  }
+
+  function calculate() {
+    const vol = parseFloat(document.getElementById('brickworkVol').value) || 0;
+    const mixC = parseFloat(document.getElementById('mixCement').value) || 1;
+    const mixS = parseFloat(document.getElementById('mixSand').value) || 0;
+    const bL = parseFloat(document.getElementById('brickL').value) || 0;
+    const bW = parseFloat(document.getElementById('brickW').value) || 0;
+    const bH = parseFloat(document.getElementById('brickH').value) || 0;
+    const mortarThk = (parseFloat(document.getElementById('mortarThk').value) || 0) / 1000;
+    const masonPerM3 = parseFloat(document.getElementById('masonRate').value) || 0;
+    const labourPerM3 = parseFloat(document.getElementById('labourRate').value) || 0;
+
+    const rMason = parseFloat(document.getElementById('rateMason').value) || 0;
+    const rLabour = parseFloat(document.getElementById('rateLabour').value) || 0;
+    const rBrick = parseFloat(document.getElementById('rateBrick').value) || 0;
+    const rCement = parseFloat(document.getElementById('rateCement').value) || 0;
+    const rSand = parseFloat(document.getElementById('rateSand').value) || 0;
+    const rWater = parseFloat(document.getElementById('rateWater').value) || 0;
+    const overheadPct = parseFloat(document.getElementById('overheadPct').value) || 0;
+
+    const brickUnitVol = bL * bW * bH;
+    const brickVolWithMortar = (bL + mortarThk) * (bW + mortarThk) * (bH + mortarThk);
+
+    let bricks = 0, dryMortar = 0, cementBags = 0, sandVol = 0, waterL = 0;
+    if (brickVolWithMortar > 0 && vol > 0) {
+      const bricksNoWaste = vol / brickVolWithMortar;
+      bricks = bricksNoWaste * (1 + BRICK_WASTAGE);
+      const brickMaterialVol = bricks * brickUnitVol;
+      const wetMortar = Math.max(0, vol - brickMaterialVol);
+      dryMortar = wetMortar * 1.57;
+      const totalParts = mixC + mixS;
+      if (totalParts > 0 && dryMortar > 0) {
+        const cementVol = (mixC / totalParts) * dryMortar;
+        const cementMass = cementVol * 1440;
+        cementBags = cementMass / 50;
+        sandVol = (mixS / totalParts) * dryMortar;
+        waterL = cementBags * 25;
+      }
+    }
+
+    const masonQty = vol * masonPerM3;
+    const labourQty = vol * labourPerM3;
+
+    const masonAmt = masonQty * rMason;
+    const labourAmt = labourQty * rLabour;
+    const brickAmt = bricks * rBrick;
+    const cementAmt = cementBags * rCement;
+    const sandAmt = sandVol * rSand;
+    const waterAmt = waterL * rWater;
+
+    const subtotal = masonAmt + labourAmt + brickAmt + cementAmt + sandAmt + waterAmt;
+    const overheadAmt = subtotal * (overheadPct / 100);
+    const totalCost = subtotal + overheadAmt;
+    const ratePerM3 = vol > 0 ? totalCost / vol : 0;
+
+    document.getElementById('resMasonQty').textContent = formatNum(masonQty, 3);
+    document.getElementById('resMasonRate').textContent = formatNum(rMason, 0);
+    document.getElementById('resMasonAmt').textContent = formatNum(masonAmt, 2);
+
+    document.getElementById('resLabourQty').textContent = formatNum(labourQty, 3);
+    document.getElementById('resLabourRate').textContent = formatNum(rLabour, 0);
+    document.getElementById('resLabourAmt').textContent = formatNum(labourAmt, 2);
+
+    document.getElementById('resDryMortar').textContent = formatNum(dryMortar, 3);
+    document.getElementById('resBricks').textContent = formatNum(bricks, 3);
+    document.getElementById('resBrickRate').textContent = formatNum(rBrick, 0);
+    document.getElementById('resBrickAmt').textContent = formatNum(brickAmt, 2);
+
+    document.getElementById('resCementBags').textContent = formatNum(cementBags, 3);
+    document.getElementById('resCementRate').textContent = formatNum(rCement, 0);
+    document.getElementById('resCementAmt').textContent = formatNum(cementAmt, 2);
+
+    document.getElementById('resSandVol').textContent = formatNum(sandVol, 3);
+    document.getElementById('resSandRate').textContent = formatNum(rSand, 0);
+    document.getElementById('resSandAmt').textContent = formatNum(sandAmt, 2);
+
+    document.getElementById('resWaterQty').textContent = formatNum(waterL, 3);
+    document.getElementById('resWaterRate').textContent = formatNum(rWater, 2);
+    document.getElementById('resWaterAmt').textContent = formatNum(waterAmt, 2);
+
+    document.getElementById('resSubtotal').textContent = formatNum(subtotal, 2);
+    document.getElementById('resOverheadPct').textContent = formatNum(overheadPct, 0);
+    document.getElementById('resOverheadAmt').textContent = formatNum(overheadAmt, 2);
+    document.getElementById('resTotal').textContent = formatNum(totalCost, 2);
+    document.getElementById('resRatePerM3').textContent = formatNum(ratePerM3, 2);
+
+    document.getElementById('resultsSection').style.display = 'block';
+  }
+
+  function resetForm() {
+    const vals = {
+      brickworkVol: '1',
+      mixCement: '1', mixSand: '4',
+      brickL: '0.23', brickW: '0.11', brickH: '0.055',
+      mortarThk: '10',
+      masonRate: '1.5', labourRate: '2.2',
+      rateMason: '1200', rateLabour: '500',
+      rateBrick: '18', rateCement: '750',
+      rateSand: '600', rateWater: '0.1',
+      overheadPct: '15'
+    };
+    for (const [id, val] of Object.entries(vals)) {
+      document.getElementById(id).value = val;
+    }
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('input').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .pair-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pair-input input {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+  }
+
+  .triple-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .triple-input input {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+  }
+
+  .split-sep {
+    font-size: 14px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+  }
+
+  .rates-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .result-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .result-table th,
+  .result-table td {
+    padding: 10px 14px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .result-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .result-table td:nth-child(5),
+  .result-table td:nth-child(7) {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  .result-table td:nth-child(6) {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .result-table td:last-child {
+    text-align: right;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .subtotal-row td {
+    font-weight: 600;
+    color: var(--text-primary);
+    border-top: 2px solid var(--border);
+  }
+
+  .total-row td {
+    font-weight: 700;
+    color: var(--text-primary);
+    border-top: 2px solid var(--border-strong);
+    font-size: 15px;
+  }
+
+  .rate-row td {
+    font-weight: 700;
+    color: var(--color-info);
+    font-size: 16px;
+    background: var(--table-header-bg);
+  }
+</style>

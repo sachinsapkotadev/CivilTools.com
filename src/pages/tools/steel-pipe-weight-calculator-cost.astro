@@ -1,0 +1,314 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Steel Pipe Weight Calculator with Total Cost"
+  description="Calculate the total weight and cost of steel pipes based on outer diameter, inner diameter, length in feet, and rate per kg."
+  eyebrow="Steel Weight Tool"
+>
+  <div class="calculator-card">
+    <div class="note-box">
+      <strong>Standard Data used in this Calculator</strong><br />
+      Density of steel = 7850 Kg/m&sup3;<br />
+      1 meter = 3.28084 feet
+    </div>
+
+    <h2 class="section-title">Enter Details of steel Pipe</h2>
+    <p class="section-subtitle">Length of steel pipe must be in Feet</p>
+
+    <div class="input-table-wrap">
+      <table class="input-table">
+        <tbody>
+          <tr>
+            <td class="td-sn">1)</td>
+            <td class="td-label">Outer Diameter:</td>
+            <td><div class="inline-unit-input"><input type="number" id="od" class="inline-input" value="40" step="any" min="0" /><span class="unit-label">mm</span></div></td>
+          </tr>
+          <tr>
+            <td class="td-sn">2)</td>
+            <td class="td-label">Inner Diameter:</td>
+            <td><div class="inline-unit-input"><input type="number" id="idVal" class="inline-input" value="30" step="any" min="0" /><span class="unit-label">mm</span></div></td>
+          </tr>
+          <tr>
+            <td class="td-sn">3)</td>
+            <td class="td-label">Length of Pipe:</td>
+            <td><div class="inline-unit-input"><input type="number" id="pipeLen" class="inline-input" value="10" step="any" min="0" /><span class="unit-label">feet.</span></div></td>
+          </tr>
+          <tr>
+            <td class="td-sn">4)</td>
+            <td class="td-label">Cost of steel Pipe per Kg.:</td>
+            <td><div class="inline-unit-input"><input type="number" id="pipeRate" class="inline-input" value="155" step="any" min="0" /><span class="unit-label">Rs.</span></div></td>
+          </tr>
+          <tr>
+            <td class="td-sn">5)</td>
+            <td class="td-label">Total No. of pipe:</td>
+            <td><div class="inline-unit-input"><input type="number" id="pipeQty" class="inline-input" value="1" step="1" min="1" /><span class="unit-label">Nos.</span></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section">
+      <h2 class="section-title">Results</h2>
+      <div class="table-wrap">
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Total Length of Steel Pipe:</td>
+              <td><span id="resLenM">0</span> meter</td>
+            </tr>
+            <tr>
+              <td>Weight of Steel Pipe:</td>
+              <td><span id="resWtPerM">0</span> Kg/m</td>
+            </tr>
+            <tr>
+              <td>Weight of Steel Pipe per foot:</td>
+              <td><span id="resWtPerFt">0</span> Kg/feet</td>
+            </tr>
+            <tr>
+              <td>Total Weight of Steel Pipe:</td>
+              <td><span id="resTotalWt">0</span> Kg</td>
+            </tr>
+            <tr>
+              <td>Total Cost of steel Pipe:</td>
+              <td><span id="resTotalCost">0</span> Rs.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function fmt(v) { return Math.round(v * 100) / 100; }
+
+  function calculate() {
+    const od = parseFloat(document.getElementById('od').value) || 0;
+    const idVal = parseFloat(document.getElementById('idVal').value) || 0;
+    const lenFt = parseFloat(document.getElementById('pipeLen').value) || 0;
+    const rate = parseFloat(document.getElementById('pipeRate').value) || 0;
+    const qty = parseInt(document.getElementById('pipeQty').value) || 1;
+
+    if (od <= 0 || idVal <= 0 || lenFt <= 0 || idVal >= od) return;
+
+    const odM = od / 1000;
+    const idM = idVal / 1000;
+    const lenM = lenFt * 0.3048;
+
+    const area = (Math.PI / 4) * (odM * odM - idM * idM);
+    const wtPerM = area * 7850;
+    const wtPerFt = wtPerM / 3.28084;
+    const totalWt = wtPerM * lenM * qty;
+    const totalCost = totalWt * rate;
+
+    document.getElementById('resLenM').textContent = fmt(lenM);
+    document.getElementById('resWtPerM').textContent = fmt(wtPerM);
+    document.getElementById('resWtPerFt').textContent = fmt(wtPerFt);
+    document.getElementById('resTotalWt').textContent = fmt(totalWt);
+    document.getElementById('resTotalCost').textContent = fmt(totalCost);
+  }
+
+  function resetForm() {
+    document.getElementById('od').value = '40';
+    document.getElementById('idVal').value = '30';
+    document.getElementById('pipeLen').value = '10';
+    document.getElementById('pipeRate').value = '155';
+    document.getElementById('pipeQty').value = '1';
+    calculate();
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('.input-table .inline-input').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .section-subtitle {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    margin: -8px 0 16px;
+    font-style: italic;
+  }
+
+  .note-box {
+    background: var(--bg-page);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .note-box strong { color: var(--text-primary); }
+
+  .input-table-wrap { overflow-x: auto; }
+
+  .input-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .input-table td {
+    padding: 10px 12px;
+    border: 1px solid var(--result-border);
+    vertical-align: middle;
+  }
+
+  .td-sn {
+    width: 40px;
+    text-align: center;
+    color: var(--text-tertiary);
+    font-weight: 500;
+  }
+
+  .td-label {
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+  }
+
+  .inline-unit-input {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .inline-input {
+    flex: 1;
+    height: 36px;
+    padding: 0 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-input);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    min-width: 80px;
+  }
+
+  .inline-input:focus {
+    outline: none;
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+  }
+
+  .unit-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .results-section {
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+
+  .result-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .result-table th,
+  .result-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .result-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .result-table td:first-child {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .result-table td:last-child {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 480px) {
+    .btn-row { flex-direction: column; }
+    .btn-primary, .btn-secondary { width: 100%; }
+    .inline-input { font-size: 13px; height: 32px; }
+  }
+</style>

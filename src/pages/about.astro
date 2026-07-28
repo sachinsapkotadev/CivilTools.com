@@ -1,0 +1,309 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="About | CivilTools.com"
+  description="CivilTools was built by Sachin Sapkota, a civil engineering diploma student at CTEVT, Nepal. Free calculators for construction estimation, structural design, and quantity surveying — 60+ tools, also available offline on Android."
+  canonical="https://www.civiltools.com/about"
+>
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "name": "About CivilTools",
+    "url": "https://www.civiltools.com/about",
+    "mainEntity": {
+      "@type": "Person",
+      "name": "Sachin Sapkota",
+      "jobTitle": "Civil Engineering Diploma Student & Developer",
+      "description": "Civil engineering diploma student at CTEVT, Nepal, building free calculators for construction estimation and quantity surveying.",
+      "url": "https://www.civiltools.com/about"
+      // TODO: Add real profile URLs below (GitHub, LinkedIn, Play Store developer page)
+      // "sameAs": ["https://github.com/...", "https://www.linkedin.com/in/..."]
+    }
+  })} />
+
+  <section class="page-header">
+    <div class="band-inner">
+      <p class="eyebrow-mono">About</p>
+      <h1 class="page-title">Built out of necessity.</h1>
+      <p class="page-desc">Free civil engineering calculators — built by a student who needed them.</p>
+    </div>
+  </section>
+
+  <section class="story-section">
+    <div class="band-inner">
+      <div class="story-content">
+        <div>
+          <h2 class="section-title">Our story.</h2>
+          <p class="story-text">
+            CivilTools was built by <strong>Sachin Sapkota</strong>, a civil engineering diploma student at CTEVT, Nepal. Sachin started this project as a side income source, but the main motivation was personal need — wanting a single place with all the civil engineering tools and calculators needed for coursework and fieldwork.
+          </p>
+          <p class="story-text">
+            The site includes <strong>60+ calculators</strong> for concrete, steel, brick, plaster, roofing, building cost estimation, and more. All calculators are built with reference to official standards including <a href="/resources">NBC 105 (Seismic Design), NBC 110 (Concrete Structures), and NBC 111 (Steel Structures)</a>. It's also available as a free <strong>offline Android app</strong> — because site signal isn't always reliable on job sites.
+          </p>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-number">60+</span>
+            <span class="stat-label">Calculators</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number">Free</span>
+            <span class="stat-label">To Use</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number">✓</span>
+            <span class="stat-label">Offline App</span>
+          </div>
+          <!-- TODO: Add real Play Store rating/install count when available -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="team-section">
+    <div class="band-inner">
+      <div class="team-card">
+        <div class="team-avatar">SS</div>
+        <h3 class="team-name">Sachin Sapkota</h3>
+        <p class="team-role">Civil Engineering Diploma Student (CTEVT) & Developer</p>
+        <p class="team-bio">"Building the tools I wished existed when I needed them."</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-band">
+    <div class="band-inner center">
+      <h2 class="section-title">Ready to get started?</h2>
+      <p class="section-body">Try any of the 60+ calculators — no sign-up required.</p>
+      <a href="/tools" class="btn-primary">Explore the tools</a>
+    </div>
+  </section>
+</Layout>
+
+<style is:global>
+  .page-header {
+    background: var(--bg-surface);
+    padding: 96px 0 64px;
+    text-align: center;
+  }
+
+  .eyebrow-mono {
+    font-family: JetBrains Mono, ui-monospace, monospace;
+    font-size: 12px;
+    font-weight: 400;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 16px;
+    letter-spacing: 0.05em;
+  }
+
+  .page-title {
+    font-size: 48px;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+  }
+
+  .page-desc {
+    font-size: 18px;
+    line-height: 28px;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .story-section {
+    background: var(--bg-page);
+    padding: 100px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .story-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .section-title {
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 24px;
+    letter-spacing: -0.02em;
+  }
+
+  .section-title.center {
+    text-align: center;
+  }
+
+  .story-text {
+    font-size: 16px;
+    line-height: 28px;
+    color: var(--text-secondary);
+    margin: 0 0 20px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+  }
+
+  .stat-number {
+    display: block;
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -0.04em;
+    margin-bottom: 8px;
+  }
+
+  .stat-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .team-section {
+    background: var(--bg-card);
+    padding: 100px 0;
+  }
+
+  .team-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    max-width: 400px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .team-avatar {
+    width: 48px;
+    height: 48px;
+    background: var(--bg-hover);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: JetBrains Mono, monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 auto 20px;
+  }
+
+  .team-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 4px;
+  }
+
+  .team-role {
+    font-size: 14px;
+    color: var(--text-tertiary);
+    margin: 0 0 16px;
+  }
+
+  .team-bio {
+    font-size: 14px;
+    line-height: 22px;
+    color: var(--text-secondary);
+    margin: 0;
+    font-style: italic;
+  }
+
+  .cta-band {
+    background: var(--bg-page);
+    padding: 100px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .section-body {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin: 0 0 32px;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    font-weight: 500;
+    border-radius: 9999px;
+    padding: 0 24px;
+    height: 48px;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+
+  .btn-primary:hover {
+    opacity: 0.9;
+  }
+
+  .band-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .band-inner.center {
+    text-align: center;
+  }
+
+  @media (max-width: 768px) {
+    .page-header { padding: 72px 0 44px; }
+    .page-title { font-size: 36px; }
+    .page-desc { font-size: 16px; }
+    .story-section { padding: 64px 0; }
+    .story-content { grid-template-columns: 1fr; gap: 48px; }
+    .team-section { padding: 64px 0; }
+    .cta-band { padding: 64px 0; }
+    .band-inner { padding: 0 16px; }
+    .stats-grid { gap: 12px; }
+    .stat-card { padding: 24px; }
+    .stat-number { font-size: 28px; }
+  }
+
+  @media (max-width: 480px) {
+    .page-title { font-size: 28px; }
+    .section-title { font-size: 24px; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .stat-number { font-size: 24px; }
+  }
+
+  @media (max-width: 360px) {
+    .page-title { font-size: 24px; }
+    .page-desc { font-size: 15px; line-height: 24px; }
+    .section-title { font-size: 21px; }
+    .page-header { padding: 64px 0 36px; }
+    .story-section { padding: 48px 0; }
+    .team-section { padding: 48px 0; }
+    .cta-band { padding: 48px 0; }
+    .stats-grid { grid-template-columns: 1fr; }
+    .stat-card { padding: 20px; }
+    .stat-number { font-size: 28px; }
+    .team-card { padding: 24px; }
+    .band-inner { padding: 0 12px; }
+  }
+</style>

@@ -1,0 +1,494 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Rebar Weight Calculator"
+  description="Estimate the total weight of reinforcement steel bars by diameter, cut length, and quantity. Supports mm and m units with instant calculation."
+  eyebrow="Steel Weight Tool"
+>
+  <div class="calculator-card">
+    <div class="table-toolbar">
+      <button class="btn-primary" id="addBarBtn">+ Add Rebar</button>
+      <button class="btn-calculate" id="calcBtn">Calculate</button>
+    </div>
+    <div class="table-wrap">
+      <table class="calc-table" id="rebarTable">
+        <thead>
+          <tr>
+            <th>S.N</th>
+            <th>Diameter (mm)</th>
+            <th>Cut Length</th>
+            <th>Quantity</th>
+            <th>Total Length (m)</th>
+            <th>Total Weight (kg)</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="rebarTableBody">
+        </tbody>
+      </table>
+    </div>
+
+    <div class="results-section" id="resultsSection">
+      <h2 class="section-title">Diameter-wise Summary</h2>
+      <div class="table-wrap">
+        <table class="calc-table summary-table" id="summaryTable">
+          <thead>
+            <tr>
+              <th>Bar Diameter</th>
+              <th>Weight Required</th>
+            </tr>
+          </thead>
+          <tbody id="summaryTableBody">
+          </tbody>
+          <tfoot id="summaryTableFoot" class="summary-foot">
+            <tr>
+              <td><strong>Grand Total Weight</strong></td>
+              <td><span id="grandTotalKg">0.00</span> kg</td>
+            </tr>
+            <tr class="summary-ton-row">
+              <td colspan="2">Equivalent: <span id="grandTotalTon">0.000</span> Metric Tons</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  const DIAMETERS = [6, 8, 10, 12, 16, 20, 25, 28, 32, 36, 40];
+
+  let bars = [];
+
+  function toMeters(val, unit) {
+    if (unit === 'ft') return val * 0.3048;
+    if (unit === 'inch') return val * 0.0254;
+    return val;
+  }
+
+  function formatNum(v, d) {
+    return Number(v).toFixed(d);
+  }
+
+  function calcRebarWeight(diameterMm, lengthM) {
+    return (diameterMm * diameterMm * lengthM) / 162.162;
+  }
+
+  function addRow(diameter, cutLengthRaw, lengthUnit, qty) {
+    bars.push({ diameter, cutLengthRaw, lengthUnit, qty });
+  }
+
+  function deleteBar(index) {
+    bars.splice(index, 1);
+    render();
+  }
+
+  function readRowData(index) {
+    const tbody = document.getElementById('rebarTableBody');
+    const tr = tbody.children[index];
+    if (!tr) return null;
+    const dia = parseInt(tr.querySelector('.bar-diameter').value) || 12;
+    const len = parseFloat(tr.querySelector('.bar-length').value) || 0;
+    const unit = tr.querySelector('.bar-unit').value;
+    const qty = parseInt(tr.querySelector('.bar-qty').value) || 1;
+    return { diameter: dia, cutLengthRaw: len, lengthUnit: unit, qty };
+  }
+
+  function calculate() {
+    const tbody = document.getElementById('rebarTableBody');
+    const rows = tbody.querySelectorAll('tr');
+    for (let i = 0; i < rows.length; i++) {
+      const data = readRowData(i);
+      if (!data) continue;
+      const cutLengthM = toMeters(data.cutLengthRaw, data.lengthUnit);
+      const totalLength = cutLengthM * data.qty;
+      const weight = calcRebarWeight(data.diameter, totalLength);
+      const tr = rows[i];
+      tr.querySelector('.td-sn').textContent = i + 1;
+      tr.querySelector('.td-tl').textContent = formatNum(totalLength, 2);
+      tr.querySelector('.td-tw').textContent = formatNum(weight, 2);
+    }
+    renderSummary();
+  }
+
+  function renderSummary() {
+    const tbody = document.getElementById('rebarTableBody');
+    const summaryBody = document.getElementById('summaryTableBody');
+    const grandTotalKg = document.getElementById('grandTotalKg');
+    const grandTotalTon = document.getElementById('grandTotalTon');
+    const rows = tbody.querySelectorAll('tr');
+
+    if (rows.length === 0) {
+      summaryBody.innerHTML = '<tr><td colspan="2" class="empty-cell">Add rebar entries to see summary...</td></tr>';
+      document.getElementById('summaryTableFoot').style.display = 'none';
+      return;
+    }
+    document.getElementById('summaryTableFoot').style.display = '';
+
+    const summary = {};
+    let grandWeight = 0;
+
+    for (const tr of rows) {
+      const wt = parseFloat(tr.querySelector('.td-tw').textContent) || 0;
+      const diaEl = tr.querySelector('.bar-diameter');
+      const dia = parseInt(diaEl.value) || 12;
+      grandWeight += wt;
+      if (!summary[dia]) summary[dia] = 0;
+      summary[dia] += wt;
+    }
+
+    let sumHtml = '';
+    const sortedKeys = Object.keys(summary).sort((a, b) => parseInt(a) - parseInt(b));
+    for (const d of sortedKeys) {
+      sumHtml += `<tr><td>&#216; ${d} mm</td><td>${formatNum(summary[d], 2)} kg</td></tr>`;
+    }
+    summaryBody.innerHTML = sumHtml;
+
+    grandTotalKg.textContent = formatNum(grandWeight, 2);
+    grandTotalTon.textContent = formatNum(grandWeight / 1000, 3);
+  }
+
+  function render() {
+    const tbody = document.getElementById('rebarTableBody');
+    if (bars.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="empty-cell">Add rebar entries to see summary...</td></tr>';
+      document.getElementById('summaryTableBody').innerHTML = '';
+      document.getElementById('summaryTableFoot').style.display = 'none';
+      document.getElementById('grandTotalKg').textContent = '0.00';
+      document.getElementById('grandTotalTon').textContent = '0.000';
+      return;
+    }
+    let html = '';
+    for (let i = 0; i < bars.length; i++) {
+      const b = bars[i];
+      const diaOptions = DIAMETERS.map(d =>
+        `<option value="${d}"${d === b.diameter ? ' selected' : ''}>&#216; ${d} mm</option>`
+      ).join('');
+      const unitOptions = ['m', 'ft', 'inch'].map(u =>
+        `<option value="${u}"${u === b.lengthUnit ? ' selected' : ''}>${u}</option>`
+      ).join('');
+      html += `<tr>
+        <td class="td-sn">${i + 1}</td>
+        <td><select class="bar-diameter inline-select">${diaOptions}</select></td>
+        <td><div class="inline-unit-input"><input type="number" class="bar-length inline-input" value="${b.cutLengthRaw}" step="any" min="0" /><select class="bar-unit inline-unit-select">${unitOptions}</select></div></td>
+        <td><input type="number" class="bar-qty inline-input" value="${b.qty}" step="1" min="1" /></td>
+        <td class="td-result td-tl">-</td>
+        <td class="td-result td-tw">-</td>
+        <td><button class="btn-delete" data-index="${i}">Delete</button></td>
+      </tr>`;
+    }
+    tbody.innerHTML = html;
+    calculate();
+  }
+
+  document.getElementById('addBarBtn').addEventListener('click', () => {
+    bars.push({ diameter: 12, cutLengthRaw: 0, lengthUnit: 'm', qty: 1 });
+    render();
+  });
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+
+  document.addEventListener('click', function (e) {
+    if (e.target.classList.contains('btn-delete')) {
+      const idx = parseInt(e.target.dataset.index);
+      if (!isNaN(idx)) deleteBar(idx);
+    }
+  });
+
+  // Init with sample data
+  (function init() {
+    bars.push({ diameter: 12, cutLengthRaw: 10, lengthUnit: 'm', qty: 1 });
+    bars.push({ diameter: 16, cutLengthRaw: 12, lengthUnit: 'm', qty: 4 });
+    render();
+  })();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .table-toolbar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    height: 40px;
+    padding: 0 20px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-calculate {
+    height: 40px;
+    padding: 0 20px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-calculate:hover { background: var(--bg-hover); }
+
+  .calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .calc-table th,
+  .calc-table td {
+    padding: 10px 12px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  .calc-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .calc-table td:last-child {
+    text-align: center;
+  }
+
+  .inline-input {
+    width: 100%;
+    min-width: 60px;
+    height: 36px;
+    padding: 0 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-input);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+  }
+
+  .inline-input:focus {
+    outline: none;
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+  }
+
+  .inline-select {
+    width: 100%;
+    min-width: 90px;
+    height: 36px;
+    padding: 0 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-input);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    cursor: pointer;
+  }
+
+  .inline-select:focus {
+    outline: none;
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+  }
+
+  .inline-unit-input {
+    display: flex;
+    gap: 6px;
+  }
+
+  .inline-unit-input .inline-input {
+    flex: 1;
+    min-width: 50px;
+  }
+
+  .inline-unit-select {
+    width: 70px;
+    height: 36px;
+    padding: 0 4px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-input);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .inline-unit-select:focus {
+    outline: none;
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+  }
+
+  .td-sn {
+    text-align: center !important;
+    color: var(--text-tertiary);
+    font-weight: 500;
+  }
+
+  .td-result {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .btn-delete {
+    padding: 4px 12px;
+    background: transparent;
+    color: #ee0000;
+    border: 1px solid #f7d4d6;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-delete:hover {
+    background: #f7d4d6;
+  }
+
+  .empty-cell {
+    text-align: center !important;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 32px 16px !important;
+  }
+
+  .results-section {
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+
+  .summary-table td:last-child {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .summary-foot td {
+    font-weight: 600;
+    color: var(--text-primary);
+    background: var(--bg-page);
+    border-top: 2px solid var(--result-border);
+    font-size: 14px;
+  }
+
+  .summary-foot td:first-child {
+    text-align: right;
+  }
+
+  .summary-ton-row td {
+    font-weight: 400;
+    color: var(--text-tertiary);
+    font-size: 13px;
+    text-align: center;
+    border-top: none;
+    padding-top: 4px;
+  }
+
+  #grandTotalKg {
+    font-weight: 700;
+  }
+
+  #grandTotalTon {
+    font-weight: 600;
+  }
+
+  @media (max-width: 768px) {
+    .calc-table th,
+    .calc-table td {
+      padding: 8px 8px;
+      font-size: 13px;
+    }
+
+    .inline-input {
+      min-width: 40px;
+      font-size: 13px;
+      height: 32px;
+    }
+
+    .inline-select {
+      min-width: 70px;
+      font-size: 13px;
+      height: 32px;
+    }
+
+    .inline-unit-select {
+      width: 60px;
+      font-size: 12px;
+      height: 32px;
+    }
+
+    .summary-foot td {
+      font-size: 13px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .calc-table th,
+    .calc-table td {
+      padding: 6px 6px;
+      font-size: 12px;
+    }
+
+    .inline-input {
+      min-width: 30px;
+      font-size: 12px;
+      height: 28px;
+      padding: 0 4px;
+    }
+
+    .inline-select {
+      min-width: 60px;
+      font-size: 12px;
+      height: 28px;
+      padding: 0 4px;
+    }
+
+    .inline-unit-select {
+      width: 50px;
+      font-size: 11px;
+      height: 28px;
+    }
+
+    .summary-foot td {
+      font-size: 12px;
+    }
+  }
+</style>

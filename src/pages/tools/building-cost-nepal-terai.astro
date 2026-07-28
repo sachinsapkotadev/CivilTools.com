@@ -1,0 +1,249 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Building Cost Estimator (Nepal Terai)" 
+  description="Simplified house construction cost estimator for the Terai region of Nepal, including finishes like tiles and painting."
+  eyebrow="Estimation Tool"
+>
+  <div class="calculator-card">
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Number of Storeys</label>
+        <select id="storeys">
+          <option value="1">1 Storey (Ground Only)</option>
+          <option value="2">2 Storeys (G + 1)</option>
+          <option value="3">3 Storeys (G + 2)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Regional Base Rate (Rs. / sq.ft)</label>
+        <input type="number" id="baseRate" value="3200" step="1" />
+      </div>
+    </div>
+
+    <div class="rooms-container">
+      <div class="section-header">
+        <h3>Building Features</h3>
+      </div>
+      <div class="input-grid">
+        <div class="input-group">
+          <label>Total Ground Area (sq.ft)</label>
+          <input type="number" id="totalArea" value="1000" step="1" />
+        </div>
+        <div class="input-group">
+          <label>Finishing Quality</label>
+          <select id="finishing">
+            <option value="0">Standard</option>
+            <option value="200">Premium (Tiles/Marble)</option>
+            <option value="400">Luxury (Full Finishing)</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="features-toggles">
+        <label class="toggle-item">
+          <input type="checkbox" id="hasLiving" checked />
+          <span>Living Room Included</span>
+        </label>
+        <label class="toggle-item">
+          <input type="checkbox" id="hasPainting" checked />
+          <span>External Painting</span>
+        </label>
+        <label class="toggle-item">
+          <input type="checkbox" id="hasBoundary" />
+          <span>Boundary Wall</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="results-section">
+      <div class="result-display">
+        <div class="main-result">
+          <span class="label">Terai Estimated Cost (2082-83)</span>
+          <div id="resTotalCost" class="result-value large">Rs. 0.00</div>
+          <p class="sub-text">Note: Costs in Kathmandu/Hills are ~15% higher</p>
+        </div>
+        
+        <div class="breakdown-container">
+          <h3>Cost Component Breakdown</h3>
+          <div class="table-wrap">
+          <table class="breakdown-table">
+            <thead>
+              <tr>
+                <th>S.N</th>
+                <th>Cost Component</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody id="breakdownBody">
+              <!-- Dynamically populated -->
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2">Total Construction Cost</td>
+                <td id="resBaseCostTable">Rs. 0.00</td>
+              </tr>
+              <tr>
+                <td colspan="2">Design and Consultation Fees (2%)</td>
+                <td id="resFeesTable">Rs. 0.00</td>
+              </tr>
+              <tr class="total-row">
+                <td colspan="2">Total Estimated Cost</td>
+                <td id="resFinalTotalTable">Rs. 0.00</td>
+              </tr>
+            </tfoot>
+          </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function update() {
+    const storeys = parseInt((document.getElementById('storeys') as HTMLSelectElement).value);
+    const baseRate = parseFloat((document.getElementById('baseRate') as HTMLInputElement).value) || 0;
+    const totalArea = parseFloat((document.getElementById('totalArea') as HTMLInputElement).value) || 0;
+    const finishing = parseFloat((document.getElementById('finishing') as HTMLSelectElement).value);
+    
+    const hasLiving = (document.getElementById('hasLiving') as HTMLInputElement).checked;
+    const hasPainting = (document.getElementById('hasPainting') as HTMLInputElement).checked;
+    const hasBoundary = (document.getElementById('hasBoundary') as HTMLInputElement).checked;
+
+    let multiplier = 1.0;
+    if (storeys === 2) multiplier = 1.7;
+    if (storeys === 3) multiplier = 2.4;
+
+    let effectiveRate = baseRate + finishing;
+    if (!hasPainting) effectiveRate -= 50;
+    if (hasBoundary) effectiveRate += 100;
+
+    const baseCost = totalArea * effectiveRate * multiplier;
+    const fees = baseCost * 0.02;
+    const totalCost = baseCost + fees;
+
+    document.getElementById('resTotalCost')!.textContent = 'Rs. ' + totalCost.toLocaleString(undefined, {maximumFractionDigits: 2});
+
+    // Detailed Breakdown
+    const components = [
+      { name: "Labour", percent: 0.25 },
+      { name: "Cement", percent: 0.15 },
+      { name: "Sand", percent: 0.05 },
+      { name: "Steel", percent: 0.12 },
+      { name: "Bricks", percent: 0.10 },
+      { name: "Doors and Windows", percent: 0.10 },
+      { name: "Electrical Work", percent: 0.08 },
+      { name: "Plumbing Work", percent: 0.05 },
+      { name: "Finishing (Paint and Plaster)", percent: 0.05 },
+      { name: "Flooring", percent: 0.03 },
+      { name: "Miscellaneous", percent: 0.02 }
+    ];
+
+    const tbody = document.getElementById('breakdownBody')!;
+    tbody.innerHTML = '';
+    
+    components.forEach((comp, index) => {
+      const amount = baseCost * comp.percent;
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${comp.name}</td>
+        <td>Rs. ${amount.toLocaleString(undefined, {maximumFractionDigits: 2})}</td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    const contingency = baseCost * 0.05;
+    const contRow = document.createElement('tr');
+    contRow.innerHTML = `
+      <td>12</td>
+      <td>Contingency Fund (5%)</td>
+      <td>Rs. ${contingency.toLocaleString(undefined, {maximumFractionDigits: 2})}</td>
+    `;
+    tbody.appendChild(contRow);
+
+    document.getElementById('resBaseCostTable')!.textContent = 'Rs. ' + baseCost.toLocaleString(undefined, {maximumFractionDigits: 2});
+    document.getElementById('resFeesTable')!.textContent = 'Rs. ' + fees.toLocaleString(undefined, {maximumFractionDigits: 2});
+    document.getElementById('resFinalTotalTable')!.textContent = 'Rs. ' + totalCost.toLocaleString(undefined, {maximumFractionDigits: 2});
+  }
+
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('input', update);
+  });
+
+  update();
+</script>
+
+<style>
+  .rooms-container {
+    margin: 32px 0;
+    padding: 24px;
+    background: var(--bg-page);
+    border-radius: 12px;
+    border: 1px solid var(--result-border);
+  }
+  .section-header {
+    margin-bottom: 16px;
+  }
+  .section-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+  }
+  .features-toggles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .toggle-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .toggle-item input {
+    width: 18px;
+    height: 18px;
+  }
+  .main-result {
+    margin-bottom: 24px;
+  }
+  .main-result .label {
+    font-size: 14px;
+    color: var(--result-text-muted);
+    display: block;
+    margin-bottom: 8px;
+  }
+  .result-display {
+    background: var(--result-bg);
+    padding: 32px;
+    border-radius: 12px;
+    text-align: center;
+  }
+  .sub-results {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--result-border);
+  }
+  .res-box {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .res-box .val {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .res-box .unit {
+    font-size: 12px;
+    color: var(--result-text-muted);
+  }
+</style>

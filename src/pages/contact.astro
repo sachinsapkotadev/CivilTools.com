@@ -1,0 +1,146 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Contact | CivilTools.com"
+  description="Get in touch with Sachin Sapkota, the developer behind CivilTools.com. Send questions, feedback, or tool suggestions."
+  canonical="https://www.civiltools.com/contact"
+>
+  <section class="page-header">
+    <div class="band-inner">
+      <p class="eyebrow-mono">Contact</p>
+      <h1 class="page-title">Get in touch.</h1>
+      <p class="page-desc">Questions, feedback, or tool suggestions — I'd love to hear from you.</p>
+    </div>
+  </section>
+
+  <section class="story-section">
+    <div class="band-inner">
+      <div class="contact-card">
+        <div class="contact-method">
+          <span class="contact-label">Email</span>
+          <a href="mailto:sachin.sapkota.dev@gmail.com" class="contact-value">sachin.sapkota.dev@gmail.com</a>
+        </div>
+        <p class="contact-note">
+          I'm a solo developer, so replies may take a day or two. For bug reports, please include the tool name and what you were calculating.
+        </p>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style is:global>
+  .page-header {
+    background: var(--bg-surface);
+    padding: 96px 0 64px;
+    text-align: center;
+  }
+
+  .eyebrow-mono {
+    font-family: JetBrains Mono, ui-monospace, monospace;
+    font-size: 12px;
+    font-weight: 400;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 16px;
+    letter-spacing: 0.05em;
+  }
+
+  .page-title {
+    font-size: 48px;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+  }
+
+  .page-desc {
+    font-size: 18px;
+    line-height: 28px;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .story-section {
+    background: var(--bg-page);
+    padding: 100px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .contact-card {
+    max-width: 500px;
+    margin: 0 auto;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 48px;
+    text-align: center;
+  }
+
+  .contact-method {
+    margin-bottom: 24px;
+  }
+
+  .contact-label {
+    display: block;
+    font-family: JetBrains Mono, ui-monospace, monospace;
+    font-size: 12px;
+    font-weight: 400;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 8px;
+    letter-spacing: 0.05em;
+  }
+
+  .contact-value {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--link-blue);
+    text-decoration: none;
+  }
+
+  .contact-value:hover {
+    color: var(--link-blue-hover);
+    text-decoration: underline;
+  }
+
+  .contact-note {
+    font-size: 14px;
+    line-height: 22px;
+    color: var(--text-tertiary);
+    margin: 0;
+  }
+
+  .band-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  @media (max-width: 768px) {
+    .page-header { padding: 72px 0 44px; }
+    .page-title { font-size: 36px; }
+    .page-desc { font-size: 16px; }
+    .story-section { padding: 64px 0; }
+    .contact-card { padding: 32px 24px; }
+    .band-inner { padding: 0 16px; }
+  }
+
+  @media (max-width: 480px) {
+    .page-title { font-size: 28px; }
+    .contact-value { font-size: 16px; }
+  }
+
+  @media (max-width: 360px) {
+    .page-title { font-size: 24px; }
+    .page-desc { font-size: 15px; line-height: 24px; }
+    .page-header { padding: 64px 0 36px; }
+    .story-section { padding: 48px 0; }
+    .contact-card { padding: 24px 16px; }
+    .band-inner { padding: 0 12px; }
+  }
+</style>

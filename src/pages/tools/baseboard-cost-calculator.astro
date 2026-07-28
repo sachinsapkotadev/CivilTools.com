@@ -1,0 +1,306 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Baseboard Cost Calculator" 
+  description="Calculate the total linear feet of baseboard needed for a room, number of sections, material cost, installation cost, and total overall cost."
+  eyebrow="Estimation Tool"
+>
+  <div class="calculator-card">
+    <h2 class="section-title">Room Dimensions</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>1. Room Length</label>
+        <div class="input-with-unit">
+          <input type="number" id="roomLength" value="16" step="any" min="0" />
+          <select id="lengthUnit">
+            <option>Feet</option>
+            <option>m</option>
+            <option>mm</option>
+            <option>inch</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>2. Room Width</label>
+        <div class="input-with-unit">
+          <input type="number" id="roomWidth" value="20" step="any" min="0" />
+          <select id="widthUnit">
+            <option>Feet</option>
+            <option>m</option>
+            <option>mm</option>
+            <option>inch</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Door Openings</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>3. Number of Doors</label>
+        <input type="number" id="numDoors" value="2" step="1" min="0" />
+      </div>
+      <div class="input-group">
+        <label>4. Width of Each Door</label>
+        <div class="input-with-unit">
+          <input type="number" id="doorWidth" value="3" step="any" min="0" />
+          <span class="unit-label">Feet</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Baseboard & Cost</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>5. Baseboard Section Length</label>
+        <div class="input-with-unit">
+          <input type="number" id="sectionLen" value="12" step="any" min="0" />
+          <span class="unit-label">Feet</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>6. Cost per Linear Foot ($)</label>
+        <div class="input-with-unit">
+          <input type="number" id="materialRate" value="3.50" step="0.01" min="0" />
+          <span class="unit-label">$</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>7. Installation Charge per Foot ($)</label>
+        <div class="input-with-unit">
+          <input type="number" id="installRate" value="2.00" step="0.01" min="0" />
+          <span class="unit-label">$</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Currency</label>
+        <select id="currency">
+          <option value="$">$ (USD)</option>
+          <option value="Rs ">Rs (INR)</option>
+          <option value="Rs ">Rs (NPR)</option>
+          <option value="\u00a3">\u00a3 (GBP)</option>
+          <option value="\u20ac">\u20ac (EUR)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <h3 class="table-heading">Results</h3>
+      <div class="table-wrap">
+      <table class="calc-table">
+        <thead>
+          <tr><th>Item</th><th>Value</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Total Linear Feet of Baseboard Needed</td><td id="resLinearFt">–</td></tr>
+          <tr><td>Number of Sections Required</td><td id="resSections">–</td></tr>
+          <tr><td>Baseboard Material Cost</td><td id="resMaterialCost">–</td></tr>
+          <tr><td>Installation Cost</td><td id="resInstallCost">–</td></tr>
+          <tr class="total-row"><td>Total Overall Cost</td><td id="resTotalCost">–</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function toFeet(val, unit) {
+    if (unit === 'm') return val * 3.28084;
+    if (unit === 'mm') return val / 304.8;
+    if (unit === 'inch') return val / 12;
+    return val;
+  }
+
+  function fmt(v, d) {
+    return Number(v.toFixed(d)).toLocaleString('en-IN');
+  }
+
+  function calculate() {
+    const L = toFeet(
+      parseFloat(document.getElementById('roomLength').value) || 0,
+      document.getElementById('lengthUnit').value
+    );
+    const W = toFeet(
+      parseFloat(document.getElementById('roomWidth').value) || 0,
+      document.getElementById('widthUnit').value
+    );
+    const nDoors = parseInt(document.getElementById('numDoors').value) || 0;
+    const doorW = parseFloat(document.getElementById('doorWidth').value) || 0;
+    const secLen = parseFloat(document.getElementById('sectionLen').value) || 1;
+    const matRate = parseFloat(document.getElementById('materialRate').value) || 0;
+    const instRate = parseFloat(document.getElementById('installRate').value) || 0;
+    const currency = document.getElementById('currency').value;
+
+    const perimeter = 2 * (L + W);
+    const deduction = nDoors * doorW;
+    const netLinearFt = Math.max(0, perimeter - deduction);
+    const sections = Math.ceil(netLinearFt / secLen);
+    const matCost = netLinearFt * matRate;
+    const instCost = netLinearFt * instRate;
+    const totalCost = matCost + instCost;
+
+    document.getElementById('resLinearFt').textContent = fmt(netLinearFt, 2) + ' ft';
+    document.getElementById('resSections').textContent = fmt(sections, 0) + ' Nos';
+    document.getElementById('resMaterialCost').textContent = currency + fmt(matCost, 2);
+    document.getElementById('resInstallCost').textContent = currency + fmt(instCost, 2);
+    document.getElementById('resTotalCost').textContent = currency + fmt(totalCost, 2);
+
+    document.getElementById('resultsSection').style.display = 'block';
+  }
+
+  function resetForm() {
+    const defaults = {
+      roomLength: '16', lengthUnit: 'Feet',
+      roomWidth: '20', widthUnit: 'Feet',
+      numDoors: '2', doorWidth: '3',
+      sectionLen: '12', materialRate: '3.50',
+      installRate: '2.00', currency: '$'
+    };
+    for (const [id, val] of Object.entries(defaults)) {
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    }
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .input-with-unit select {
+    width: 110px;
+    flex-shrink: 0;
+  }
+
+  .unit-label {
+    display: flex;
+    align-items: center;
+    height: 44px;
+    padding: 0 14px;
+    background: var(--bg-hover);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .table-heading {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 24px 0 12px;
+  }
+
+  .calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .calc-table th,
+  .calc-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .calc-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .calc-table td:last-child {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  .total-row td {
+    border-top: 2px solid var(--border-strong);
+    font-weight: 700;
+  }
+
+  .total-row td:last-child {
+    font-size: 16px;
+    color: var(--color-success);
+  }
+</style>

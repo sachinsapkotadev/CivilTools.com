@@ -1,0 +1,228 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout
+  title="Septic Tank Designer"
+  description="Design a septic tank per standard engineering practice. Computes effective volume, width, length, and depth based on number of users, sewage flow, cleaning period, and detention time."
+  eyebrow="RCC Design Tool"
+>
+  <div class="calculator-card">
+    <h2 class="section-title">Input Parameters</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>No. of Users</label>
+        <input type="number" id="nou" value="10" step="1" min="1" />
+      </div>
+      <div class="input-group">
+        <label>Rate of Sewage Flow <span class="unit">lpcd</span></label>
+        <input type="number" id="rosf" value="100" step="any" min="1" />
+      </div>
+      <div class="input-group">
+        <label>Cleaning Period</label>
+        <select id="A">
+          <option value="m6">6 months</option>
+          <option value="y1">1 year</option>
+          <option value="y2">2 years</option>
+          <option value="y3">3 years</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Detention Time</label>
+        <select id="B">
+          <option value="d1">1 Day</option>
+          <option value="d2">2 Days</option>
+          <option value="d3">3 Days</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>L/B Ratio</label>
+        <select id="C">
+          <option value="r2">2</option>
+          <option value="r3">3</option>
+          <option value="r4">4</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Effective Depth <span class="unit">m</span></label>
+        <input type="number" id="ad1" value="1" step="0.1" min="0.5" />
+      </div>
+      <div class="input-group">
+        <label>Free Board</label>
+        <select id="D">
+          <option value="fb30">30 cm</option>
+          <option value="fb35">35 cm</option>
+          <option value="fb40">40 cm</option>
+          <option value="fb45">45 cm</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div id="resultsSection" class="results-section">
+      <h2 class="section-title">Design Results</h2>
+      <div class="result-grid">
+        <div class="result-card">
+          <span class="result-label">Effective Volume Required</span>
+          <span class="result-value large" id="v">–</span>
+          <span class="result-alt" id="vz">–</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Width of Septic Tank</span>
+          <span class="result-value" id="B1">–</span>
+          <span class="result-alt" id="B1z">–</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Length of Septic Tank</span>
+          <span class="result-value" id="L">–</span>
+          <span class="result-alt" id="Lz">–</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">Total Depth (Eff. + Free Board)</span>
+          <span class="result-value" id="D1">–</span>
+          <span class="result-alt" id="D1z">–</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  const cleaningFactors = { m6: 0.0283, y1: 0.0490, y2: 0.0708, y3: 0.0850 };
+  const detentionValues = { d1: 1, d2: 2, d3: 3 };
+  const ratioValues = { r2: 2, r3: 3, r4: 4 };
+  const freeBoardValues = { fb30: 0.30, fb35: 0.35, fb40: 0.40, fb45: 0.45 };
+
+  function getVal(id) { return parseFloat(document.getElementById(id).value) || 0; }
+  function getSelVal(map, id) { return map[document.getElementById(id).value] || 0; }
+
+  function calcDesign() {
+    const nou = getVal('nou');
+    const rosf = getVal('rosf');
+    const ads = getVal('ad1');
+    const time = getSelVal(cleaningFactors, 'A');
+    const dtime = getSelVal(detentionValues, 'B');
+    const ratio = getSelVal(ratioValues, 'C');
+    const free = getSelVal(freeBoardValues, 'D');
+
+    if (nou <= 0 || rosf <= 0 || ads <= 0) return;
+
+    const q = nou * rosf;
+    const v1 = (q * dtime) / 1000;
+    const v2 = 0.0425 * nou;
+    const v3 = time * nou;
+    const vTotal = v1 + v2 + v3;
+
+    const v = Math.round(vTotal * 100) / 100;
+    const vz = Math.round(vTotal * 10.764 * 100) / 100;
+
+    const As = vTotal / ads;
+    const B = Math.round(Math.sqrt(As / ratio) * 100) / 100;
+    const Bz = Math.round(B * 3.28 * 100) / 100;
+
+    const L = Math.round(ratio * B * 100) / 100;
+    const Lz = Math.round(L * 3.28 * 100) / 100;
+
+    const D = Math.round((ads + free) * 100) / 100;
+    const Dz = Math.round(D * 3.28 * 100) / 100;
+
+    document.getElementById('v').textContent = v + ' m\u00B3';
+    document.getElementById('vz').textContent = vz + ' ft\u00B3';
+    document.getElementById('B1').textContent = B + ' m';
+    document.getElementById('B1z').textContent = Bz + ' ft';
+    document.getElementById('L').textContent = L + ' m';
+    document.getElementById('Lz').textContent = Lz + ' ft';
+    document.getElementById('D1').textContent = D + ' m';
+    document.getElementById('D1z').textContent = Dz + ' ft';
+  }
+
+  document.querySelectorAll('.calculator-card input, .calculator-card select').forEach(el => {
+    el.addEventListener('input', calcDesign);
+    el.addEventListener('change', calcDesign);
+  });
+
+  calcDesign();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 24px 0;
+  }
+
+  .unit {
+    color: var(--text-tertiary);
+    font-weight: 400;
+    font-size: 12px;
+  }
+
+  .results-section {
+    margin-top: 0;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .result-card {
+    background: var(--result-bg, var(--bg-page));
+    border: 1px solid var(--result-border, var(--border));
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .result-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .result-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .result-value.large {
+    font-size: 28px;
+    color: var(--link-blue, #2563eb);
+  }
+
+  .result-alt {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    font-family: JetBrains Mono, ui-monospace, monospace;
+  }
+
+  @media (max-width: 640px) {
+    .result-grid {
+      grid-template-columns: 1fr;
+    }
+    .result-value { font-size: 20px; }
+    .result-value.large { font-size: 24px; }
+    .result-card { padding: 16px; }
+  }
+
+  @media (max-width: 360px) {
+    .result-value { font-size: 18px; }
+    .result-value.large { font-size: 20px; }
+    .result-card { padding: 12px; }
+  }
+</style>

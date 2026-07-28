@@ -1,0 +1,280 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Formwork Estimator" 
+  description="Estimate formwork cost for RCC roof slabs including plywood, timber, labour, nails, and transport. Enter area and rates to calculate total formwork cost."
+  eyebrow="Estimation Tool"
+>
+  <div class="calculator-card">
+    <h2 class="section-title">A) Area</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>1) Area of Roof</label>
+        <div class="input-with-unit">
+          <input type="number" id="roofArea" value="1000" step="any" min="0" />
+          <select id="areaUnit">
+            <option value="sqft">Square Feet</option>
+            <option value="sqm">Square Meters</option>
+            <option value="sqyd">Square Yards</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">B) Cost Rates (per sq ft)</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>1) Plywood</label>
+        <div class="input-with-unit">
+          <input type="number" id="ratePlywood" value="6" step="0.5" min="0" />
+          <span class="unit-label">Rs</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>2) Timber for Props and Battens</label>
+        <div class="input-with-unit">
+          <input type="number" id="rateTimber" value="20" step="0.5" min="0" />
+          <span class="unit-label">Rs</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>3) Labour</label>
+        <div class="input-with-unit">
+          <input type="number" id="rateLabour" value="15" step="0.5" min="0" />
+          <span class="unit-label">Rs</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>4) Nails, Clamps, Miscellaneous</label>
+        <div class="input-with-unit">
+          <input type="number" id="rateMisc" value="5" step="0.5" min="0" />
+          <span class="unit-label">Rs</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>5) Transport and Wastage</label>
+        <div class="input-with-unit">
+          <input type="number" id="rateTransport" value="3" step="0.5" min="0" />
+          <span class="unit-label">Rs</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Re-Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <h3 class="table-heading">Cost Estimate</h3>
+      <div class="table-wrap">
+      <table class="calc-table">
+        <thead>
+          <tr><th>S.N</th><th>Cost Component</th><th>Amount</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Plywood</td><td id="resPlywood">–</td></tr>
+          <tr><td>2</td><td>Timber for Props and Battens</td><td id="resTimber">–</td></tr>
+          <tr><td>3</td><td>Labour</td><td id="resLabour">–</td></tr>
+          <tr><td>4</td><td>Nails, Clamps, Miscellaneous</td><td id="resMisc">–</td></tr>
+          <tr><td>5</td><td>Transport and Wastage</td><td id="resTransport">–</td></tr>
+          <tr class="total-row"><td></td><td>Total Estimated Cost</td><td id="resTotal">–</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function fmtCost(v) {
+    return '\u20B9 ' + Number(v.toFixed(2)).toLocaleString('en-IN');
+  }
+
+  function toSqFt(val, unit) {
+    if (unit === 'sqm') return val * 10.7639;
+    if (unit === 'sqyd') return val * 9;
+    return val;
+  }
+
+  function calculate() {
+    const areaRaw = parseFloat(document.getElementById('roofArea').value) || 0;
+    const areaUnit = document.getElementById('areaUnit').value;
+    const area = toSqFt(areaRaw, areaUnit);
+
+    const rPly = parseFloat(document.getElementById('ratePlywood').value) || 0;
+    const rTim = parseFloat(document.getElementById('rateTimber').value) || 0;
+    const rLab = parseFloat(document.getElementById('rateLabour').value) || 0;
+    const rMisc = parseFloat(document.getElementById('rateMisc').value) || 0;
+    const rTrn = parseFloat(document.getElementById('rateTransport').value) || 0;
+
+    const cPly = area * rPly;
+    const cTim = area * rTim;
+    const cLab = area * rLab;
+    const cMisc = area * rMisc;
+    const cTrn = area * rTrn;
+    const total = cPly + cTim + cLab + cMisc + cTrn;
+
+    document.getElementById('resPlywood').textContent = fmtCost(cPly);
+    document.getElementById('resTimber').textContent = fmtCost(cTim);
+    document.getElementById('resLabour').textContent = fmtCost(cLab);
+    document.getElementById('resMisc').textContent = fmtCost(cMisc);
+    document.getElementById('resTransport').textContent = fmtCost(cTrn);
+    document.getElementById('resTotal').textContent = fmtCost(total);
+
+    document.getElementById('resultsSection').style.display = 'block';
+  }
+
+  function resetForm() {
+    const defaults = {
+      roofArea: '1000', areaUnit: 'sqft',
+      ratePlywood: '6', rateTimber: '20',
+      rateLabour: '15', rateMisc: '5', rateTransport: '3'
+    };
+    for (const [id, val] of Object.entries(defaults)) {
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    }
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .unit-label {
+    display: flex;
+    align-items: center;
+    height: 44px;
+    padding: 0 14px;
+    background: var(--bg-hover);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .input-with-unit select {
+    width: 140px;
+    flex-shrink: 0;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .table-heading {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 24px 0 12px;
+  }
+
+  .calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .calc-table th,
+  .calc-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .calc-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .calc-table td:nth-child(2) {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .calc-table td:nth-child(3) {
+    font-weight: 600;
+    color: var(--color-success);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  .total-row td {
+    border-top: 2px solid var(--border-strong);
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .total-row td:last-child {
+    font-size: 16px;
+  }
+</style>

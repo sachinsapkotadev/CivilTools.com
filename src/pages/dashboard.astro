@@ -1,0 +1,407 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+  <section class="dash-page" id="dash-page">
+    <div class="dash-content" id="dash-content">
+      <div class="dash-top">
+        <div class="dash-greeting">
+          <h1 class="dash-hi" id="dash-hi">Welcome</h1>
+          <p class="dash-sub" id="dash-email"></p>
+        </div>
+        <div class="dash-plan-badge" id="dash-plan-badge">
+          <span class="plan-label" id="dash-plan-label">Free</span>
+        </div>
+      </div>
+
+      <div class="dash-stats" id="dash-stats">
+        <div class="stat-card"><h3 class="stat-label">Plan</h3><p class="stat-val" id="stat-plan">Free</p></div>
+        <div class="stat-card"><h3 class="stat-label">Purchases</h3><p class="stat-val" id="stat-purchases">0</p></div>
+        <div class="stat-card"><h3 class="stat-label">Member since</h3><p class="stat-val" id="stat-joined">-</p></div>
+      </div>
+
+      <div class="dash-section" id="dash-upgrade" style="display:none">
+        <div class="upgrade-card">
+          <h2>Upgrade to Pro</h2>
+          <p>Get unlimited calculations, advanced tools, and priority support.</p>
+        </div>
+      </div>
+
+      <div class="dash-section">
+        <h2 class="dash-section-title">Recent purchases</h2>
+        <div id="purchases-list"><p class="dash-empty">No purchases yet.</p></div>
+      </div>
+
+      <div class="dash-section">
+        <h2 class="dash-section-title">Quick tools</h2>
+        <div class="dash-tools-grid">
+          <a href="/tools" class="dash-tool-card">
+            <h3>Frame Analysis</h3>
+            <p>2D/3D structural frame analysis</p>
+          </a>
+          <a href="/tools" class="dash-tool-card">
+            <h3>Bearing Capacity</h3>
+            <p>Foundation bearing capacity calcs</p>
+          </a>
+          <a href="/tools" class="dash-tool-card">
+            <h3>Pipe Network</h3>
+            <p>Hydraulic pipe network design</p>
+          </a>
+          <a href="/tools" class="dash-tool-card">
+            <h3>Takeoff & Estimates</h3>
+            <p>Quantity takeoffs and BOQ</p>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<script>
+import { auth, db } from '../lib/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc, collection, query, where, orderBy, getDocs, enableMultiTabIndexedDbPersistence } from 'firebase/firestore';
+
+enableMultiTabIndexedDbPersistence(db).catch(() => {});
+
+const contentEl = document.getElementById('dash-content');
+const hiEl = document.getElementById('dash-hi');
+const emailEl = document.getElementById('dash-email');
+const planLabel = document.getElementById('dash-plan-label');
+const statPlan = document.getElementById('stat-plan');
+const statPurchases = document.getElementById('stat-purchases');
+const statJoined = document.getElementById('stat-joined');
+const upgradeSection = document.getElementById('dash-upgrade');
+const purchasesList = document.getElementById('purchases-list');
+
+function formatDate(ts: any) {
+  if (!ts) return '-';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+function formatCurrency(cents: number) {
+  return `$${(cents / 100).toFixed(2)}`;
+}
+
+const cached = sessionStorage.getItem('dash_user');
+if (cached) {
+  try {
+    const c = JSON.parse(cached);
+    hiEl.textContent = `Welcome${c.name ? `, ${c.name}` : ''}`;
+    emailEl.textContent = c.email;
+    statPlan.textContent = c.plan;
+    planLabel.textContent = c.plan;
+    statJoined.textContent = c.joined;
+    document.getElementById('dash-plan-badge').className = `dash-plan-badge plan-badge-${c.planClass}`;
+    statPurchases.textContent = c.purchases;
+    if (c.showUpgrade) upgradeSection.style.display = 'block';
+  } catch (_) {}
+}
+
+async function loadDashboard(user: any) {
+  const uid = user.uid;
+
+  const [userDocSnap, purchasesSnap] = await Promise.all([
+    getDoc(doc(db, 'users', uid)),
+    getDocs(query(
+      collection(db, 'purchases'),
+      where('userId', '==', uid),
+      orderBy('createdAt', 'desc')
+    )),
+  ]);
+
+  const userData = userDocSnap.data();
+  const plan = userData?.plan || 'free';
+  const joined = userData?.createdAt || user.metadata?.creationTime;
+  const purchases = purchasesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+  hiEl.textContent = `Welcome${user.displayName ? `, ${user.displayName}` : ''}`;
+  emailEl.textContent = user.email;
+  statPlan.textContent = plan.charAt(0).toUpperCase() + plan.slice(1);
+  planLabel.textContent = statPlan.textContent;
+  document.getElementById('dash-plan-badge').className = `dash-plan-badge plan-badge-${plan}`;
+  statJoined.textContent = formatDate(joined);
+  statPurchases.textContent = purchases.length.toString();
+
+  if (plan === 'free') upgradeSection.style.display = 'block';
+
+  if (purchases.length > 0) {
+    purchasesList.innerHTML = `
+      <div class="purchases-table-wrap">
+        <table class="purchases-table">
+          <thead><tr><th>Plan</th><th>Amount</th><th>Date</th></tr></thead>
+          <tbody>${purchases.map((p: any) => `
+            <tr>
+              <td><span class="plan-badge plan-${p.plan}">${p.plan}</span></td>
+              <td>${p.amount ? formatCurrency(p.amount) : '-'}</td>
+              <td>${formatDate(p.createdAt)}</td>
+            </tr>
+          `).join('')}</tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  sessionStorage.setItem('dash_user', JSON.stringify({
+    name: user.displayName,
+    email: user.email,
+    plan: statPlan.textContent,
+    planClass: plan,
+    joined: statJoined.textContent,
+    purchases: purchases.length.toString(),
+    showUpgrade: plan === 'free',
+  }));
+}
+
+const user = auth.currentUser;
+if (user) {
+  loadDashboard(user);
+} else {
+  onAuthStateChanged(auth, (user) => {
+    if (!user) { window.location.href = '/login'; return; }
+    loadDashboard(user);
+  });
+}
+</script>
+
+<style is:global>
+  .dash-page {
+    min-height: calc(100vh - 64px);
+    padding: 48px 24px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .dash-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+  }
+
+  .dash-hi {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.8px;
+    margin: 0 0 4px;
+    color: var(--text-primary);
+  }
+
+  .dash-sub {
+    font-size: 14px;
+    color: var(--text-tertiary);
+    margin: 0;
+  }
+
+  .dash-plan-badge {
+    display: inline-flex;
+    align-items: center;
+    height: 28px;
+    padding: 0 12px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .plan-badge-free { background: #f5f5f5; color: #737373; }
+  .plan-badge-pro { background: #eff6ff; color: #2563eb; }
+  .plan-badge-lifetime { background: #fef3c7; color: #d97706; }
+
+  .dash-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    margin: 0 0 8px;
+    letter-spacing: 0.5px;
+  }
+
+  .stat-val {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .dash-section {
+    margin-bottom: 48px;
+  }
+
+  .dash-section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 16px;
+    color: var(--text-primary);
+  }
+
+  .dash-empty {
+    color: var(--text-tertiary);
+    font-size: 14px;
+    margin: 0;
+  }
+
+  .upgrade-card {
+    background: linear-gradient(135deg, #eff6ff, var(--bg-card));
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    padding: 32px;
+  }
+
+  .upgrade-card h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    color: var(--text-primary);
+  }
+
+  .upgrade-card p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0 0 20px;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--btn-primary-text);
+    background: var(--btn-primary-bg);
+    padding: 0 20px;
+    height: 40px;
+    border-radius: 100px;
+    text-decoration: none;
+    transition: opacity 0.2s;
+    border: none;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  .btn-primary:hover { opacity: 0.85; }
+
+  .dash-tools-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .dash-tool-card {
+    display: block;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    text-decoration: none;
+    transition: box-shadow 0.2s;
+  }
+
+  .dash-tool-card:hover {
+    box-shadow: 0px 2px 2px rgba(0,0,0,0.04), 0px 8px 8px -8px rgba(0,0,0,0.04);
+  }
+
+  .dash-tool-card h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 4px;
+    color: var(--text-primary);
+  }
+
+  .dash-tool-card p {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    margin: 0;
+  }
+
+  .purchases-table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .purchases-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .purchases-table th {
+    text-align: left;
+    padding: 10px 16px;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--bg-page);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .purchases-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+
+  .purchases-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .plan-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+
+  .plan-pro { background: #eff6ff; color: #2563eb; }
+  .plan-lifetime { background: #fef3c7; color: #d97706; }
+
+  @media (max-width: 768px) {
+    .dash-page { padding: 32px 16px; }
+    .dash-hi { font-size: 24px; }
+    .dash-section-title { font-size: 16px; }
+    .upgrade-card { padding: 24px; }
+    .stat-card { padding: 16px; }
+    .stat-val { font-size: 20px; }
+  }
+
+  @media (max-width: 640px) {
+    .dash-stats { grid-template-columns: 1fr; }
+    .dash-tools-grid { grid-template-columns: 1fr; }
+    .dash-top { flex-direction: column; gap: 12px; }
+  }
+
+  @media (max-width: 360px) {
+    .dash-page { padding: 24px 12px; }
+    .dash-hi { font-size: 22px; }
+    .dash-sub { font-size: 13px; }
+    .stat-val { font-size: 18px; }
+    .stat-card { padding: 14px 16px; }
+    .dash-tool-card { padding: 16px; }
+    .upgrade-card { padding: 20px; }
+    .dash-section { margin-bottom: 32px; }
+    .dash-stats { margin-bottom: 32px; gap: 10px; }
+    .purchases-table th,
+    .purchases-table td { padding: 8px 10px !important; font-size: 12px !important; }
+  }
+</style>

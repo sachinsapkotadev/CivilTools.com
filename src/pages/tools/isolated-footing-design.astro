@@ -1,0 +1,765 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="RCC Isolated Footing Design Calculator" 
+  description="Design RCC isolated pad footings per IS 456:2000. Computes footing size, depth, one-way and two-way shear checks, and reinforcement detailing with biaxial moments."
+  eyebrow="Structural Design Tool"
+>
+  <div class="calculator-card">
+    <h2 class="section-title">1. Loads &amp; Soil Data</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Axial Load (P) <span class="unit">kN</span></label>
+        <input type="number" id="axialLoad" value="1000" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Safe Bearing Capacity <span class="unit">kN/m&sup2;</span></label>
+        <input type="number" id="sbc" value="200" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Moment along Length (M<sub>L</sub>) <span class="unit">kNm</span></label>
+        <input type="number" id="momentLength" value="50" step="any" />
+      </div>
+      <div class="input-group">
+        <label>Moment along Width (M<sub>B</sub>) <span class="unit">kNm</span></label>
+        <input type="number" id="momentWidth" value="20" step="any" />
+      </div>
+    </div>
+
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Concrete Grade (f<sub>ck</sub>)</label>
+        <select id="concreteGrade">
+          <option value="20">M20</option>
+          <option value="25" selected>M25</option>
+          <option value="30">M30</option>
+          <option value="35">M35</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Steel Grade (f<sub>y</sub>)</label>
+        <select id="steelGrade">
+          <option value="415">Fe415</option>
+          <option value="500" selected>Fe500</option>
+          <option value="550">Fe550</option>
+        </select>
+      </div>
+    </div>
+
+    <h2 class="section-title">2. Column Dimensions</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Column Length (L<sub>c</sub>) <span class="unit">mm</span></label>
+        <input type="number" id="colLength" value="400" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Column Width (B<sub>c</sub>) <span class="unit">mm</span></label>
+        <input type="number" id="colWidth" value="300" step="any" min="0" />
+      </div>
+    </div>
+
+    <h2 class="section-title">3. Reinforcement Preference</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Bar Diameter (&phi;)</label>
+        <select id="barDia">
+          <option value="10">10 mm</option>
+          <option value="12" selected>12 mm</option>
+          <option value="16">16 mm</option>
+          <option value="20">20 mm</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Clear Cover</label>
+        <select id="clearCover">
+          <option value="50" selected>50 mm</option>
+          <option value="75">75 mm</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Plan View -->
+    <div id="planViewContainer">
+      <h2 class="section-title">Plan View Detailing</h2>
+      <div class="plan-view">
+        <div class="plan-canvas-wrap">
+          <canvas id="planCanvas" width="400" height="320"></canvas>
+        </div>
+        <div class="plan-dimensions">
+          <div class="plan-dim-row">
+            <span class="dim-label">Footing Size</span>
+            <span class="dim-value" id="planFootingSize">0.0 &times; 0.0 m</span>
+          </div>
+          <div class="plan-dim-row">
+            <span class="dim-label">Overall Depth (D)</span>
+            <span class="dim-value" id="planOverallDepth">0 mm</span>
+          </div>
+          <div class="plan-dim-row">
+            <span class="dim-label">Effective Depth (d)</span>
+            <span class="dim-value" id="planEffDepth">0 mm</span>
+          </div>
+          <div class="plan-dim-row">
+            <span class="dim-label">Rebar (Lengthwise)</span>
+            <span class="dim-value" id="planRebarL">--</span>
+          </div>
+          <div class="plan-dim-row">
+            <span class="dim-label">Rebar (Widthwise)</span>
+            <span class="dim-value" id="planRebarB">--</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div id="resultsSection">
+      <h2 class="section-title">Calculation Steps (IS 456:2000)</h2>
+
+      <!-- Step 1 -->
+      <div class="calc-step">
+        <h3 class="step-title">Step 1: Size of Footing</h3>
+        <div class="step-results" id="step1Results"></div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="calc-step">
+        <h3 class="step-title">Step 2: Depth from Bending Moment</h3>
+        <div class="step-results" id="step2Results"></div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="calc-step">
+        <h3 class="step-title">Step 3: Shear Checks</h3>
+        <div class="step-results" id="step3Results"></div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="calc-step">
+        <h3 class="step-title">Step 4: Reinforcement Details</h3>
+        <div class="step-results" id="step4Results"></div>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function round(v, d = 2) { return Number(v.toFixed(d)); }
+
+  function getVal(id) { return parseFloat(document.getElementById(id).value) || 0; }
+
+  function drawPlanView(L, B, Lc, Bc, D, d, barDia, sL, sB) {
+    const canvas = document.getElementById('planCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+
+    ctx.clearRect(0, 0, W, H);
+
+    const pad = 30, dimPad = 18;
+    const scaleX = (W - 2 * pad) / (Math.max(L, B) * 1.0);
+    const scaleY = (H - 2 * pad) / (Math.max(L, B) * 1.0);
+    const scale = Math.min(scaleX, scaleY) * 1.0;
+
+    const fw = B * scale;
+    const fh = L * scale;
+    const fx = (W - fw) / 2;
+    const fy = (H - fh) / 2;
+
+    // Footing outline
+    ctx.strokeStyle = '#171717';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(fx, fy, fw, fh);
+
+    // Column
+    const cw = Bc * scale / 1000;
+    const ch = Lc * scale / 1000;
+    const cx = (W - cw) / 2;
+    const cy = (H - ch) / 2;
+    ctx.fillStyle = '#e5e7eb';
+    ctx.fillRect(cx, cy, cw, ch);
+    ctx.strokeStyle = '#6b7280';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(cx, cy, cw, ch);
+
+    // Column cross hatch
+    ctx.strokeStyle = '#9ca3af';
+    ctx.lineWidth = 0.5;
+    for (let i = 0; i < 4; i++) {
+      ctx.beginPath();
+      ctx.moveTo(cx + i * cw / 4, cy);
+      ctx.lineTo(cx + (i + 1) * cw / 4, cy + ch);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx + (i + 1) * cw / 4, cy);
+      ctx.lineTo(cx + i * cw / 4, cy + ch);
+      ctx.stroke();
+    }
+
+    // Dimension lines
+    ctx.strokeStyle = '#2563eb';
+    ctx.lineWidth = 1;
+    ctx.fillStyle = '#2563eb';
+    ctx.font = '12px Inter, sans-serif';
+    ctx.textAlign = 'center';
+
+    // L dimension
+    const ly1 = fy - dimPad;
+    const ly2 = fy + fh + dimPad;
+    ctx.beginPath();
+    ctx.moveTo(fx, ly1); ctx.lineTo(fx + fw, ly1);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(fx, ly2); ctx.lineTo(fx + fw, ly2);
+    ctx.stroke();
+    // Ticks
+    ctx.beginPath();
+    ctx.moveTo(fx, ly1 - 4); ctx.lineTo(fx, ly1 + 4);
+    ctx.moveTo(fx + fw, ly1 - 4); ctx.lineTo(fx + fw, ly1 + 4);
+    ctx.moveTo(fx, ly2 - 4); ctx.lineTo(fx, ly2 + 4);
+    ctx.moveTo(fx + fw, ly2 - 4); ctx.lineTo(fx + fw, ly2 + 4);
+    ctx.stroke();
+    // Top arrow
+    ctx.beginPath();
+    ctx.moveTo(fx - 4, ly1 - 3); ctx.lineTo(fx, ly1); ctx.lineTo(fx - 4, ly1 + 3);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(fx + fw + 4, ly1 - 3); ctx.lineTo(fx + fw, ly1); ctx.lineTo(fx + fw + 4, ly1 + 3);
+    ctx.stroke();
+
+    ctx.fillText(`${L.toFixed(1)} m`, W / 2, ly1 - 10);
+
+    // B dimension
+    const bx1 = fx - dimPad;
+    const bx2 = fx + fw + dimPad;
+    ctx.beginPath();
+    ctx.moveTo(bx1, fy); ctx.lineTo(bx1, fy + fh);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(bx2, fy); ctx.lineTo(bx2, fy + fh);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(bx1 - 4, fy); ctx.lineTo(bx1 + 4, fy);
+    ctx.moveTo(bx1 - 4, fy + fh); ctx.lineTo(bx1 + 4, fy + fh);
+    ctx.moveTo(bx2 - 4, fy); ctx.lineTo(bx2 + 4, fy);
+    ctx.moveTo(bx2 - 4, fy + fh); ctx.lineTo(bx2 + 4, fy + fh);
+    ctx.stroke();
+    ctx.save();
+    ctx.translate(bx1 - 14, fy + fh / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText(`${B.toFixed(1)} m`, 0, 0);
+    ctx.restore();
+
+    // Reinforcement indicators
+    if (sL > 0 && sB > 0) {
+      ctx.strokeStyle = '#dc2626';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 3]);
+
+      const barOffset = 12;
+      for (let x = fx + barOffset; x < fx + fw - barOffset; x += (sB / 1000) * scale) {
+        ctx.beginPath();
+        ctx.moveTo(x, fy + barOffset);
+        ctx.lineTo(x, fy + fh - barOffset);
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = '#059669';
+      ctx.lineWidth = 1;
+      for (let y = fy + barOffset; y < fy + fh - barOffset; y += (sL / 1000) * scale) {
+        ctx.beginPath();
+        ctx.moveTo(fx + barOffset, y);
+        ctx.lineTo(fx + fw - barOffset, y);
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+    }
+
+    // Legend
+    ctx.font = '10px Inter, sans-serif';
+    ctx.fillStyle = '#dc2626';
+    ctx.fillRect(W - 92, fy + 6, 8, 8);
+    ctx.fillStyle = '#171717';
+    ctx.fillText('B-dir bars', W - 80, fy + 14);
+    ctx.fillStyle = '#059669';
+    ctx.fillRect(W - 92, fy + 22, 8, 8);
+    ctx.fillStyle = '#171717';
+    ctx.fillText('L-dir bars', W - 80, fy + 30);
+  }
+
+  function calcDesign() {
+    const P = getVal('axialLoad');
+    const SBC = getVal('sbc');
+    const ML = getVal('momentLength');
+    const MB = getVal('momentWidth');
+    const fck = getVal('concreteGrade');
+    const fy = getVal('steelGrade');
+    const Lc_mm = getVal('colLength');
+    const Bc_mm = getVal('colWidth');
+    const barDia = getVal('barDia');
+    const cover = getVal('clearCover');
+
+    if (P <= 0 || SBC <= 0) return;
+
+    // --- Step 1: Size of Footing ---
+    const P_eff = P + 0.1 * P;
+    const Lc = Lc_mm / 1000;
+    const Bc = Bc_mm / 1000;
+
+    // Find footing size
+    let L, B;
+    const colRatio = Math.max(Lc, Bc) / Math.min(Lc, Bc);
+    const A_req = P_eff / SBC;
+    // Start with reasonable dimensions
+    let trialL = Math.max(Math.ceil(Math.sqrt(A_req * colRatio) * 10) / 10, 1.2);
+    let trialB = Math.max(Math.ceil(Math.sqrt(A_req / colRatio) * 10) / 10, 1.2);
+
+    let found = false;
+    for (let iter = 0; iter < 100; iter++) {
+      const A = trialL * trialB;
+      const ZL = trialB * trialL * trialL / 6;
+      const ZB = trialL * trialB * trialB / 6;
+      const q_max = P_eff / A + ML / ZL + MB / ZB;
+      const q_min = P_eff / A - ML / ZL - MB / ZB;
+
+      if (q_max <= SBC && q_min >= -0.01) {
+        found = true;
+        break;
+      }
+      if (q_max > SBC) {
+        trialL += 0.1;
+        trialB += 0.1;
+      } else if (q_min < 0) {
+        if (Math.abs(ML) >= Math.abs(MB)) {
+          trialL += 0.2;
+        } else {
+          trialB += 0.2;
+        }
+      }
+    }
+    if (!found) {
+      // Force solution
+      while (true) {
+        const A = trialL * trialB;
+        const ZL = trialB * trialL * trialL / 6;
+        const ZB = trialL * trialB * trialB / 6;
+        const q_max = P_eff / A + ML / ZL + MB / ZB;
+        const q_min = P_eff / A - ML / ZL - MB / ZB;
+        if (q_max <= SBC && q_min >= -0.01) break;
+        trialL += 0.1; trialB += 0.1;
+        if (trialL > 10) break;
+      }
+    }
+
+    // Ensure L >= B convention: L is the longer side
+    if (trialL < trialB) {
+      let tmp = trialL; trialL = trialB; trialB = tmp;
+    }
+
+    // Try to align L with column length direction
+    // ML is moment along length, MB along width
+    // We'll keep L as the longer dimension
+    L = trialL;
+    B = trialB;
+
+    const A_footing = L * B;
+    const ZL = B * L * L / 6;
+    const ZB = L * B * B / 6;
+    const q_max = P_eff / A_footing + ML / ZL + MB / ZB;
+    const q_min = P_eff / A_footing - ML / ZL - MB / ZB;
+    const eL = ML / P;
+    const eB = MB / P;
+
+    // --- Step 2: Depth from Bending ---
+    const Pu = 1.5 * P;
+    const MuL = 1.5 * ML;
+    const MuB = 1.5 * MB;
+    const Pu_eff = 1.5 * P_eff;
+
+    // Factored base pressures
+    const qf_max = Pu_eff / A_footing + MuL / ZL + MuB / ZB;
+    const qf_min = Pu_eff / A_footing - MuL / ZL - MuB / ZB;
+
+    // Cantilever distances (in m)
+    const cantL = (L - Lc) / 2;
+    const cantB = (B - Bc) / 2;
+
+    // Pressure at column face along L direction (q_max edge side)
+    const q_face_L_max = qf_max - (qf_max - qf_min) * cantL / L;
+    // Pressure at column face along L direction (q_min edge side)
+    const q_face_L_min = qf_min + (qf_max - qf_min) * (L - cantL) / L;
+
+    // Moment per meter width at column face (L direction - critical section)
+    // Using q_max side (more critical)
+    const Mu_L_per_m = (cantL * cantL / 6) * (2 * qf_max + q_face_L_max);
+
+    // For B direction
+    const q_face_B_max = qf_max - (qf_max - qf_min) * cantB / B;
+    const Mu_B_per_m = (cantB * cantB / 6) * (2 * qf_max + q_face_B_max);
+
+    // Alternatively, also check the q_min side
+    const q_face_B_min = qf_min + (qf_max - qf_min) * (B - cantB) / B;
+    const Mu_B_per_m_min = (cantB * cantB / 6) * (2 * qf_min + q_face_B_min);
+
+    const Mu_L_max = Mu_L_per_m;
+    const Mu_B_max = Math.max(Mu_B_per_m, Mu_B_per_m_min);
+    const Mu_max = Math.max(Mu_L_max, Mu_B_max);
+
+    // Ru = 0.133 * fck for Fe500, or more generally:
+    const xu_max_d = 0.0035 / (0.0035 + fy / 200000);
+    const Ru_limit = 0.36 * fck * xu_max_d * (1 - 0.416 * xu_max_d);
+
+    const d_req = Math.sqrt(Mu_max * 1e6 / (Ru_limit * 1000));
+
+    // Start with D to pass bending + cover considerations
+    let D = Math.max(Math.ceil((d_req + cover + barDia / 2) / 25) * 25, 300);
+    if (D < d_req + cover + barDia / 2) D += 25;
+
+    let d = D - cover - barDia / 2;
+
+    // --- Step 3: Shear Checks ---
+    // One-way shear: check at d from column face
+    // We may need to increase depth if shear fails
+    let oneWayShearOk = false, twoWayShearOk = false;
+    let shearIter = 0;
+    let tau_c = 0;
+
+    while ((!oneWayShearOk || !twoWayShearOk) && shearIter < 30) {
+      d = D - cover - barDia / 2;
+      if (d <= 0) { D += 50; continue; }
+
+      // One-way shear
+      const d_m = d / 1000;
+      const x_crit_L = cantL - d_m; // distance from edge to critical section
+      if (x_crit_L > 0) {
+        const q_at_crit = qf_max - (qf_max - qf_min) * x_crit_L / L;
+        // Shear force at critical section (per m width)
+        const Vu1_per_m = (x_crit_L / 2) * (2 * qf_max - (qf_max - qf_min) * x_crit_L / L);
+        // Actually: shear = area of pressure diagram from edge to critical section
+        // Average pressure at critical section = q_at_crit
+        // Shear per m = (qf_max + q_at_crit) / 2 * x_crit_L
+        const Vu1_total = (qf_max + q_at_crit) / 2 * x_crit_L * B; // total shear force
+
+        const tau_v1 = Vu1_total * 1000 / (B * 1000 * d);
+        // tau_c (approx) for M25 ~0.35 for 0.2% steel; simplified
+        // Per IS 456, use approximate tau_c = 0.35 + (fck - 20) * 0.005 for under-reinforced sections
+        const tau_c_approx = 0.28 + (fck - 15) * 0.025;
+        tau_c = Math.min(tau_c_approx, 0.42);
+
+        oneWayShearOk = tau_v1 <= tau_c;
+      } else {
+        oneWayShearOk = true;
+      }
+
+      // Two-way (punching) shear
+      const colPerim = 2 * (Lc_mm + d + Bc_mm + d);
+      const d2_m = d / 1000;
+      const critL = Lc + 2 * (d2_m / 2);
+      const critB = Bc + 2 * (d2_m / 2);
+      // Approx pressure within critical perimeter (use average factored pressure)
+      const qf_avg = (qf_max + qf_min) / 2;
+      const punchArea = critL * critB / 1e6; // m²
+      const Vu2 = Pu - qf_avg * punchArea; // kN
+
+      const tau_v2 = Vu2 * 1000 / (colPerim * d);
+      const tau_p_allow = 0.25 * Math.sqrt(fck);
+      twoWayShearOk = tau_v2 <= tau_p_allow;
+
+      if (!oneWayShearOk || !twoWayShearOk) {
+        D += 25;
+        shearIter++;
+      }
+    }
+
+    d = D - cover - barDia / 2;
+
+    // Recalculate one-way shear at final depth
+    const d_m = d / 1000;
+    const x_crit_L = Math.max(cantL - d_m, 0);
+    let Vu1_total = 0;
+    if (x_crit_L > 0) {
+      const q_at_crit = qf_max - (qf_max - qf_min) * x_crit_L / L;
+      Vu1_total = (qf_max + q_at_crit) / 2 * x_crit_L * B;
+    }
+    const tau_v1 = Vu1_total > 0 ? Vu1_total * 1000 / (B * 1000 * d) : 0;
+
+    // Punching
+    const colPerim = 2 * (Lc_mm + d + Bc_mm + d);
+    const d2_m = d / 1000;
+    const critL = Lc_mm / 1000 + d2_m;
+    const critB = Bc_mm / 1000 + d2_m;
+    const qf_avg = (qf_max + qf_min) / 2;
+    const punchArea = critL * critB;
+    const Vu2 = Pu - qf_avg * punchArea;
+    const tau_v2 = Vu2 * 1000 / (colPerim * d);
+    const tau_p_allow = 0.25 * Math.sqrt(fck);
+
+    // --- Step 4: Reinforcement ---
+    // Ast required from Mu
+    function calcAst(Mu, d_val) {
+      if (d_val <= 0) return 0;
+      const m = fy / (0.36 * fck);
+      const R = Mu * 1e6 / (1000 * d_val * d_val);
+      const pt_req = (1 - Math.sqrt(1 - (4.6 * R) / fck)) * fck / (2 * fy);
+      if (pt_req <= 0 || isNaN(pt_req)) return 0;
+      return pt_req / 100 * 1000 * d_val;
+    }
+
+    const Ast_L = calcAst(Mu_L_max, d);
+    const Ast_B = calcAst(Mu_B_max, d);
+
+    // Min steel: 0.12% of gross area
+    const Ast_min = 0.12 / 100 * 1000 * D;
+
+    const Ast_L_prov = Math.max(Ast_L, Ast_min);
+    const Ast_B_prov = Math.max(Ast_B, Ast_min);
+
+    // Spacing
+    const areaBar = Math.PI * barDia * barDia / 4;
+    let spacingL = Math.floor(areaBar / Ast_L_prov * 1000 / 10) * 10;
+    let spacingB = Math.floor(areaBar / Ast_B_prov * 1000 / 10) * 10;
+
+    // Max spacing: 3d or 300mm (IS 456)
+    const maxSpace = Math.min(3 * d, 300);
+    spacingL = Math.min(spacingL, Math.floor(maxSpace / 10) * 10);
+    spacingB = Math.min(spacingB, Math.floor(maxSpace / 10) * 10);
+
+    if (spacingL < 50) spacingL = 50;
+    if (spacingB < 50) spacingB = 50;
+
+    // Provided Ast
+    const Ast_L_actual = areaBar / spacingL * 1000;
+    const Ast_B_actual = areaBar / spacingB * 1000;
+
+    // --- Update UI ---
+    document.getElementById('planFootingSize').textContent = `${L.toFixed(1)} m × ${B.toFixed(1)} m`;
+    document.getElementById('planOverallDepth').textContent = `${D} mm`;
+    document.getElementById('planEffDepth').textContent = `${d.toFixed(0)} mm`;
+    document.getElementById('planRebarL').textContent = spacingL > 0 ? `Ø${barDia} @ ${spacingL} mm c/c` : '--';
+    document.getElementById('planRebarB').textContent = spacingB > 0 ? `Ø${barDia} @ ${spacingB} mm c/c` : '--';
+
+    drawPlanView(L, B, Lc_mm, Bc_mm, D, d, barDia, spacingL, spacingB);
+
+    // Step 1
+    const q_max_disp = round(q_max, 2);
+    const q_min_disp = round(q_min, 2);
+    const q_max_ok = q_max_disp <= SBC;
+    const q_min_ok = q_min_disp >= 0;
+
+    document.getElementById('step1Results').innerHTML = `
+      <div class="step-line">Vertical Load (P + 10% self-weight) = ${P_eff.toFixed(2)} kN</div>
+      <div class="step-line">Eccentricities: e<sub>L</sub> = ${eL.toFixed(3)} m, e<sub>B</sub> = ${eB.toFixed(3)} m</div>
+      <div class="step-line">Provided Footing Size = ${L.toFixed(1)} m × ${B.toFixed(1)} m (Area: ${A_footing.toFixed(2)} m&sup2;)</div>
+      <div class="step-line ${q_max_ok ? 'safe' : 'fail'}">Max Base Pressure (q<sub>max</sub>) = ${q_max_disp} kN/m&sup2; ${q_max_ok ? '≤' : '>'} SBC (${SBC} kN/m&sup2;) ${q_max_ok ? '→ Safe' : '→ Revise'}</div>
+      <div class="step-line ${q_min_ok ? 'safe' : 'fail'}">Min Base Pressure (q<sub>min</sub>) = ${q_min_disp} kN/m&sup2; ${q_min_ok ? '≥ 0 (No Tension)' : '< 0 (Tension)'} ${q_min_ok ? '→ Safe' : '→ Revise'}</div>
+    `;
+
+    // Step 2
+    document.getElementById('step2Results').innerHTML = `
+      <div class="step-line">Factored Load (P<sub>u</sub>) = ${Pu.toFixed(2)} kN</div>
+      <div class="step-line">Factored Edge Pressure (q<sub>edge,L</sub>) = ${round(qf_max, 2)} kN/m&sup2;, (q<sub>face,L</sub>) = ${round(q_face_L_max, 2)} kN/m&sup2;</div>
+      <div class="step-line">M<sub>u,L</sub> (per meter width) = ${round(Mu_L_max, 2)} kNm/m</div>
+      <div class="step-line">M<sub>u,B</sub> (per meter width) = ${round(Mu_B_max, 2)} kNm/m</div>
+      <div class="step-line">R<sub>u,lim</sub> = ${round(Ru_limit, 3)} N/mm&sup2;</div>
+      <div class="step-line">d<sub>req</sub> = √(M<sub>u,max</sub> / (R<sub>u</sub> × b)) = √(${round(Mu_max, 2)}×10&sup6; / (${round(Ru_limit, 3)} × 1000)) = ${round(d_req, 1)} mm</div>
+      <div class="step-line">Provided Overall Depth (D) = ${D} mm, Effective Depth (d) = ${d} mm</div>
+    `;
+
+    // Step 3
+    document.getElementById('step3Results').innerHTML = `
+      <div class="step-line">Checking at provided effective depth d = ${d} mm (Overall D = ${D} mm)</div>
+      <div class="step-subsection">One-Way Shear (at d from face):</div>
+      <div class="step-line">Max V<sub>u1</sub> = ${round(Vu1_total, 2)} kN</div>
+      <div class="step-line ${tau_v1 <= tau_c ? 'safe' : 'fail'}">τ<sub>v1</sub> = ${round(tau_v1, 3)} N/mm&sup2; ${tau_v1 <= tau_c ? '≤' : '>'} τ<sub>c</sub> (${round(tau_c, 2)} N/mm&sup2;) ${tau_v1 <= tau_c ? '→ Safe' : '→ Revise'}</div>
+      <div class="step-subsection">Two-Way Punching Shear (at d/2 from face):</div>
+      <div class="step-line">V<sub>u2</sub> = ${round(Vu2, 2)} kN, Perimeter b<sub>0</sub> = ${colPerim} mm</div>
+      <div class="step-line ${tau_v2 <= tau_p_allow ? 'safe' : 'fail'}">τ<sub>v2</sub> = ${round(tau_v2, 3)} N/mm&sup2; ${tau_v2 <= tau_p_allow ? '≤' : '>'} τ<sub>p,allow</sub> (${round(tau_p_allow, 3)} N/mm&sup2;) ${tau_v2 <= tau_p_allow ? '→ Safe' : '→ Revise'}</div>
+    `;
+
+    // Step 4
+    document.getElementById('step4Results').innerHTML = `
+      <div class="step-line">Min Steel Area = 0.12% of Gross Area = ${round(Ast_min, 1)} mm&sup2;/m</div>
+      <div class="step-line">Ast required (L-dir) = ${round(Ast_L, 1)} mm&sup2;/m, Provided = ${round(Ast_L_actual, 1)} mm&sup2;/m</div>
+      <div class="step-line">Ast required (B-dir) = ${round(Ast_B, 1)} mm&sup2;/m, Provided = ${round(Ast_B_actual, 1)} mm&sup2;/m</div>
+      <div class="step-line">Spacing L-Dir (For M<sub>u,L</sub>) = Ø${barDia} @ ${spacingL} mm c/c</div>
+      <div class="step-line">Spacing B-Dir (For M<sub>u,B</sub>) = Ø${barDia} @ ${spacingB} mm c/c</div>
+    `;
+  }
+
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('input', calcDesign);
+  });
+
+  calcDesign();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .unit {
+    color: var(--text-tertiary);
+    font-weight: 400;
+    font-size: 12px;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 32px 0;
+  }
+
+  #planViewContainer {
+    margin-bottom: 32px;
+  }
+
+  .plan-view {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+    background: var(--result-bg);
+    border: 1px solid var(--result-border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .plan-canvas-wrap {
+    flex-shrink: 0;
+  }
+
+  #planCanvas {
+    width: 400px;
+    height: 320px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #ffffff;
+  }
+
+  .plan-dimensions {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .plan-dim-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .plan-dim-row:last-child {
+    border-bottom: none;
+  }
+
+  .dim-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .dim-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  #resultsSection {
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+
+  .calc-step {
+    background: var(--result-bg);
+    border: 1px solid var(--result-border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+
+  .step-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 14px;
+  }
+
+  .step-results {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .step-line {
+    font-size: 13px;
+    line-height: 20px;
+    color: var(--text-primary);
+    padding: 2px 0;
+  }
+
+  .step-line.safe {
+    color: var(--color-success);
+    font-weight: 500;
+  }
+
+  .step-line.fail {
+    color: var(--color-danger);
+    font-weight: 500;
+  }
+
+  .step-subsection {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+  }
+
+  @media (max-width: 768px) {
+    .plan-view {
+      flex-direction: column;
+      padding: 16px;
+      gap: 20px;
+    }
+
+    #planCanvas {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 400 / 320;
+    }
+
+    .plan-canvas-wrap {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .calc-step {
+      padding: 16px;
+    }
+
+    .step-line {
+      font-size: 12px;
+      line-height: 18px;
+    }
+
+    .step-title {
+      font-size: 14px;
+    }
+  }
+</style>

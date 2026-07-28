@@ -1,0 +1,615 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="MS Hollow Pipe Weight Calculator"
+  description="Calculate weight and cost of Hollow Square, Circular, L Steel, T Steel, and Flat Sheet. Supports mm, cm, inch, ft, and m units."
+  eyebrow="Steel Weight Tool"
+>
+  <div class="calculator-card">
+    <div class="tab-bar" id="tabBar">
+      <button class="tab-btn active" data-tab="square">Square</button>
+      <button class="tab-btn" data-tab="circular">Circular</button>
+      <button class="tab-btn" data-tab="angle">L Steel</button>
+      <button class="tab-btn" data-tab="tee">T Steel</button>
+      <button class="tab-btn" data-tab="flat">Flat Sheet</button>
+    </div>
+
+    <!-- Square Hollow -->
+    <div class="tab-panel active" id="panel-square">
+      <h2 class="section-title">Hollow Square Pipe Weight Calculator</h2>
+      <div class="input-table-wrap">
+        <table class="input-table">
+          <thead><tr><th>S.N</th><th>Discription</th><th>Value</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Outer side length of Square Pipe:</td><td><div class="inline-unit-input"><input type="number" id="sqSide" class="inline-input" value="75" step="any" min="0" /><select class="inline-unit-select" id="sqSideUnit"><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option><option value="m">m</option></select></div></td></tr>
+            <tr><td>2</td><td>Thickness of Square Pipe:</td><td><div class="inline-unit-input"><input type="number" id="sqThk" class="inline-input" value="6" step="any" min="0" /><select class="inline-unit-select" id="sqThkUnit"><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option><option value="m">m</option></select></div></td></tr>
+            <tr><td>3</td><td>Length of Square Pipe:</td><td><div class="inline-unit-input"><input type="number" id="sqLen" class="inline-input" value="1" step="any" min="0" /><select class="inline-unit-select" id="sqLenUnit"><option value="m">m</option><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option></select></div></td></tr>
+            <tr><td>4</td><td>Quantity of Square Pipe:</td><td><div class="inline-unit-input"><input type="number" id="sqQty" class="inline-input" value="1" step="1" min="1" /><span class="unit-label">Nos.</span></div></td></tr>
+            <tr><td>5</td><td>Cost of Square Pipe per Kg:</td><td><div class="inline-unit-input"><input type="number" id="sqRate" class="inline-input" value="155" step="any" min="0" /><span class="unit-label">Rs.</span></div></td></tr>
+            <tr><td>6</td><td>Density of Steel:</td><td><div class="inline-unit-input"><input type="number" id="sqDensity" class="inline-input" value="7850" step="any" min="0" /><span class="unit-label">Kg/m&sup3;</span></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary calc-tab-btn" data-tab="square">Calculate</button>
+        <button class="btn-secondary reset-tab-btn" data-tab="square">Reset</button>
+      </div>
+      <div class="tab-results" id="sqResults">
+        <h3 class="table-heading">Results</h3>
+        <table class="result-table"><tbody>
+          <tr><td>Weight of Single Square Pipe:</td><td><span class="sq-r-wt1">0</span> Kg</td></tr>
+          <tr><td>Weight of Total Square Pipe:</td><td><span class="sq-r-wtT">0</span> Kg</td></tr>
+          <tr><td>Cost of Single Square Pipe:</td><td><span class="sq-r-co1">0</span> Rs.</td></tr>
+          <tr><td>Cost of Total Steel Pipe:</td><td><span class="sq-r-coT">0</span> Rs.</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <!-- Circular Hollow -->
+    <div class="tab-panel" id="panel-circular">
+      <h2 class="section-title">Hollow Circular Pipe Weight Calculator</h2>
+      <div class="input-table-wrap">
+        <table class="input-table">
+          <thead><tr><th>S.N</th><th>Discription</th><th>Value</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Outer Diameter of Circular Pipe:</td><td><div class="inline-unit-input"><input type="number" id="ciOD" class="inline-input" value="100" step="any" min="0" /><select class="inline-unit-select" id="ciODUnit"><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option><option value="m">m</option></select></div></td></tr>
+            <tr><td>2</td><td>Thickness of Pipe:</td><td><div class="inline-unit-input"><input type="number" id="ciThk" class="inline-input" value="5" step="any" min="0" /><select class="inline-unit-select" id="ciThkUnit"><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option><option value="m">m</option></select></div></td></tr>
+            <tr><td>3</td><td>Length of Circular Pipe:</td><td><div class="inline-unit-input"><input type="number" id="ciLen" class="inline-input" value="1" step="any" min="0" /><select class="inline-unit-select" id="ciLenUnit"><option value="m">m</option><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option></select></div></td></tr>
+            <tr><td>4</td><td>Quantity of Circular Pipe:</td><td><div class="inline-unit-input"><input type="number" id="ciQty" class="inline-input" value="1" step="1" min="1" /><span class="unit-label">Nos.</span></div></td></tr>
+            <tr><td>5</td><td>Cost of Circular Pipe per Kg:</td><td><div class="inline-unit-input"><input type="number" id="ciRate" class="inline-input" value="155" step="any" min="0" /><span class="unit-label">Rs.</span></div></td></tr>
+            <tr><td>6</td><td>Density of Steel:</td><td><div class="inline-unit-input"><input type="number" id="ciDensity" class="inline-input" value="7850" step="any" min="0" /><span class="unit-label">Kg/m&sup3;</span></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary calc-tab-btn" data-tab="circular">Calculate</button>
+        <button class="btn-secondary reset-tab-btn" data-tab="circular">Reset</button>
+      </div>
+      <div class="tab-results" id="ciResults">
+        <h3 class="table-heading">Results</h3>
+        <table class="result-table"><tbody>
+          <tr><td>Weight of Single Circular Pipe:</td><td><span class="ci-r-wt1">0</span> Kg</td></tr>
+          <tr><td>Weight of Total Circular Pipe:</td><td><span class="ci-r-wtT">0</span> Kg</td></tr>
+          <tr><td>Cost of Single Circular Pipe:</td><td><span class="ci-r-co1">0</span> Rs.</td></tr>
+          <tr><td>Cost of Total Steel Pipe:</td><td><span class="ci-r-coT">0</span> Rs.</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <!-- L Steel (Angle) -->
+    <div class="tab-panel" id="panel-angle">
+      <h2 class="section-title">L Steel Weight Calculator</h2>
+      <div class="input-table-wrap">
+        <table class="input-table">
+          <thead><tr><th>S.N</th><th>Discription</th><th>Value</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Width of L Steel Plate:</td><td><div class="inline-unit-input"><input type="number" id="anWidth" class="inline-input" value="50" step="any" min="0" /><select class="inline-unit-select" id="anWidthUnit"><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option><option value="m">m</option></select></div></td></tr>
+            <tr><td>2</td><td>Height of L Steel Plate:</td><td><div class="inline-unit-input"><input type="number" id="anHeight" class="inline-input" value="50" step="any" min="0" /><select class="inline-unit-select" id="anHeightUnit"><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option><option value="m">m</option></select></div></td></tr>
+            <tr><td>3</td><td>Thickness of L Steel Plate:</td><td><div class="inline-unit-input"><input type="number" id="anThk" class="inline-input" value="5" step="any" min="0" /><select class="inline-unit-select" id="anThkUnit"><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option><option value="m">m</option></select></div></td></tr>
+            <tr><td>4</td><td>Length of L Steel:</td><td><div class="inline-unit-input"><input type="number" id="anLen" class="inline-input" value="1" step="any" min="0" /><select class="inline-unit-select" id="anLenUnit"><option value="m">m</option><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option></select></div></td></tr>
+            <tr><td>5</td><td>Quantity of L Steel:</td><td><div class="inline-unit-input"><input type="number" id="anQty" class="inline-input" value="1" step="1" min="1" /><span class="unit-label">Nos.</span></div></td></tr>
+            <tr><td>6</td><td>Cost of L Steel per Kg:</td><td><div class="inline-unit-input"><input type="number" id="anRate" class="inline-input" value="155" step="any" min="0" /><span class="unit-label">Rs.</span></div></td></tr>
+            <tr><td>7</td><td>Density of Steel:</td><td><div class="inline-unit-input"><input type="number" id="anDensity" class="inline-input" value="7850" step="any" min="0" /><span class="unit-label">Kg/m&sup3;</span></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary calc-tab-btn" data-tab="angle">Calculate</button>
+        <button class="btn-secondary reset-tab-btn" data-tab="angle">Reset</button>
+      </div>
+      <div class="tab-results" id="anResults">
+        <h3 class="table-heading">Results</h3>
+        <table class="result-table"><tbody>
+          <tr><td>Weight of Single L Steel:</td><td><span class="an-r-wt1">0</span> Kg</td></tr>
+          <tr><td>Weight of Total L Steel:</td><td><span class="an-r-wtT">0</span> Kg</td></tr>
+          <tr><td>Cost of Single L Steel:</td><td><span class="an-r-co1">0</span> Rs.</td></tr>
+          <tr><td>Cost of Total L Steel:</td><td><span class="an-r-coT">0</span> Rs.</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <!-- T Steel -->
+    <div class="tab-panel" id="panel-tee">
+      <h2 class="section-title">T Steel Weight Calculator</h2>
+      <div class="input-table-wrap">
+        <table class="input-table">
+          <thead><tr><th>S.N</th><th>Discription</th><th>Value</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Flange Width of T Steel:</td><td><div class="inline-unit-input"><input type="number" id="teFlange" class="inline-input" value="60" step="any" min="0" /><select class="inline-unit-select" id="teFlangeUnit"><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option><option value="m">m</option></select></div></td></tr>
+            <tr><td>2</td><td>Over all Depth of T Steel:</td><td><div class="inline-unit-input"><input type="number" id="teDepth" class="inline-input" value="60" step="any" min="0" /><select class="inline-unit-select" id="teDepthUnit"><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option><option value="m">m</option></select></div></td></tr>
+            <tr><td>3</td><td>Thickness of T Steel:</td><td><div class="inline-unit-input"><input type="number" id="teThk" class="inline-input" value="5" step="any" min="0" /><select class="inline-unit-select" id="teThkUnit"><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option><option value="m">m</option></select></div></td></tr>
+            <tr><td>4</td><td>Length of T Steel:</td><td><div class="inline-unit-input"><input type="number" id="teLen" class="inline-input" value="1" step="any" min="0" /><select class="inline-unit-select" id="teLenUnit"><option value="m">m</option><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option></select></div></td></tr>
+            <tr><td>5</td><td>Quantity of T Steel:</td><td><div class="inline-unit-input"><input type="number" id="teQty" class="inline-input" value="1" step="1" min="1" /><span class="unit-label">Nos.</span></div></td></tr>
+            <tr><td>6</td><td>Cost of T Steel per Kg:</td><td><div class="inline-unit-input"><input type="number" id="teRate" class="inline-input" value="155" step="any" min="0" /><span class="unit-label">Rs.</span></div></td></tr>
+            <tr><td>7</td><td>Density of Steel:</td><td><div class="inline-unit-input"><input type="number" id="teDensity" class="inline-input" value="7850" step="any" min="0" /><span class="unit-label">Kg/m&sup3;</span></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary calc-tab-btn" data-tab="tee">Calculate</button>
+        <button class="btn-secondary reset-tab-btn" data-tab="tee">Reset</button>
+      </div>
+      <div class="tab-results" id="teResults">
+        <h3 class="table-heading">Results</h3>
+        <table class="result-table"><tbody>
+          <tr><td>Weight of Single T Steel:</td><td><span class="te-r-wt1">0</span> Kg</td></tr>
+          <tr><td>Weight of Total T Steel:</td><td><span class="te-r-wtT">0</span> Kg</td></tr>
+          <tr><td>Cost of Single T Steel:</td><td><span class="te-r-co1">0</span> Rs.</td></tr>
+          <tr><td>Cost of Total T Steel:</td><td><span class="te-r-coT">0</span> Rs.</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <!-- Flat Sheet -->
+    <div class="tab-panel" id="panel-flat">
+      <h2 class="section-title">Flat Sheet Weight Calculator</h2>
+      <div class="input-table-wrap">
+        <table class="input-table">
+          <thead><tr><th>S.N</th><th>Discription</th><th>Value</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Length of Flat Steel:</td><td><div class="inline-unit-input"><input type="number" id="flLen" class="inline-input" value="2000" step="any" min="0" /><select class="inline-unit-select" id="flLenUnit"><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option><option value="m">m</option></select></div></td></tr>
+            <tr><td>2</td><td>Width of Flat Steel:</td><td><div class="inline-unit-input"><input type="number" id="flWidth" class="inline-input" value="1000" step="any" min="0" /><select class="inline-unit-select" id="flWidthUnit"><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option><option value="m">m</option></select></div></td></tr>
+            <tr><td>3</td><td>Thickness of Flat Steel:</td><td><div class="inline-unit-input"><input type="number" id="flThk" class="inline-input" value="6" step="any" min="0" /><select class="inline-unit-select" id="flThkUnit"><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option><option value="m">m</option></select></div></td></tr>
+            <tr><td>4</td><td>Length of Flat Steel:</td><td><div class="inline-unit-input"><input type="number" id="flLen2" class="inline-input" value="1" step="any" min="0" /><select class="inline-unit-select" id="flLen2Unit"><option value="m">m</option><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option></select></div></td></tr>
+            <tr><td>5</td><td>Quantity of Flat Steel:</td><td><div class="inline-unit-input"><input type="number" id="flQty" class="inline-input" value="1" step="1" min="1" /><span class="unit-label">Nos.</span></div></td></tr>
+            <tr><td>6</td><td>Cost of Flat Steel per Kg:</td><td><div class="inline-unit-input"><input type="number" id="flRate" class="inline-input" value="155" step="any" min="0" /><span class="unit-label">Rs.</span></div></td></tr>
+            <tr><td>7</td><td>Density of Steel:</td><td><div class="inline-unit-input"><input type="number" id="flDensity" class="inline-input" value="7850" step="any" min="0" /><span class="unit-label">Kg/m&sup3;</span></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary calc-tab-btn" data-tab="flat">Calculate</button>
+        <button class="btn-secondary reset-tab-btn" data-tab="flat">Reset</button>
+      </div>
+      <div class="tab-results" id="flResults">
+        <h3 class="table-heading">Results</h3>
+        <table class="result-table"><tbody>
+          <tr><td>Weight of Single Flat Steel:</td><td><span class="fl-r-wt1">0</span> Kg</td></tr>
+          <tr><td>Weight of Total Flat Steel:</td><td><span class="fl-r-wtT">0</span> Kg</td></tr>
+          <tr><td>Cost of Single Flat Steel:</td><td><span class="fl-r-co1">0</span> Rs.</td></tr>
+          <tr><td>Cost of Total Flat Steel:</td><td><span class="fl-r-coT">0</span> Rs.</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function toMeters(val, unit) {
+    switch (unit) {
+      case 'mm': return val / 1000;
+      case 'cm': return val / 100;
+      case 'inch': return val * 0.0254;
+      case 'ft': return val * 0.3048;
+      default: return val;
+    }
+  }
+
+  function fmt(v) { return Math.round(v * 100) / 100; }
+
+  function calcSquare() {
+    const s = toMeters(parseFloat(sqSide.value) || 0, sqSideUnit.value);
+    const t = toMeters(parseFloat(sqThk.value) || 0, sqThkUnit.value);
+    const l = toMeters(parseFloat(sqLen.value) || 0, sqLenUnit.value);
+    const q = parseInt(sqQty.value) || 1;
+    const r = parseFloat(sqRate.value) || 0;
+    const d = parseFloat(sqDensity.value) || 7850;
+    if (s <= 0 || t <= 0 || l <= 0 || t >= s / 2) return;
+    const outer = s * s;
+    const inner = (s - 2 * t) * (s - 2 * t);
+    const vol = (outer - inner) * l;
+    const wt1 = vol * d;
+    const wtT = wt1 * q;
+    document.querySelector('.sq-r-wt1').textContent = fmt(wt1);
+    document.querySelector('.sq-r-wtT').textContent = fmt(wtT);
+    document.querySelector('.sq-r-co1').textContent = fmt(wt1 * r);
+    document.querySelector('.sq-r-coT').textContent = fmt(wtT * r);
+  }
+
+  function resetSquare() {
+    sqSide.value = '75'; sqSideUnit.value = 'mm';
+    sqThk.value = '6'; sqThkUnit.value = 'mm';
+    sqLen.value = '1'; sqLenUnit.value = 'm';
+    sqQty.value = '1'; sqRate.value = '155'; sqDensity.value = '7850';
+    calcSquare();
+  }
+
+  function calcCircular() {
+    const od = toMeters(parseFloat(ciOD.value) || 0, ciODUnit.value);
+    const t = toMeters(parseFloat(ciThk.value) || 0, ciThkUnit.value);
+    const l = toMeters(parseFloat(ciLen.value) || 0, ciLenUnit.value);
+    const q = parseInt(ciQty.value) || 1;
+    const r = parseFloat(ciRate.value) || 0;
+    const d = parseFloat(ciDensity.value) || 7850;
+    if (od <= 0 || t <= 0 || l <= 0 || t >= od / 2) return;
+    const id = od - 2 * t;
+    const outer = Math.PI * od * od / 4;
+    const inner = Math.PI * id * id / 4;
+    const vol = (outer - inner) * l;
+    const wt1 = vol * d;
+    const wtT = wt1 * q;
+    document.querySelector('.ci-r-wt1').textContent = fmt(wt1);
+    document.querySelector('.ci-r-wtT').textContent = fmt(wtT);
+    document.querySelector('.ci-r-co1').textContent = fmt(wt1 * r);
+    document.querySelector('.ci-r-coT').textContent = fmt(wtT * r);
+  }
+
+  function resetCircular() {
+    ciOD.value = '100'; ciODUnit.value = 'mm';
+    ciThk.value = '5'; ciThkUnit.value = 'mm';
+    ciLen.value = '1'; ciLenUnit.value = 'm';
+    ciQty.value = '1'; ciRate.value = '155'; ciDensity.value = '7850';
+    calcCircular();
+  }
+
+  function calcAngle() {
+    const w = toMeters(parseFloat(anWidth.value) || 0, anWidthUnit.value);
+    const h = toMeters(parseFloat(anHeight.value) || 0, anHeightUnit.value);
+    const t = toMeters(parseFloat(anThk.value) || 0, anThkUnit.value);
+    const l = toMeters(parseFloat(anLen.value) || 0, anLenUnit.value);
+    const q = parseInt(anQty.value) || 1;
+    const r = parseFloat(anRate.value) || 0;
+    const den = parseFloat(anDensity.value) || 7850;
+    if (w <= 0 || h <= 0 || t <= 0 || l <= 0) return;
+    const area = (w * t) + (h - t) * t;
+    const vol = area * l;
+    const wt1 = vol * den;
+    const wtT = wt1 * q;
+    document.querySelector('.an-r-wt1').textContent = fmt(wt1);
+    document.querySelector('.an-r-wtT').textContent = fmt(wtT);
+    document.querySelector('.an-r-co1').textContent = fmt(wt1 * r);
+    document.querySelector('.an-r-coT').textContent = fmt(wtT * r);
+  }
+
+  function resetAngle() {
+    anWidth.value = '50'; anWidthUnit.value = 'mm';
+    anHeight.value = '50'; anHeightUnit.value = 'mm';
+    anThk.value = '5'; anThkUnit.value = 'mm';
+    anLen.value = '1'; anLenUnit.value = 'm';
+    anQty.value = '1'; anRate.value = '155'; anDensity.value = '7850';
+    calcAngle();
+  }
+
+  function calcTee() {
+    const bf = toMeters(parseFloat(teFlange.value) || 0, teFlangeUnit.value);
+    const d = toMeters(parseFloat(teDepth.value) || 0, teDepthUnit.value);
+    const t = toMeters(parseFloat(teThk.value) || 0, teThkUnit.value);
+    const l = toMeters(parseFloat(teLen.value) || 0, teLenUnit.value);
+    const q = parseInt(teQty.value) || 1;
+    const r = parseFloat(teRate.value) || 0;
+    const den = parseFloat(teDensity.value) || 7850;
+    if (bf <= 0 || d <= 0 || t <= 0 || l <= 0) return;
+    const area = (bf * t) + (d - t) * t;
+    const vol = area * l;
+    const wt1 = vol * den;
+    const wtT = wt1 * q;
+    document.querySelector('.te-r-wt1').textContent = fmt(wt1);
+    document.querySelector('.te-r-wtT').textContent = fmt(wtT);
+    document.querySelector('.te-r-co1').textContent = fmt(wt1 * r);
+    document.querySelector('.te-r-coT').textContent = fmt(wtT * r);
+  }
+
+  function resetTee() {
+    teFlange.value = '60'; teFlangeUnit.value = 'mm';
+    teDepth.value = '60'; teDepthUnit.value = 'mm';
+    teThk.value = '5'; teThkUnit.value = 'mm';
+    teLen.value = '1'; teLenUnit.value = 'm';
+    teQty.value = '1'; teRate.value = '155'; teDensity.value = '7850';
+    calcTee();
+  }
+
+  function calcFlat() {
+    const l1 = toMeters(parseFloat(flLen.value) || 0, flLenUnit.value);
+    const w = toMeters(parseFloat(flWidth.value) || 0, flWidthUnit.value);
+    const t = toMeters(parseFloat(flThk.value) || 0, flThkUnit.value);
+    const l2 = toMeters(parseFloat(flLen2.value) || 0, flLen2Unit.value);
+    const q = parseInt(flQty.value) || 1;
+    const r = parseFloat(flRate.value) || 0;
+    const den = parseFloat(flDensity.value) || 7850;
+    const len = l1 > 0 ? l1 : l2;
+    if (len <= 0 || w <= 0 || t <= 0) return;
+    const vol = len * w * t;
+    const wt1 = vol * den;
+    const wtT = wt1 * q;
+    document.querySelector('.fl-r-wt1').textContent = fmt(wt1);
+    document.querySelector('.fl-r-wtT').textContent = fmt(wtT);
+    document.querySelector('.fl-r-co1').textContent = fmt(wt1 * r);
+    document.querySelector('.fl-r-coT').textContent = fmt(wtT * r);
+  }
+
+  function resetFlat() {
+    flLen.value = '2000'; flLenUnit.value = 'mm';
+    flWidth.value = '1000'; flWidthUnit.value = 'mm';
+    flThk.value = '6'; flThkUnit.value = 'mm';
+    flLen2.value = '1'; flLen2Unit.value = 'm';
+    flQty.value = '1'; flRate.value = '155'; flDensity.value = '7850';
+    calcFlat();
+  }
+
+  // Tab switching
+  document.getElementById('tabBar').addEventListener('click', e => {
+    const btn = e.target.closest('.tab-btn');
+    if (!btn) return;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+  });
+
+  // Calculate buttons
+  document.querySelectorAll('.calc-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const map = { square: calcSquare, circular: calcCircular, angle: calcAngle, tee: calcTee, flat: calcFlat };
+      map[btn.dataset.tab]();
+    });
+  });
+
+  // Reset buttons
+  document.querySelectorAll('.reset-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const map = { square: resetSquare, circular: resetCircular, angle: resetAngle, tee: resetTee, flat: resetFlat };
+      map[btn.dataset.tab]();
+    });
+  });
+
+  // Enter key support
+  document.querySelectorAll('.inline-input').forEach(el => {
+    el.addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
+      const panel = el.closest('.tab-panel');
+      if (!panel) return;
+      const id = panel.id.replace('panel-', '');
+      const map = { square: calcSquare, circular: calcCircular, angle: calcAngle, tee: calcTee, flat: calcFlat };
+      if (map[id]) map[id]();
+    });
+  });
+
+  // Initialize all
+  calcSquare(); calcCircular(); calcAngle(); calcTee(); calcFlat();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab-bar {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    background: var(--table-header-bg);
+    border-radius: 10px;
+    padding: 4px;
+    overflow-x: auto;
+  }
+
+  .tab-btn {
+    padding: 8px 20px;
+    border: none;
+    background: transparent;
+    color: var(--result-text-muted);
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .tab-btn:hover { color: var(--text-primary); }
+  .tab-btn.active {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .input-table-wrap { overflow-x: auto; }
+
+  .input-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .input-table th,
+  .input-table td {
+    padding: 10px 12px;
+    border: 1px solid var(--result-border);
+    vertical-align: middle;
+    text-align: left;
+  }
+
+  .input-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .input-table th:first-child,
+  .input-table td:first-child {
+    width: 40px;
+    text-align: center;
+    color: var(--text-tertiary);
+    font-weight: 500;
+  }
+
+  .input-table td:nth-child(2) {
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+  }
+
+  .inline-unit-input {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .inline-input {
+    flex: 1;
+    height: 36px;
+    padding: 0 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-input);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    min-width: 80px;
+  }
+
+  .inline-input:focus {
+    outline: none;
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+  }
+
+  .inline-unit-select {
+    width: 80px;
+    height: 36px;
+    padding: 0 4px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-input);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color 0.2s;
+  }
+
+  .inline-unit-select:focus {
+    outline: none;
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+  }
+
+  .unit-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .tab-results {
+    margin-top: 20px;
+  }
+
+  .table-heading {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 12px;
+  }
+
+  .result-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .result-table th,
+  .result-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .result-table td:first-child {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .result-table td:last-child {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 768px) {
+    .input-table td:nth-child(2) {
+      font-size: 13px;
+    }
+
+    .result-table td {
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .tab-bar {
+      gap: 2px;
+      padding: 3px;
+    }
+
+    .tab-btn {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .btn-row { flex-direction: column; }
+    .btn-primary, .btn-secondary { width: 100%; }
+
+    .inline-input {
+      font-size: 13px;
+      height: 32px;
+      min-width: 60px;
+    }
+
+    .inline-unit-select {
+      width: 65px;
+      height: 32px;
+      font-size: 12px;
+    }
+  }
+</style>

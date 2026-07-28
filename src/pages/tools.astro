@@ -1,0 +1,566 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const toolCategories = [
+  {
+    id: 1,
+    name: "Converter",
+    tools: [
+      { name: "Unit Converter for Civil Engineers", href: "/tools/unit-converter" },
+      { name: "Land Area Converter", href: "/tools/land-area-converter" },
+      { name: "Weight to Volume of Cement Converter", href: "/tools/cement-converter" },
+      { name: "Concrete Column Calculator", href: "/tools/column-calculator" },
+      { name: "Concrete Slab Weight Calculator", href: "/tools/slab-calculator" },
+      { name: "Block Weight Calculator", href: "/tools/block-calculator" },
+      { name: "Land Area Unit Converter for Nepal", href: "/tools/nepal-land-converter" }
+    ]
+  },
+  {
+    id: 2,
+    name: "Building Estimator",
+    tools: [
+      { name: "Cost to Build a House Calculator", href: "/tools/building-cost-calculator" },
+      { name: "Building Cost for India", href: "/tools/building-cost-india" },
+      { name: "Building Cost for Nepal", href: "/tools/building-cost-nepal" },
+      { name: "Building Cost Nepal Terai", href: "/tools/building-cost-nepal-terai" },
+      { name: "Land Price Calculator", href: "/tools/land-price-calculator" },
+      { name: "Plinth Area Calculator", href: "/tools/plinth-area-calculator" }
+    ]
+  },
+  {
+    id: 3,
+    name: "Estimation",
+    tools: [
+      { name: "Brick Masonry Calculator", href: "/tools/brick-masonry-calculator" },
+      { name: "Brick Quantity Calculator with Mortar", href: "/tools/brick-quantity-calculator" },
+      { name: "Concrete Calculator", href: "/tools/concrete-calculator" },
+      { name: "Plaster Calculator", href: "/tools/plaster-calculator" },
+      { name: "Tiles Area Estimator", href: "/tools/tile-square-footage-calculator" },
+      { name: "Tiles Area with Cost Calculator", href: "/tools/tiles-area-with-cost-calculator" },
+      { name: "Stair Granite Estimator", href: "/tools/stair-granite-estimator" },
+      { name: "Slab Estimator", href: "/tools/slab-estimator" },
+      { name: "Trapezoidal Footing Estimator", href: "/tools/trapezoidal-footing-estimator" },
+      { name: "Stair Concrete Estimator", href: "/tools/dog-legged-stair-estimator" },
+      { name: "Concrete Weight Estimator", href: "/tools/concrete-weight-estimator" },
+      { name: "Wood Estimator", href: "/tools/wood-estimator" },
+      { name: "Roof Cost Estimator", href: "/tools/roof-cost-estimator" },
+      { name: "Painting Cost Estimator for Exterior", href: "/tools/painting-cost-estimator-for-exterior" },
+      { name: "Compound Wall Estimator", href: "/tools/compound-wall-estimator" },
+      { name: "Carpet Estimator", href: "/tools/carpet-estimator" },
+      { name: "Formwork Estimator", href: "/tools/formwork-estimator" },
+      { name: "Labour Cost Estimator", href: "/tools/labour-cost-estimator" },
+      { name: "Weight of Concrete per Square Foot Calculation", href: "/tools/concrete-weight-per-sqft" },
+      { name: "Base Board Cost Calculator", href: "/tools/baseboard-cost-calculator" },
+      { name: "Concrete Block Calculator for Wall", href: "/tools/concrete-block-calculator" },
+      { name: "Wood Cubic Feet Calculator", href: "/tools/wood-cubic-feet-calculator" },
+      { name: "Concrete Mix Design Calculator", href: "/tools/concrete-mix-design-calculator" }
+    ]
+  },
+  {
+    id: 4,
+    name: "Steel Weight",
+    tools: [
+      { name: "Rebar Weight Calculator", href: "/tools/rebar-weight-calculator" },
+      { name: "Square Pipe Weight Calculator", href: "/tools/square-pipe-weight-calculator" },
+      { name: "Chequered Plate Weight Calculator", href: "/tools/chequered-plate-weight-calculator" },
+      { name: "MS Hollow Pipe Weight Calculator", href: "/tools/ms-hollow-pipe-weight-calculator" },
+      { name: "Rebar Calculator for Slab", href: "/tools/rebar-calculator-for-slab" },
+      { name: "Steel Bar Weight Calculator in Feet With Total Cost", href: "/tools/steel-bar-weight-calculator-feet" },
+      { name: "Steel Pipe Weight Calculator with Total Cost", href: "/tools/steel-pipe-weight-calculator-cost" },
+      { name: "Steel Plate Weight Calculator with Total Cost", href: "/tools/steel-plate-weight-calculator-cost" }
+    ]
+  },
+  {
+    id: 5,
+    name: "Rate Analysis",
+    tools: [
+      { name: "Rate Analysis of PCC Calculator", href: "/tools/rate-analysis-pcc" },
+      { name: "Rate Analysis of PCC for RCC Calculator", href: "/tools/rate-analysis-pcc-for-rcc" },
+      { name: "Rate Analysis for Brick Work Calculator", href: "/tools/rate-analysis-brick-work" },
+      { name: "Rate Analysis of Plaster Works Calculator", href: "/tools/rate-analysis-plaster" }
+    ]
+  },
+  { id: 6, name: "Transportation", tools: [
+    { name: "Super Elevation Calculator", href: "/tools/super-elevation-calculator" }
+  ] },
+  { id: 7, name: "RCC Design", tools: [
+      { name: "Rebar C/S Area Calculator", href: "/tools/rebar-cs-area-calculator" },
+      { name: "Rebar % Calculator", href: "/tools/rebar-percentage-calculator" },
+      { name: "Development Length Calculator (IS 456:2000)", href: "/tools/development-length-calculator" },
+      { name: "Septic Tank Designer", href: "/tools/septic-tank-designer" },
+    { name: "Two Way RCC Slab Designer", href: "/tools/two-way-slab-designer" },
+    { name: "Stair Calculator with Landing", href: "/tools/stair-calculator-with-landing" },
+    { name: "Advanced Concrete Mix Design", href: "/tools/concrete-mix-design-calculator" },
+    { name: "Isolated Footing Design", href: "/tools/isolated-footing-design" }
+  ] },
+  { id: 8, name: "Cutting Length", tools: [
+    { name: "Cutting Length of Rectangular or Square Ties Calculator", href: "/tools/cutting-length-rectangular-ties" },
+      { name: "Cutting Length of Triangular Ties Calculator", href: "/tools/cutting-length-triangular-ties" },
+    { name: "Cutting Length of Circular Ties Calculator", href: "/tools/cutting-length-circular-ties" },
+    { name: "Cutting Length of Helical Stirrups in Pile/Column Calculator", href: "/tools/cutting-length-helical-stirrups" },
+    { name: "Cutting Length of Diamond Ties Calculator", href: "/tools/cutting-length-diamond-ties" }
+  ] },
+  { id: 9, name: "Bar Bending Schedule", tools: [
+    { name: "Spacing of Stirrups in Beam Calculator" },
+    { name: "BBS of Footing" },
+    { name: "BBS of Crank Beam" },
+    { name: "BBS of Continuous Beam (No T/B Extra)" },
+    { name: "BBS of Continuous Beam (T/B Extra)" },
+    { name: "BBS of Column" }
+  ] },
+  { id: 10, name: "BOQ Maker", tools: [
+    { name: "BOQ Maker" }
+  ] },
+  { id: 11, name: "Material Lab Test", tools: [] },
+  { id: 12, name: "Concrete Technology", tools: [] },
+  { id: 13, name: "Soil Mechanics", tools: [
+    { name: "Soil Properties Calculator" },
+    { name: "Cutting and Filling Calculator" },
+    { name: "Formula for Void Ratio | Degree of Unsaturation Calculator" },
+    { name: "Minimum Depth of Foundation" },
+    { name: "Concrete Calculator for Retaining Wall" },
+    { name: "Foundation Concrete Calculator" },
+    { name: "Safe Soil Bearing Capacity Calculator" }
+  ] },
+  { id: 14, name: "Structural Analysis", tools: [] },
+  { id: 15, name: "Strength of Materials", tools: [] },
+  { id: 16, name: "Load Calculator", tools: [] },
+  { id: 17, name: "Hydraulics & Fluid Mechanics", tools: [] },
+  { id: 18, name: "Survey", tools: [] },
+  { id: 19, name: "Foundation Engineering", tools: [] },
+  { id: 20, name: "Building", tools: [] },
+  { id: 23, name: "Finance", tools: [] },
+  { id: 24, name: "Volume/Area", tools: [] },
+  { id: 25, name: "Management/Tracking", tools: [] }
+];
+---
+
+<Layout>
+  <section class="page-header">
+    <div class="band-inner">
+      <p class="eyebrow-mono">Engineering Suite</p>
+      <h1 class="page-title">Professional Tools.</h1>
+      <p class="page-desc">A growing collection of calculators and engineering tools designed for civil engineers, architects, and construction professionals.</p>
+    </div>
+  </section>
+
+  <section class="categories-section">
+    <div class="band-inner">
+      <h2 class="section-title center">All Tools.</h2>
+      <div class="categories-grid">
+        {toolCategories.map((category) => (
+          <div class={`category-card ${category.tools.length === 0 ? 'empty' : ''}`}>
+            <div class="category-header">
+              <h3 class="category-name">{category.name}</h3>
+              {category.tools.length === 0 && (
+                <span class="coming-soon-badge">Coming Soon</span>
+              )}
+            </div>
+            {category.tools.length > 0 ? (
+              <ul class="tool-list">
+                {category.tools.map((tool) => (
+                  <li>
+                    {tool.href ? (
+                      <a href={tool.href} class="tool-link">
+                        <svg width="4" height="4" viewBox="0 0 4 4" fill="none">
+                          <circle cx="2" cy="2" r="2" fill="#d4d4d4"/>
+                        </svg>
+                        {tool.name}
+                      </a>
+                    ) : (
+                      <span class="tool-link disabled">
+                        <svg width="4" height="4" viewBox="0 0 4 4" fill="none">
+                          <circle cx="2" cy="2" r="2" fill="#e0e0e0"/>
+                        </svg>
+                        {tool.name}
+                        <span class="coming-soon-tag">Coming Soon</span>
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p class="empty-text">Tools in this category are under development and will be available soon.</p>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="features-section">
+    <div class="band-inner">
+      <h2 class="section-title center">Why use Civil Tools?</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Free to Use</h3>
+          <p class="feature-desc">All our calculators are completely free. No hidden charges or usage limits.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Accurate Results</h3>
+          <p class="feature-desc">Built and verified by civil engineers following industry standards and codes.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">No Signup Needed</h3>
+          <p class="feature-desc">Use any tool instantly without creating an account or providing personal data.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Mobile Friendly</h3>
+          <p class="feature-desc">All tools work on any device &mdash; desktop, tablet, or phone. No app needed.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-light">
+    <div class="band-inner center">
+      <h2 class="section-title">Can't find what you need?</h2>
+      <p class="section-body">We release new tools every month. Request a specific calculator and we'll add it to our roadmap.</p>
+      <a href="/about" class="btn-primary">Request a Tool</a>
+    </div>
+  </section>
+</Layout>
+
+<style is:global>
+  .page-header {
+    background: var(--bg-surface);
+    padding: 96px 0 64px;
+    text-align: center;
+  }
+
+  .eyebrow-mono {
+    font-family: JetBrains Mono, ui-monospace, monospace;
+    font-size: 12px;
+    font-weight: 400;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 16px;
+    letter-spacing: 0.05em;
+  }
+
+  .page-title {
+    font-size: 48px;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+  }
+
+  .page-desc {
+    font-size: 18px;
+    line-height: 28px;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .categories-section {
+    background: var(--bg-page);
+    padding: 80px 0 100px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title {
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    margin: 0 0 12px;
+  }
+
+  .section-title.center {
+    text-align: center;
+  }
+
+  .section-body {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin: 0 0 32px;
+  }
+
+  .categories-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin-top: 56px;
+  }
+
+  .category-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .category-card:not(.empty):hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  }
+
+  .category-card.empty {
+    background: var(--bg-page);
+  }
+
+  .category-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .category-name {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .category-card.empty .category-name {
+    color: var(--text-tertiary);
+  }
+
+  .coming-soon-badge {
+    font-family: JetBrains Mono, ui-monospace, monospace;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    background: var(--bg-hover);
+    padding: 4px 10px;
+    border-radius: 9999px;
+    white-space: nowrap;
+  }
+
+  .tool-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .tool-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    padding: 6px 0;
+    text-decoration: none;
+    transition: color 0.1s ease;
+  }
+
+  .tool-link:hover {
+    color: var(--text-primary);
+  }
+
+  .tool-link.disabled {
+    color: var(--text-muted);
+    cursor: default;
+  }
+
+  .coming-soon-tag {
+    font-family: JetBrains Mono, ui-monospace, monospace;
+    font-size: 9px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    background: var(--bg-hover);
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  .empty-text {
+    font-size: 13px;
+    line-height: 20px;
+    color: var(--text-muted);
+    margin: 0;
+    font-style: italic;
+  }
+
+  .features-section {
+    background: var(--bg-card);
+    padding: 100px 0;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+    margin-top: 56px;
+  }
+
+  .feature-card {
+    text-align: center;
+  }
+
+  .feature-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+  }
+
+  .feature-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 12px;
+  }
+
+  .feature-desc {
+    font-size: 14px;
+    line-height: 22px;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .cta-light {
+    background: var(--bg-page);
+    padding: 96px 0;
+    text-align: center;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    font-weight: 500;
+    border-radius: 9999px;
+    padding: 0 24px;
+    height: 48px;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+
+  .btn-primary:hover {
+    opacity: 0.9;
+  }
+
+  .band-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .band-inner.center {
+    text-align: center;
+  }
+
+  @media (max-width: 1024px) {
+    .categories-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .features-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .page-header {
+      padding: 72px 0 44px;
+    }
+
+    .page-title {
+      font-size: 36px;
+    }
+
+    .page-desc {
+      font-size: 16px;
+      line-height: 24px;
+    }
+
+    .categories-section {
+      padding: 48px 0 72px;
+    }
+
+    .categories-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .category-card {
+      padding: 20px;
+    }
+
+    .features-section {
+      padding: 72px 0;
+    }
+
+    .features-grid {
+      grid-template-columns: 1fr;
+      gap: 48px;
+    }
+
+    .cta-light {
+      padding: 64px 0;
+    }
+
+    .band-inner {
+      padding: 0 16px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .page-title {
+      font-size: 28px;
+    }
+    .section-title {
+      font-size: 24px;
+    }
+    .tool-link {
+      font-size: 13px;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .page-title { font-size: 24px; }
+    .page-desc { font-size: 15px; line-height: 24px; }
+    .section-title { font-size: 21px; }
+    .page-header { padding: 64px 0 36px; }
+    .categories-section { padding: 36px 0 56px; }
+    .features-section { padding: 48px 0; }
+    .cta-light { padding: 48px 0; }
+    .category-card { padding: 16px; }
+    .categories-grid { margin-top: 32px; gap: 16px; }
+    .features-grid { margin-top: 32px; gap: 32px; }
+    .band-inner { padding: 0 12px; }
+    .tool-link { font-size: 13px; }
+  }
+</style>

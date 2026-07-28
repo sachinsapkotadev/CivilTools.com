@@ -1,0 +1,549 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+
+const pageTitle = "Unit Converter for Civil Engineers | Length, Area, Volume & More";
+const pageDesc = "Convert length, area, volume, mass, pressure, time, and temperature units instantly. Free online unit converter built for civil engineers, contractors, and students.";
+const keywords = "unit converter, civil engineering unit converter, metric to imperial converter, length converter online, area unit converter, volume converter, pressure unit converter, mass converter";
+const canonicalUrl = "https://www.civiltools.com/tools/unit-converter";
+
+const appSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Unit Converter for Civil Engineers",
+  "url": "https://www.civiltools.com/tools/unit-converter",
+  "description": pageDesc,
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "All",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How do I convert meters to feet?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "To convert meters to feet, multiply the length in meters by 3.28084. For example, 1 meter = 3.28084 feet. To convert feet to meters, divide the length in feet by 3.28084."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What units does this converter support?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "This converter supports seven measurement categories: length (meters, centimeters, millimeters, kilometers, inches, feet, yards, miles), area (square meters, square centimeters, square millimeters, square kilometers, square inches, square feet, square yards, acres, hectares), volume (cubic meters, cubic centimeters, liters, milliliters, cubic inches, cubic feet, cubic yards, gallons), mass (kilograms, grams, milligrams, metric tons, pounds, ounces), pressure (pascals, kilopascals, megapascals, bar, psi, atmospheres), time (seconds, minutes, hours, days, weeks, years), and temperature (celsius, fahrenheit, kelvin)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is this unit converter accurate for engineering use?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, this converter uses standard engineering conversion factors with up to 6 decimal places of precision. All conversion factors follow SI and ISO standards. The tool handles both metric-to-imperial and imperial-to-metric conversions and includes specialized temperature conversion formulas for Celsius, Fahrenheit, and Kelvin."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do you convert between different pressure units used in construction?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Common pressure conversions in construction include: 1 MPa = 145.038 psi, 1 bar = 14.5038 psi, and 1 kPa = 0.145038 psi. Concrete strength is typically measured in MPa or psi, with standard grades like M20 concrete corresponding to approximately 2900 psi."
+      }
+    }
+  ]
+};
+
+const pageSchemas = [appSchema, faqSchema];
+
+const units = {
+  length: {
+    name: "Length",
+    factors: {
+      m: 1,
+      cm: 0.01,
+      mm: 0.001,
+      km: 1000,
+      in: 0.0254,
+      ft: 0.3048,
+      yd: 0.9144,
+      mi: 1609.34
+    },
+    labels: {
+      m: "Meters (m)",
+      cm: "Centimeters (cm)",
+      mm: "Millimeters (mm)",
+      km: "Kilometers (km)",
+      in: "Inches (in)",
+      ft: "Feet (ft)",
+      yd: "Yards (yd)",
+      mi: "Miles (mi)"
+    }
+  },
+  area: {
+    name: "Area",
+    factors: {
+      sqm: 1,
+      sqcm: 0.0001,
+      sqmm: 0.000001,
+      sqkm: 1000000,
+      sqin: 0.00064516,
+      sqft: 0.092903,
+      sqyd: 0.836127,
+      acre: 4046.86,
+      hectare: 10000
+    },
+    labels: {
+      sqm: "Square Meters (m²)",
+      sqcm: "Square Centimeters (cm²)",
+      sqmm: "Square Millimeters (mm²)",
+      sqkm: "Square Kilometers (km²)",
+      sqin: "Square Inches (in²)",
+      sqft: "Square Feet (ft²)",
+      sqyd: "Square Yards (yd²)",
+      acre: "Acres",
+      hectare: "Hectares"
+    }
+  },
+  volume: {
+    name: "Volume",
+    factors: {
+      cum: 1,
+      cucm: 0.000001,
+      liter: 0.001,
+      ml: 0.000001,
+      cuin: 0.000016387,
+      cuft: 0.0283168,
+      cuyd: 0.764555,
+      gal: 0.00378541
+    },
+    labels: {
+      cum: "Cubic Meters (m³)",
+      cucm: "Cubic Centimeters (cm³)",
+      liter: "Liters (L)",
+      ml: "Milliliters (mL)",
+      cuin: "Cubic Inches (in³)",
+      cuft: "Cubic Feet (ft³)",
+      cuyd: "Cubic Yards (yd³)",
+      gal: "Gallons (US)"
+    }
+  },
+  mass: {
+    name: "Mass / Weight",
+    factors: {
+      kg: 1,
+      g: 0.001,
+      mg: 0.000001,
+      ton: 1000,
+      lb: 0.453592,
+      oz: 0.0283495
+    },
+    labels: {
+      kg: "Kilograms (kg)",
+      g: "Grams (g)",
+      mg: "Milligrams (mg)",
+      ton: "Metric Tons (t)",
+      lb: "Pounds (lb)",
+      oz: "Ounces (oz)"
+    }
+  },
+  pressure: {
+    name: "Pressure",
+    factors: {
+      pa: 1,
+      kpa: 1000,
+      mpa: 1000000,
+      bar: 100000,
+      psi: 6894.76,
+      atm: 101325
+    },
+    labels: {
+      pa: "Pascal (Pa)",
+      kpa: "Kilopascal (kPa)",
+      mpa: "Megapascal (MPa)",
+      bar: "Bar",
+      psi: "Pounds per Sq Inch (psi)",
+      atm: "Atmosphere (atm)"
+    }
+  },
+  time: {
+    name: "Time",
+    factors: {
+      sec: 1,
+      min: 60,
+      hr: 3600,
+      day: 86400,
+      week: 604800,
+      year: 31536000
+    },
+    labels: {
+      sec: "Seconds (s)",
+      min: "Minutes (min)",
+      hr: "Hours (h)",
+      day: "Days",
+      week: "Weeks",
+      year: "Years"
+    }
+  },
+  temperature: {
+    name: "Temperature",
+    factors: {}, // Specialized handling needed
+    labels: {
+      c: "Celsius (°C)",
+      f: "Fahrenheit (°F)",
+      k: "Kelvin (K)"
+    }
+  }
+};
+---
+
+<ToolLayout 
+  title={pageTitle} 
+  description={pageDesc}
+  eyebrow="Conversion Tool"
+  canonical={canonicalUrl}
+  keywords={keywords}
+  schema={pageSchemas}
+>
+  <div class="calculator-card">
+    <div class="input-grid">
+      <div class="input-group">
+        <label for="category">Category</label>
+        <select id="category">
+          {Object.entries(units).map(([key, value]) => (
+            <option value={key}>{value.name}</option>
+          ))}
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="fromValue">Value</label>
+        <input type="number" id="fromValue" value="1" step="any" />
+      </div>
+    </div>
+
+    <div class="input-grid">
+      <div class="input-group">
+        <label for="fromUnit">From</label>
+        <select id="fromUnit"></select>
+      </div>
+      <div class="input-group" style="display: flex; align-items: center; justify-content: center; padding-top: 24px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-tertiary);"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+      <div class="input-group">
+        <label for="toUnit">To</label>
+        <select id="toUnit"></select>
+      </div>
+    </div>
+
+    <div class="results-section">
+      <div class="result-display">
+        <div id="resultText" class="result-value large">---</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <h3>Quick References</h3>
+      <table class="quick-ref-table">
+        <thead>
+          <tr>
+            <th>Conversion</th>
+            <th>Factor</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1 meter</td><td>= 3.28084 feet</td></tr>
+          <tr><td>1 kilometer</td><td>= 0.621371 miles</td></tr>
+          <tr><td>1 square meter</td><td>= 10.7639 square feet</td></tr>
+          <tr><td>1 hectare</td><td>= 2.47105 acres</td></tr>
+          <tr><td>1 kilogram</td><td>= 2.20462 pounds</td></tr>
+          <tr><td>1 metric ton</td><td>= 2204.62 pounds</td></tr>
+          <tr><td>1 bar</td><td>= 14.5038 psi</td></tr>
+          <tr><td>1 megapascal</td><td>= 145.038 psi</td></tr>
+        </tbody>
+      </table>
+      <ul id="quickRefs"></ul>
+    </div>
+
+    <!-- Educational Content for SEO and AEO -->
+    <article class="seo-article" style="margin-top: 40px; border-top: 1px solid var(--border); padding-top: 40px; line-height: 1.6; font-size: 15px;">
+      <h2 style="color: var(--text-primary); font-size: 22px; margin-bottom: 16px; font-weight: 600;">How to Use the Unit Converter for Civil Engineers</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 20px;">
+        Civil engineering calculations frequently require converting measurements between Metric (SI) and Imperial (US Customary) systems. This online unit converter is specifically optimized for structural engineers, construction estimators, site supervisors, and contractors to perform instantaneous conversions for <strong>length</strong>, <strong>area</strong>, <strong>volume</strong>, <strong>mass/weight</strong>, <strong>pressure</strong>, <strong>time</strong>, and <strong>temperature</strong>.
+      </p>
+
+      <h3 style="color: var(--text-primary); font-size: 18px; margin-top: 24px; margin-bottom: 12px; font-weight: 600;">Standard Civil Engineering Conversion Formulas</h3>
+      <div class="table-wrap" style="margin-bottom: 24px; overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;">
+          <thead>
+            <tr style="border-bottom: 2px solid var(--border); background: var(--table-header-bg);">
+              <th style="padding: 12px; font-weight: 600; color: var(--text-primary);">Quantity</th>
+              <th style="padding: 12px; font-weight: 600; color: var(--text-primary);">Convert From</th>
+              <th style="padding: 12px; font-weight: 600; color: var(--text-primary);">Convert To</th>
+              <th style="padding: 12px; font-weight: 600; color: var(--text-primary);">Multiplier / Formula</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: 12px; font-weight: 500; color: var(--text-primary);">Length</td>
+              <td style="padding: 12px; color: var(--text-secondary);">Meters (m)</td>
+              <td style="padding: 12px; color: var(--text-secondary);">Feet (ft)</td>
+              <td style="padding: 12px; color: var(--text-secondary);">Multiply by 3.28084</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: 12px; font-weight: 500; color: var(--text-primary);">Area</td>
+              <td style="padding: 12px; color: var(--text-secondary);">Square Meters (m²)</td>
+              <td style="padding: 12px; color: var(--text-secondary);">Square Feet (ft²)</td>
+              <td style="padding: 12px; color: var(--text-secondary);">Multiply by 10.7639</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: 12px; font-weight: 500; color: var(--text-primary);">Volume</td>
+              <td style="padding: 12px; color: var(--text-secondary);">Cubic Meters (m³)</td>
+              <td style="padding: 12px; color: var(--text-secondary);">Cubic Feet (ft³)</td>
+              <td style="padding: 12px; color: var(--text-secondary);">Multiply by 35.3147</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: 12px; font-weight: 500; color: var(--text-primary);">Pressure / Strength</td>
+              <td style="padding: 12px; color: var(--text-secondary);">Megapascals (MPa)</td>
+              <td style="padding: 12px; color: var(--text-secondary);">PSI (lbs/in²)</td>
+              <td style="padding: 12px; color: var(--text-secondary);">Multiply by 145.038</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: 12px; font-weight: 500; color: var(--text-primary);">Weight</td>
+              <td style="padding: 12px; color: var(--text-secondary);">Kilograms (kg)</td>
+              <td style="padding: 12px; color: var(--text-secondary);">Pounds (lbs)</td>
+              <td style="padding: 12px; color: var(--text-secondary);">Multiply by 2.20462</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="color: var(--text-primary); font-size: 18px; margin-top: 24px; margin-bottom: 16px; font-weight: 600;">Frequently Asked Questions (FAQ)</h3>
+      <div class="faq-section" style="display: flex; flex-direction: column; gap: 20px;">
+        <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+          <h4 style="color: var(--text-primary); font-size: 15px; margin-bottom: 8px; font-weight: 600;">How do I convert meters to feet?</h4>
+          <p style="color: var(--text-secondary); margin: 0;">
+            To convert meters to feet, multiply the length in meters by 3.28084. For example, 1 meter = 3.28084 feet. To convert feet to meters, divide the length in feet by 3.28084.
+          </p>
+        </div>
+        <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+          <h4 style="color: var(--text-primary); font-size: 15px; margin-bottom: 8px; font-weight: 600;">What units does this converter support?</h4>
+          <p style="color: var(--text-secondary); margin: 0;">
+            This converter supports seven measurement categories: length (meters, centimeters, millimeters, kilometers, inches, feet, yards, miles), area (square meters, square centimeters, square millimeters, square kilometers, square inches, square feet, square yards, acres, hectares), volume (cubic meters, cubic centimeters, liters, milliliters, cubic inches, cubic feet, cubic yards, gallons), mass (kilograms, grams, milligrams, metric tons, pounds, ounces), pressure (pascals, kilopascals, megapascals, bar, psi, atmospheres), time (seconds, minutes, hours, days, weeks, years), and temperature (celsius, fahrenheit, kelvin).
+          </p>
+        </div>
+        <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+          <h4 style="color: var(--text-primary); font-size: 15px; margin-bottom: 8px; font-weight: 600;">Is this unit converter accurate for engineering use?</h4>
+          <p style="color: var(--text-secondary); margin: 0;">
+            Yes, this converter uses standard engineering conversion factors with up to 6 decimal places of precision. All conversion factors follow SI and ISO standards. The tool handles both metric-to-imperial and imperial-to-metric conversions and includes specialized temperature conversion formulas for Celsius, Fahrenheit, and Kelvin.
+          </p>
+        </div>
+        <div style="background: var(--bg-hover); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+          <h4 style="color: var(--text-primary); font-size: 15px; margin-bottom: 8px; font-weight: 600;">How do you convert between different pressure units used in construction?</h4>
+          <p style="color: var(--text-secondary); margin: 0;">
+            Common pressure conversions in construction include: 1 MPa = 145.038 psi, 1 bar = 14.5038 psi, and 1 kPa = 0.145038 psi. Concrete strength is typically measured in MPa or psi, with standard grades like M20 concrete corresponding to approximately 2900 psi.
+          </p>
+        </div>
+      </div>
+    </article>
+  </div>
+</ToolLayout>
+
+<script define:vars={{ units }}>
+  const categorySelect = document.getElementById('category');
+  const fromValueInput = document.getElementById('fromValue');
+  const fromUnitSelect = document.getElementById('fromUnit');
+  const toUnitSelect = document.getElementById('toUnit');
+  const resultText = document.getElementById('resultText');
+  const quickRefs = document.getElementById('quickRefs');
+
+  function updateUnits() {
+    const category = categorySelect.value;
+    const catUnits = units[category].labels;
+    
+    fromUnitSelect.innerHTML = '';
+    toUnitSelect.innerHTML = '';
+    
+    Object.entries(catUnits).forEach(([key, label], index) => {
+      const opt1 = new Option(label, key);
+      const opt2 = new Option(label, key);
+      fromUnitSelect.add(opt1);
+      toUnitSelect.add(opt2);
+      
+      if (index === 1) toUnitSelect.selectedIndex = 1;
+    });
+    
+    convert();
+  }
+
+  function convert() {
+    const category = categorySelect.value;
+    const fromUnit = fromUnitSelect.value;
+    const toUnit = toUnitSelect.value;
+    const val = parseFloat(fromValueInput.value);
+
+    if (isNaN(val)) {
+      resultText.textContent = "---";
+      return;
+    }
+
+    let convertedValue;
+    if (category === 'temperature') {
+      let celsius;
+      if (fromUnit === 'c') celsius = val;
+      else if (fromUnit === 'f') celsius = (val - 32) * 5/9;
+      else if (fromUnit === 'k') celsius = val - 273.15;
+
+      if (toUnit === 'c') convertedValue = celsius;
+      else if (toUnit === 'f') convertedValue = (celsius * 9/5) + 32;
+      else if (toUnit === 'k') convertedValue = celsius + 273.15;
+    } else {
+      const factors = units[category].factors;
+      const baseValue = val * factors[fromUnit];
+      convertedValue = baseValue / factors[toUnit];
+    }
+
+    // Format output
+    let displayValue;
+    if (convertedValue === 0) displayValue = "0";
+    else if (Math.abs(convertedValue) < 0.0001 || Math.abs(convertedValue) > 1000000000) {
+      displayValue = convertedValue.toExponential(4);
+    } else {
+      displayValue = parseFloat(convertedValue.toFixed(6)).toString();
+    }
+
+    resultText.textContent = `${val} ${fromUnit} = ${displayValue} ${toUnit}`;
+    updateQuickRefs();
+  }
+
+  function updateQuickRefs() {
+    const category = categorySelect.value;
+    const fromUnit = fromUnitSelect.value;
+    const val = parseFloat(fromValueInput.value) || 1;
+    const labels = units[category].labels;
+    
+    quickRefs.innerHTML = '';
+    Object.keys(labels).forEach((unit) => {
+      if (unit === fromUnit) return;
+      
+      let converted;
+      if (category === 'temperature') {
+        let celsius;
+        if (fromUnit === 'c') celsius = val;
+        else if (fromUnit === 'f') celsius = (val - 32) * 5/9;
+        else if (fromUnit === 'k') celsius = val - 273.15;
+
+        if (unit === 'c') converted = celsius;
+        else if (unit === 'f') converted = (celsius * 9/5) + 32;
+        else if (unit === 'k') converted = celsius + 273.15;
+      } else {
+        const factors = units[category].factors;
+        converted = (val * factors[fromUnit]) / factors[unit];
+      }
+
+      const li = document.createElement('li');
+      li.innerHTML = `<span>${labels[unit]}</span> <strong>${parseFloat(converted.toFixed(4))}</strong>`;
+      quickRefs.appendChild(li);
+    });
+  }
+
+  categorySelect.addEventListener('change', updateUnits);
+  fromValueInput.addEventListener('input', convert);
+  fromUnitSelect.addEventListener('change', convert);
+  toUnitSelect.addEventListener('change', convert);
+
+  // Initialize
+  updateUnits();
+</script>
+
+<style>
+  .result-display {
+    text-align: center;
+    padding: 24px;
+    background: var(--result-bg);
+    border-radius: 12px;
+  }
+
+  .info-grid {
+    margin-top: 48px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .info-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .info-card h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+  }
+
+  #quickRefs {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+  }
+
+  #quickRefs li {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 8px 12px;
+    background: var(--bg-page);
+    border-radius: 6px;
+  }
+
+  #quickRefs li span {
+    color: var(--text-secondary);
+  }
+
+  #quickRefs li strong {
+    color: var(--text-primary);
+  }
+
+  .quick-ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .quick-ref-table th,
+  .quick-ref-table td {
+    padding: 6px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .quick-ref-table th {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .quick-ref-table td {
+    color: var(--text-secondary);
+  }
+
+  .quick-ref-table tr:last-child td {
+    border-bottom: none;
+  }
+</style>

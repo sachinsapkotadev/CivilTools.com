@@ -1,0 +1,736 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout
+  title="Two Way RCC Slab Designer"
+  description="Design two-way RCC slabs per IS Code 456:2000. Computes depth, reinforcement, shear, and deflection checks."
+  eyebrow="Structural Design Tool"
+>
+  <div class="calculator-card">
+    <h2 class="section-title">1. Slab Geometry &amp; Basic Parameters</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Type of Slab</label>
+        <select id="slabType">
+          <option value="1">One Short Edge Continuous</option>
+          <option value="2">One Long Edge Continuous</option>
+          <option value="3">Two Adjacent Edges Continuous</option>
+          <option value="4">Two Short Edges Continuous</option>
+          <option value="5">Two Long Edges Continuous</option>
+          <option value="6">Three Edges Continuous</option>
+          <option value="7">All Edges Continuous</option>
+          <option value="8">Simply Supported</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Shorter Clear Span (lx) <span class="unit">m</span></label>
+        <input type="number" id="lx" value="3" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Longer Clear Span (ly) <span class="unit">m</span></label>
+        <input type="number" id="ly" value="5" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Beam Width (Short Span) <span class="unit">mm</span></label>
+        <input type="number" id="beamShort" value="300" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Beam Width (Long Span) <span class="unit">mm</span></label>
+        <input type="number" id="beamLong" value="300" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Basic l/d Ratio (k) <span class="unit">35-40</span></label>
+        <input type="number" id="basicK" value="35" step="any" min="1" />
+      </div>
+    </div>
+
+    <h2 class="section-title">2. Depth &amp; Loads</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Assumed Effective Depth <span class="unit">mm</span></label>
+        <input type="number" id="effDepth" value="110" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Clear Cover <span class="unit">mm</span></label>
+        <input type="number" id="clearCover" value="25" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Live Load <span class="unit">kN/m&sup2;</span></label>
+        <input type="number" id="liveLoad" value="3" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Floor Finish <span class="unit">kN/m&sup2;</span></label>
+        <input type="number" id="floorFinish" value="1" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Concrete Grade (f<sub>ck</sub>)</label>
+        <select id="concreteGrade">
+          <option value="20" selected>M20</option>
+          <option value="25">M25</option>
+          <option value="30">M30</option>
+          <option value="35">M35</option>
+          <option value="40">M40</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Steel Grade (f<sub>y</sub>)</label>
+        <select id="steelGrade">
+          <option value="250">Fe250</option>
+          <option value="415" selected>Fe415</option>
+          <option value="500">Fe500</option>
+          <option value="550">Fe550</option>
+        </select>
+      </div>
+    </div>
+
+    <h2 class="section-title">3. Bending Moment Coefficients (Table-26, IS 456:2000)</h2>
+    <p class="input-hint">Enter values from Table-26 based on your slab type and ly/lx ratio.</p>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>ly/lx Lower Range</label>
+        <input type="number" id="ratioLower" value="1" step="0.1" min="1" />
+      </div>
+      <div class="input-group">
+        <label>ly/lx Upper Range</label>
+        <input type="number" id="ratioUpper" value="1.1" step="0.1" min="1" />
+      </div>
+      <div class="input-group">
+        <label>&alpha;<sub>x</sub>(-) Lower</label>
+        <input type="number" id="alphaXml" value="0.032" step="0.001" />
+      </div>
+      <div class="input-group">
+        <label>&alpha;<sub>x</sub>(-) Upper</label>
+        <input type="number" id="alphaXmh" value="0.037" step="0.001" />
+      </div>
+      <div class="input-group">
+        <label>&alpha;<sub>y</sub>(-) Lower</label>
+        <input type="number" id="alphaYml" value="0.032" step="0.001" />
+      </div>
+      <div class="input-group">
+        <label>&alpha;<sub>y</sub>(-) Upper</label>
+        <input type="number" id="alphaYmh" value="0.032" step="0.001" />
+      </div>
+      <div class="input-group">
+        <label>&alpha;<sub>x</sub>(+) Lower</label>
+        <input type="number" id="alphaXpl" value="0.024" step="0.001" />
+      </div>
+      <div class="input-group">
+        <label>&alpha;<sub>x</sub>(+) Upper</label>
+        <input type="number" id="alphaXph" value="0.028" step="0.001" />
+      </div>
+      <div class="input-group">
+        <label>&alpha;<sub>y</sub>(+) Lower</label>
+        <input type="number" id="alphaYpl" value="0.024" step="0.001" />
+      </div>
+      <div class="input-group">
+        <label>&alpha;<sub>y</sub>(+) Upper</label>
+        <input type="number" id="alphaYph" value="0.024" step="0.001" />
+      </div>
+    </div>
+
+    <h2 class="section-title">4. Reinforcement &amp; Spacing</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Bar Dia (-)ve x-dir <span class="unit">mm</span></label>
+        <select id="barDiaNx">
+          <option value="8">8</option>
+          <option value="10" selected>10</option>
+          <option value="12">12</option>
+          <option value="16">16</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Provided Spacing (-)ve x-dir <span class="unit">mm</span></label>
+        <input type="number" id="spacingNx" value="225" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Bar Dia (-)ve y-dir <span class="unit">mm</span></label>
+        <select id="barDiaNy">
+          <option value="8">8</option>
+          <option value="10" selected>10</option>
+          <option value="12">12</option>
+          <option value="16">16</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Provided Spacing (-)ve y-dir <span class="unit">mm</span></label>
+        <input type="number" id="spacingNy" value="180" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Bar Dia (+)ve x-dir <span class="unit">mm</span></label>
+        <select id="barDiaPx">
+          <option value="8">8</option>
+          <option value="10" selected>10</option>
+          <option value="12">12</option>
+          <option value="16">16</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Provided Spacing (+)ve x-dir <span class="unit">mm</span></label>
+        <input type="number" id="spacingPx" value="225" step="any" min="0" />
+      </div>
+      <div class="input-group">
+        <label>Bar Dia (+)ve y-dir <span class="unit">mm</span></label>
+        <select id="barDiaPy">
+          <option value="8" selected>8</option>
+          <option value="10">10</option>
+          <option value="12">12</option>
+          <option value="16">16</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Provided Spacing (+)ve y-dir <span class="unit">mm</span></label>
+        <input type="number" id="spacingPy" value="180" step="any" min="0" />
+      </div>
+    </div>
+
+    <h2 class="section-title">5. Shear Table Values (Table-19, IS 456:2000)</h2>
+    <p class="input-hint">Enter two points from Table-19 for interpolation.</p>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>P<sub>1</sub> <span class="unit">%</span></label>
+        <input type="number" id="shearP1" value="0.23" step="0.01" />
+      </div>
+      <div class="input-group">
+        <label>&tau;<sub>c1</sub> <span class="unit">N/mm&sup2;</span></label>
+        <input type="number" id="shearTc1" value="0.36" step="0.01" />
+      </div>
+      <div class="input-group">
+        <label>P<sub>2</sub> <span class="unit">%</span></label>
+        <input type="number" id="shearP2" value="0.50" step="0.01" />
+      </div>
+      <div class="input-group">
+        <label>&tau;<sub>c2</sub> <span class="unit">N/mm&sup2;</span></label>
+        <input type="number" id="shearTc2" value="0.48" step="0.01" />
+      </div>
+      <div class="input-group">
+        <label>K<sub>s</sub> (Cl. 40.2.1)</label>
+        <input type="number" id="shearKs" value="1" step="0.05" />
+      </div>
+    </div>
+
+    <h2 class="section-title">6. Deflection Modification Factor (Figure-4, IS 456:2000)</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Modification Factor (k<sub>t</sub>)</label>
+        <input type="number" id="modFactor" value="1.6" step="0.05" />
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Results -->
+    <div id="resultsSection">
+      <h2 class="section-title">Design Results (IS 456:2000)</h2>
+
+      <div class="calc-step">
+        <h3 class="step-title">A. Preliminary Calculations</h3>
+        <div class="step-results" id="stepAResults"></div>
+      </div>
+
+      <div class="calc-step">
+        <h3 class="step-title">B. Loads &amp; Moments</h3>
+        <div class="step-results" id="stepBResults"></div>
+      </div>
+
+      <div class="calc-step">
+        <h3 class="step-title">C. Depth Check</h3>
+        <div class="step-results" id="stepCResults"></div>
+      </div>
+
+      <div class="calc-step">
+        <h3 class="step-title">D. Reinforcement (-)ve Along x-direction</h3>
+        <div class="step-results" id="stepDResults"></div>
+      </div>
+
+      <div class="calc-step">
+        <h3 class="step-title">E. Reinforcement (-)ve Along y-direction</h3>
+        <div class="step-results" id="stepEResults"></div>
+      </div>
+
+      <div class="calc-step">
+        <h3 class="step-title">F. Reinforcement (+)ve Along x-direction</h3>
+        <div class="step-results" id="stepFResults"></div>
+      </div>
+
+      <div class="calc-step">
+        <h3 class="step-title">G. Reinforcement (+)ve Along y-direction</h3>
+        <div class="step-results" id="stepGResults"></div>
+      </div>
+
+      <div class="calc-step">
+        <h3 class="step-title">H. Check for Shear</h3>
+        <div class="step-results" id="stepHResults"></div>
+      </div>
+
+      <div class="calc-step">
+        <h3 class="step-title">I. Check for Deflection</h3>
+        <div class="step-results" id="stepIResults"></div>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function round(v, d) {
+    if (d === undefined) d = 4;
+    return Number(v.toFixed(d));
+  }
+
+  function getVal(id) { return parseFloat(document.getElementById(id).value) || 0; }
+
+  function getSel(id) { return parseFloat(document.getElementById(id).value); }
+
+  function interpolate(x, x1, x2, y1, y2) {
+    if (x2 === x1) return y1;
+    return y1 + (y2 - y1) * (x - x1) / (x2 - x1);
+  }
+
+  function calcDesign() {
+    // ---- Read inputs ----
+    const slabType = parseInt(document.getElementById('slabType').value);
+    const lx = getVal('lx');           // clear span short (m)
+    const ly = getVal('ly');           // clear span long (m)
+    const bwS = getVal('beamShort');   // beam width short (mm)
+    const bwL = getVal('beamLong');    // beam width long (mm)
+    const k = getVal('basicK');
+    const dAssumed = getVal('effDepth');
+    const cover = getVal('clearCover');
+    const LL = getVal('liveLoad');
+    const FF = getVal('floorFinish');
+    const fck = getSel('concreteGrade');
+    const fy = getSel('steelGrade');
+
+    // Slab type label
+    const slabLabels = [
+      '', 'One Short Edge Continuous', 'One Long Edge Continuous',
+      'Two Adjacent Edges Continuous', 'Two Short Edges Continuous',
+      'Two Long Edges Continuous', 'Three Edges Continuous',
+      'All Edges Continuous', 'Simply Supported'
+    ];
+
+    // Coefficients
+    const rLow = getVal('ratioLower');
+    const rHigh = getVal('ratioUpper');
+    const axml = getVal('alphaXml');
+    const axmh = getVal('alphaXmh');
+    const ayml = getVal('alphaYml');
+    const aymh = getVal('alphaYmh');
+    const axpl = getVal('alphaXpl');
+    const axph = getVal('alphaXph');
+    const aypl = getVal('alphaYpl');
+    const ayph = getVal('alphaYph');
+
+    // Rebar details
+    const diaNx = getSel('barDiaNx');
+    const spNx = getVal('spacingNx');
+    const diaNy = getSel('barDiaNy');
+    const spNy = getVal('spacingNy');
+    const diaPx = getSel('barDiaPx');
+    const spPx = getVal('spacingPx');
+    const diaPy = getSel('barDiaPy');
+    const spPy = getVal('spacingPy');
+
+    // Shear table
+    const sP1 = getVal('shearP1');
+    const sTc1 = getVal('shearTc1');
+    const sP2 = getVal('shearP2');
+    const sTc2 = getVal('shearTc2');
+    const sKs = getVal('shearKs');
+
+    // Deflection
+    const modK = getVal('modFactor');
+
+    // ---- A. Preliminary Calculations ----
+    const dRec = round((lx * 1000) / k, 2);
+    const D = round(dAssumed + cover);
+    const dx = round(D - cover - diaNx / 2);
+    const dy_neg = round(D - cover - diaNx - diaNy / 2);
+    const dy_pos = round(D - cover - diaNx - diaPy / 2);
+    const dShear = dx; // use dx for shear check
+
+    // Effective spans (Cl. 22.2 IS 456)
+    const lxEffClearSpan = lx + dAssumed / 1000;
+    const lxEffC2C = lx + bwS / 1000;
+    const lxEff = round(Math.min(lxEffClearSpan, lxEffC2C), 2);
+
+    const lyEffClearSpan = ly + dAssumed / 1000;
+    const lyEffC2C = ly + bwL / 1000;
+    const lyEff = round(Math.min(lyEffClearSpan, lyEffC2C), 2);
+
+    const ratio = round(lyEff / lxEff, 3);
+    const isTwoWay = ratio <= 2;
+    const slabLabel = slabLabels[slabType] || 'Unknown';
+
+    // ---- B. Loads & Moments ----
+    const selfWeight = round(D / 1000 * 25, 3);
+    const totalDL = round(selfWeight + FF);
+    const wFactored = round(1.5 * (selfWeight + LL + FF), 4);
+    const wUnfactored = round(selfWeight + LL + FF);
+
+    // Interpolated coefficients
+    const axm = round(interpolate(ratio, rLow, rHigh, axml, axmh), 4);
+    const aym = round(interpolate(ratio, rLow, rHigh, ayml, aymh), 4);
+    const axp = round(interpolate(ratio, rLow, rHigh, axpl, axph), 4);
+    const ayp = round(interpolate(ratio, rLow, rHigh, aypl, ayph), 4);
+
+    const wlx2 = round(wFactored * lxEff * lxEff, 4);
+
+    const Mx_neg = round(axm * wlx2, 4);
+    const Mx_pos = round(axp * wlx2, 4);
+    const My_neg = round(aym * wlx2, 4);
+    const My_pos = round(ayp * wlx2, 4);
+    const Mmax = Math.max(Mx_neg, Mx_pos, My_neg, My_pos);
+
+    // Shear force (load distribution factor for two-way slab)
+    const r4 = ratio * ratio * ratio * ratio;
+    const distFactor = round(r4 / (1 + r4), 4);
+    const Vu = round(distFactor * wFactored * lxEff / 2, 4);
+
+    // ---- C. Depth Check ----
+    // xu_max/d per IS 456
+    let xuMax_d;
+    if (fy <= 250) xuMax_d = 0.5313;
+    else if (fy <= 415) xuMax_d = 0.4791;
+    else xuMax_d = 0.4560;
+
+    const Mu_lim = round(0.36 * fck * 1000 * dx * dx * xuMax_d * (1 - 0.416 * xuMax_d) / 1e6, 4);
+    const dReq = round(Math.sqrt(Mmax * 1e6 / (0.36 * fck * 1000 * xuMax_d * (1 - 0.416 * xuMax_d))), 2);
+    const depthOk = dx >= dReq;
+
+    // ---- D to G: Reinforcement ----
+    function calcAst(Mu, d_eff) {
+      if (d_eff <= 0 || Mu <= 0) return 0;
+      const MuNmm = Mu * 1e6;
+      const denom = 0.87 * fy * d_eff;
+      const term = 1 - Math.sqrt(1 - (4.6 * MuNmm) / (fck * 1000 * d_eff * d_eff));
+      if (isNaN(term) || term < 0) return 0;
+      return round(0.5 * (fck / fy) * 1000 * d_eff * (fck / (2 * fy) === 0 ? 0 : term));
+    }
+
+    // Using the direct formula: Ast = 0.5*fck/fy*b*d*(1 - sqrt(1 - 4.6*Mu/(fck*b*d*d)))
+    function calcAstDirect(Mu, d_eff) {
+      if (d_eff <= 0 || Mu <= 0) return 0;
+      const R = Mu * 1e6 / (1000 * d_eff * d_eff);
+      const term = fck / (2 * fy);
+      const sqrtTerm = 1 - (4.6 * R) / fck;
+      if (sqrtTerm < 0) return 0;
+      return round(0.5 * (fck / fy) * 1000 * d_eff * (1 - Math.sqrt(sqrtTerm)), 2);
+    }
+
+    function calcSpacing(areaBar, astReq) {
+      if (astReq <= 0) return 0;
+      return round(areaBar / astReq * 1000, 2);
+    }
+
+    function areaBarD(dia) {
+      return Math.PI * dia * dia / 4;
+    }
+
+    // Min steel: 0.12% of gross area (b*D) for Fe415/500, 0.15% for Fe250
+    const minSteelPct = fy <= 250 ? 0.15 : 0.12;
+    const Ast_min_per_m = round(minSteelPct / 100 * 1000 * D, 2);
+
+    // D: (-)ve x-direction
+    const dxDia = dx;
+    const AstNx_req = round(Math.max(calcAstDirect(Mx_neg, dxDia), Ast_min_per_m), 2);
+    const areaNx = round(areaBarD(diaNx), 2);
+    const spNx_req = round(calcSpacing(areaNx, AstNx_req), 2);
+    const AstNx_prov = spNx > 0 ? round(areaNx / spNx * 1000, 2) : 0;
+    const designNxOk = AstNx_prov >= AstNx_req;
+
+    // E: (-)ve y-direction
+    const AstNy_req = round(Math.max(calcAstDirect(My_neg, dy_neg), Ast_min_per_m), 2);
+    const areaNy = round(areaBarD(diaNy), 2);
+    const spNy_req = round(calcSpacing(areaNy, AstNy_req), 2);
+    const AstNy_prov = spNy > 0 ? round(areaNy / spNy * 1000, 2) : 0;
+    const designNyOk = AstNy_prov >= AstNy_req;
+
+    // F: (+)ve x-direction
+    const AstPx_req = round(Math.max(calcAstDirect(Mx_pos, dxDia), Ast_min_per_m), 2);
+    const areaPx = round(areaBarD(diaPx), 2);
+    const spPx_req = round(calcSpacing(areaPx, AstPx_req), 2);
+    const AstPx_prov = spPx > 0 ? round(areaPx / spPx * 1000, 2) : 0;
+    const designPxOk = AstPx_prov >= AstPx_req;
+
+    // G: (+)ve y-direction
+    const AstPy_req = round(Math.max(calcAstDirect(My_pos, dy_pos), Ast_min_per_m), 2);
+    const areaPy = round(areaBarD(diaPy), 2);
+    const spPy_req = round(calcSpacing(areaPy, AstPy_req), 2);
+    const AstPy_prov = spPy > 0 ? round(areaPy / spPy * 1000, 2) : 0;
+    const designPyOk = AstPy_prov >= AstPy_req;
+
+    // ---- H. Shear Check ----
+    const tau_v = dx > 0 ? round(Vu * 1000 / (1000 * dShear), 4) : 0;
+
+    // % reinforcement at critical section (use max of all provided)
+    const pctSteel = round(100 * AstNx_prov / (1000 * dShear), 4);
+
+    // Interpolate tau_c from Table-19
+    let tau_c = interpolate(pctSteel, sP1, sP2, sTc1, sTc2);
+    tau_c = round(Math.max(tau_c, 0), 4);
+
+    const tau_c_design = round(tau_c * sKs, 4);
+    const shearOk = tau_c_design > tau_v;
+
+    // ---- I. Deflection Check ----
+    const ldProvided = round(lxEff * 1000 / dShear, 2);
+    const fs = round(0.58 * fy * AstNx_req / AstNx_prov, 2);
+    const ldAllowable = round(modK * k, 2);
+    const deflectionOk = ldProvided <= ldAllowable;
+
+    // ---- Update UI ----
+    function safe(textContent) {
+      const span = document.createElement('span');
+      span.className = 'safe';
+      span.textContent = textContent;
+      return span.outerHTML;
+    }
+
+    function fail(textContent) {
+      const span = document.createElement('span');
+      span.className = 'fail';
+      span.textContent = textContent;
+      return span.outerHTML;
+    }
+
+    function statusTag(ok, yes = 'OK', no = 'Revise') {
+      return ok ? safe(yes) : fail(no);
+    }
+
+    // Set innerHTML
+    setHTML('stepAResults', `
+      <div class="step-line">Type of Slab: <strong>${slabLabel}</strong></div>
+      <div class="step-line">Shorter Clear Span (lx) = ${lx} m, Longer Clear Span (ly) = ${ly} m</div>
+      <div class="step-line">Recommended Effective Depth = lx/k = ${lx*1000}/${k} = ${dRec} mm</div>
+      <div class="step-line">Assumed Effective Depth = ${dAssumed} mm, Clear Cover = ${cover} mm</div>
+      <div class="step-line">Overall Depth (D) = ${dAssumed} + ${cover} = ${D} mm</div>
+      <div class="step-line">Effective Span lx = min(${lx}+${dAssumed/1000}, ${lx}+${bwS/1000}) = ${lxEff} m</div>
+      <div class="step-line">Effective Span ly = min(${ly}+${dAssumed/1000}, ${ly}+${bwL/1000}) = ${lyEff} m</div>
+      <div class="step-line">ly/lx = ${ratio} ${ratio <= 2 ? '&le; 2, ' + safe('Two-way slab') : '> 2, ' + fail('One-way slab')}</div>
+      <div class="step-line dx-line">dx = D - cover - &phi;<sub>nx</sub>/2 = ${dx} mm</div>
+      <div class="step-line dx-line">dy (neg) = D - cover - &phi;<sub>nx</sub> - &phi;<sub>ny</sub>/2 = ${dy_neg} mm</div>
+      <div class="step-line dx-line">dy (pos) = D - cover - &phi;<sub>nx</sub> - &phi;<sub>py</sub>/2 = ${dy_pos} mm</div>
+    `);
+
+    setHTML('stepBResults', `
+      <div class="step-line">Live Load = ${LL} kN/m&sup2;, Floor Finish = ${FF} kN/m&sup2;</div>
+      <div class="step-line">Self Load = ${D}/1000 &times; 25 = ${selfWeight} kN/m&sup2;</div>
+      <div class="step-line">Total Service Load = ${selfWeight} + ${LL} + ${FF} = ${wUnfactored} kN/m&sup2;</div>
+      <div class="step-line">Total Factored Load = 1.5 &times; ${wUnfactored} = ${wFactored} kN/m&sup2;</div>
+      <div class="step-line">&nbsp;</div>
+      <div class="step-line">Interpolated &alpha;<sub>x</sub>(-) = ${axm}</div>
+      <div class="step-line">Interpolated &alpha;<sub>y</sub>(-) = ${aym}</div>
+      <div class="step-line">Interpolated &alpha;<sub>x</sub>(+) = ${axp}</div>
+      <div class="step-line">Interpolated &alpha;<sub>y</sub>(+) = ${ayp}</div>
+      <div class="step-line">&nbsp;</div>
+      <div class="step-line">w &times; lx<sup>2</sup> = ${wFactored} &times; ${lxEff}<sup>2</sup> = ${wlx2}</div>
+      <div class="step-line">(-)ve Moment (x-dir) = ${axm} &times; ${wlx2} = ${Mx_neg} kN-m</div>
+      <div class="step-line">(+)ve Moment (x-dir) = ${axp} &times; ${wlx2} = ${Mx_pos} kN-m</div>
+      <div class="step-line">(-)ve Moment (y-dir) = ${aym} &times; ${wlx2} = ${My_neg} kN-m</div>
+      <div class="step-line">(+)ve Moment (y-dir) = ${ayp} &times; ${wlx2} = ${My_pos} kN-m</div>
+      <div class="step-line res-highlight">Maximum Moment = ${Mmax} kN-m</div>
+      <div class="step-line">Shear Force V<sub>u</sub> = ${distFactor} &times; ${wFactored} &times; ${lxEff}/2 = ${Vu} kN</div>
+    `);
+
+    setHTML('stepCResults', `
+      <div class="step-line">Steel Grade f<sub>y</sub> = ${fy} N/mm&sup2;, f<sub>ck</sub> = ${fck} N/mm&sup2;</div>
+      <div class="step-line">x<sub>u,max</sub>/d = ${xuMax_d}</div>
+      <div class="step-line">M<sub>u,lim</sub> = 0.36 &times; ${fck} &times; 1000 &times; ${dx}<sup>2</sup> &times; ${xuMax_d} &times; (1 - 0.416 &times; ${xuMax_d}) / 10<sup>6</sup></div>
+      <div class="step-line">M<sub>u,lim</sub> = ${Mu_lim} kN-m</div>
+      <div class="step-line">Min. Effective Depth Required = ${dReq} mm</div>
+      <div class="step-line">Effective Depth Provided (dx) = ${dx} mm</div>
+      <div class="step-line">Status: Depth ${statusTag(depthOk, 'OK', 'INSUFFICIENT — Increase depth')}</div>
+    `);
+
+    setHTML('stepDResults', `
+      <div class="step-line">Strength of Rebar (f<sub>y</sub>) = ${fy} N/mm&sup2;</div>
+      <div class="step-line">Area of Steel Required = ${AstNx_req} mm&sup2;/m</div>
+      <div class="step-line">Min Steel (${minSteelPct}%) = ${Ast_min_per_m} mm&sup2;/m</div>
+      <div class="step-line">&nbsp;</div>
+      <div class="step-line">Bar Dia = ${diaNx} mm, Area per bar = ${areaNx} mm&sup2;</div>
+      <div class="step-line">Spacing Required = ${spNx_req} mm</div>
+      <div class="step-line">Provided Spacing = ${spNx} mm</div>
+      <div class="step-line">Area of Steel Provided = ${AstNx_prov} mm&sup2;/m</div>
+      <div class="step-line">Status: ${statusTag(designNxOk)}</div>
+    `);
+
+    setHTML('stepEResults', `
+      <div class="step-line">Strength of Rebar (f<sub>y</sub>) = ${fy} N/mm&sup2;</div>
+      <div class="step-line">Area of Steel Required = ${AstNy_req} mm&sup2;/m</div>
+      <div class="step-line">&nbsp;</div>
+      <div class="step-line">Bar Dia = ${diaNy} mm, Area per bar = ${areaNy} mm&sup2;</div>
+      <div class="step-line">Spacing Required = ${spNy_req} mm</div>
+      <div class="step-line">Provided Spacing = ${spNy} mm</div>
+      <div class="step-line">Area of Steel Provided = ${AstNy_prov} mm&sup2;/m</div>
+      <div class="step-line">Status: ${statusTag(designNyOk)}</div>
+    `);
+
+    setHTML('stepFResults', `
+      <div class="step-line">Strength of Rebar (f<sub>y</sub>) = ${fy} N/mm&sup2;</div>
+      <div class="step-line">Area of Steel Required = ${AstPx_req} mm&sup2;/m</div>
+      <div class="step-line">&nbsp;</div>
+      <div class="step-line">Bar Dia = ${diaPx} mm, Area per bar = ${areaPx} mm&sup2;</div>
+      <div class="step-line">Spacing Required = ${spPx_req} mm</div>
+      <div class="step-line">Provided Spacing = ${spPx} mm</div>
+      <div class="step-line">Area of Steel Provided = ${AstPx_prov} mm&sup2;/m</div>
+      <div class="step-line">Status: ${statusTag(designPxOk)}</div>
+    `);
+
+    setHTML('stepGResults', `
+      <div class="step-line">Strength of Rebar (f<sub>y</sub>) = ${fy} N/mm&sup2;</div>
+      <div class="step-line">Area of Steel Required = ${AstPy_req} mm&sup2;/m</div>
+      <div class="step-line">&nbsp;</div>
+      <div class="step-line">Bar Dia = ${diaPy} mm, Area per bar = ${areaPy} mm&sup2;</div>
+      <div class="step-line">Spacing Required = ${spPy_req} mm</div>
+      <div class="step-line">Provided Spacing = ${spPy} mm</div>
+      <div class="step-line">Area of Steel Provided = ${AstPy_prov} mm&sup2;/m</div>
+      <div class="step-line">Status: ${statusTag(designPyOk)}</div>
+    `);
+
+    setHTML('stepHResults', `
+      <div class="step-line">&tau;<sub>v</sub> = V<sub>u</sub>/(b&times;d) = ${Vu}&times;10<sup>3</sup>/(1000&times;${dShear}) = ${tau_v} N/mm&sup2;</div>
+      <div class="step-line">100A<sub>st</sub>/(bd) = ${pctSteel}%</div>
+      <div class="step-line">&nbsp;</div>
+      <div class="step-line">Table-19: P<sub>1</sub> = ${sP1}%, &tau;<sub>c1</sub> = ${sTc1}; P<sub>2</sub> = ${sP2}%, &tau;<sub>c2</sub> = ${sTc2}</div>
+      <div class="step-line">Interpolated &tau;<sub>c</sub> = ${tau_c} N/mm&sup2;</div>
+      <div class="step-line">K<sub>s</sub> = ${sKs}</div>
+      <div class="step-line">&tau;<sub>c</sub>' = K<sub>s</sub> &times; &tau;<sub>c</sub> = ${tau_c_design} N/mm&sup2;</div>
+      <div class="step-line">Status: ${statusTag(shearOk, 'Design is Safe in Shear (&tau;c > &tau;v)', 'Shear Check FAILED')}</div>
+    `);
+
+    setHTML('stepIResults', `
+      <div class="step-line">(l/d)<sub>Provided</sub> = ${lxEff}&times;1000 / ${dShear} = ${ldProvided}</div>
+      <div class="step-line">Steel Stress (f<sub>s</sub>) = 0.58 &times; ${fy} &times; ${AstNx_req}/${AstNx_prov} = ${fs} N/mm&sup2;</div>
+      <div class="step-line">% Reinforcement = ${pctSteel}%</div>
+      <div class="step-line">Modification Factor (Figure-4) = ${modK}</div>
+      <div class="step-line">Allowable (l/d) = ${modK} &times; ${k} = ${ldAllowable}</div>
+      <div class="step-line">Status: ${statusTag(deflectionOk, '(l/d) Provided < (l/d) Allowable. Design is OK', 'Deflection Check FAILED')}</div>
+    `);
+  }
+
+  function setHTML(id, html) {
+    document.getElementById(id).innerHTML = html;
+  }
+
+  // Attach event listeners
+  document.querySelectorAll('#resultsSection input, #resultsSection select, #resultsSection .calculator-card input, #resultsSection .calculator-card select').forEach(el => {
+    // Already handled below
+  });
+
+  document.querySelectorAll('.calculator-card input, .calculator-card select').forEach(el => {
+    el.addEventListener('input', calcDesign);
+    el.addEventListener('change', calcDesign);
+  });
+
+  calcDesign();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .unit {
+    color: var(--text-tertiary);
+    font-weight: 400;
+    font-size: 12px;
+  }
+
+  .input-hint {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    margin: -8px 0 16px;
+    font-style: italic;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 32px 0;
+  }
+
+  #resultsSection {
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+
+  .calc-step {
+    background: var(--result-bg);
+    border: 1px solid var(--result-border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+
+  .step-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 14px;
+  }
+
+  .step-results {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .step-line {
+    font-size: 13px;
+    line-height: 20px;
+    color: var(--text-primary);
+    padding: 2px 0;
+  }
+
+  .step-line.safe, .step-line span.safe {
+    color: var(--color-success);
+    font-weight: 500;
+  }
+
+  .step-line.fail, .step-line span.fail {
+    color: var(--color-danger);
+    font-weight: 500;
+  }
+
+  .res-highlight {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+    padding: 6px 0;
+    border-top: 1px dashed var(--border);
+    border-bottom: 1px dashed var(--border);
+    margin: 4px 0;
+  }
+
+  .dx-line {
+    color: var(--text-secondary);
+    font-size: 12px;
+  }
+
+  @media (max-width: 480px) {
+    .calc-step {
+      padding: 16px;
+    }
+
+    .step-line {
+      font-size: 12px;
+      line-height: 18px;
+    }
+
+    .step-title {
+      font-size: 14px;
+    }
+  }
+</style>

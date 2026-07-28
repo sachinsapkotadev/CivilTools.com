@@ -1,0 +1,347 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Painting Cost Estimator for Exterior" 
+  description="Calculate exterior house painting costs including putty, primer, paint quantities, and labour. Estimate total painting cost for your house exterior."
+  eyebrow="Estimation Tool"
+>
+  <div class="calculator-card">
+    <h2 class="section-title">Building Dimensions</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>No of Storey</label>
+        <select id="storey">
+          <option value="10">Ground Floor</option>
+          <option value="19">Ground + First Floor</option>
+          <option value="28">Ground + First + Second Floor</option>
+          <option value="37">Ground + First + Second + Third Floor</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Length of House</label>
+        <div class="input-with-unit">
+          <input type="number" id="bldgLength" value="36" step="any" />
+          <span class="unit-label">Feet</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Width of House</label>
+        <div class="input-with-unit">
+          <input type="number" id="bldgWidth" value="24" step="any" />
+          <span class="unit-label">Feet</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Painting Specifications</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Putty Coat</label>
+        <select id="puttyCoat">
+          <option value="1">Single Coat</option>
+          <option value="2">Double Coat</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Rate of Putty per Kg</label>
+        <div class="input-with-unit">
+          <input type="number" id="puttyRate" value="30" step="1" min="0" />
+          <span class="unit-label">Rs</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Primer Coat</label>
+        <select id="primerCoat">
+          <option value="1">Single Coat</option>
+          <option value="2">Double Coat</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Rate of Primer per Liter</label>
+        <div class="input-with-unit">
+          <input type="number" id="primerRate" value="220" step="1" min="0" />
+          <span class="unit-label">Rs</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Paint Coat</label>
+        <select id="paintCoat">
+          <option value="1">Single Coat</option>
+          <option value="2">Double Coat</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Rate of Paint per Liter</label>
+        <div class="input-with-unit">
+          <input type="number" id="paintRate" value="300" step="1" min="0" />
+          <span class="unit-label">Rs</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Labour & Openings</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Labour cost per sq ft</label>
+        <div class="input-with-unit">
+          <input type="number" id="labourRate" value="15" step="0.5" min="0" />
+          <span class="unit-label">Rs</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>No. of Doors</label>
+        <input type="number" id="numDoors" value="1" step="1" min="0" />
+      </div>
+      <div class="input-group">
+        <label>No. of Windows</label>
+        <input type="number" id="numWindows" value="1" step="1" min="0" />
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Re-Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <h3 class="table-heading">Quantity & Cost Estimate</h3>
+      <div class="table-wrap">
+      <table class="calc-table">
+        <thead>
+          <tr><th>Item</th><th>Quantity</th><th>Cost</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Area of Painting</td><td id="resArea">–</td><td>–</td></tr>
+          <tr><td>Putty Quantity</td><td id="resPutty">–</td><td id="resPuttyCost">–</td></tr>
+          <tr><td>Primer Quantity</td><td id="resPrimer">–</td><td id="resPrimerCost">–</td></tr>
+          <tr><td>Paint Quantity</td><td id="resPaint">–</td><td id="resPaintCost">–</td></tr>
+          <tr><td>Labour</td><td id="resLabourArea">–</td><td id="resLabourCost">–</td></tr>
+          <tr class="total-row"><td>Approximate Total Cost</td><td>–</td><td id="resTotalCost">–</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  function fmt(v, d) {
+    return Number(v.toFixed(d)).toLocaleString('en-IN');
+  }
+
+  function fmtCost(v) {
+    if (v <= 0) return '–';
+    return 'Rs ' + Number(v.toFixed(2)).toLocaleString('en-IN');
+  }
+
+  function calculate() {
+    const totalHeight = parseFloat(document.getElementById('storey').value) || 10;
+    const L = parseFloat(document.getElementById('bldgLength').value) || 0;
+    const W = parseFloat(document.getElementById('bldgWidth').value) || 0;
+
+    const puttyCoat = parseInt(document.getElementById('puttyCoat').value) || 1;
+    const puttyRate = parseFloat(document.getElementById('puttyRate').value) || 0;
+    const primerCoat = parseInt(document.getElementById('primerCoat').value) || 1;
+    const primerRate = parseFloat(document.getElementById('primerRate').value) || 0;
+    const paintCoat = parseInt(document.getElementById('paintCoat').value) || 1;
+    const paintRate = parseFloat(document.getElementById('paintRate').value) || 0;
+    const labourRate = parseFloat(document.getElementById('labourRate').value) || 0;
+    const nDoors = parseInt(document.getElementById('numDoors').value) || 0;
+    const nWindows = parseInt(document.getElementById('numWindows').value) || 0;
+
+    // Wall area
+    const perimeter = 2 * (L + W);
+    const grossArea = perimeter * totalHeight;
+
+    // Standard deductions per opening
+    const doorArea = 21;  // sq ft per door
+    const windowArea = 20; // sq ft per window
+    const netArea = Math.max(0, grossArea - nDoors * doorArea - nWindows * windowArea);
+
+    // Coverage rates per coat
+    const puttyCoverage = 15;   // sq ft per kg
+    const primerCoverage = 130; // sq ft per liter
+    const paintCoverage = 90;   // sq ft per liter
+
+    const puttyKg = (netArea / puttyCoverage) * puttyCoat;
+    const primerL = (netArea / primerCoverage) * primerCoat;
+    const paintL = (netArea / paintCoverage) * paintCoat;
+
+    const puttyCost = puttyKg * puttyRate;
+    const primerCost = primerL * primerRate;
+    const paintCost = paintL * paintRate;
+    const labourCost = netArea * labourRate;
+    const totalCost = puttyCost + primerCost + paintCost + labourCost;
+
+    document.getElementById('resArea').textContent = fmt(netArea, 0) + ' Sq. Ft';
+    document.getElementById('resPutty').textContent = fmt(puttyKg, 3) + ' Kg';
+    document.getElementById('resPuttyCost').textContent = fmtCost(puttyCost);
+    document.getElementById('resPrimer').textContent = fmt(primerL, 3) + ' Liter';
+    document.getElementById('resPrimerCost').textContent = fmtCost(primerCost);
+    document.getElementById('resPaint').textContent = fmt(paintL, 3) + ' Liter';
+    document.getElementById('resPaintCost').textContent = fmtCost(paintCost);
+    document.getElementById('resLabourArea').textContent = fmt(netArea, 0) + ' sq ft';
+    document.getElementById('resLabourCost').textContent = fmtCost(labourCost);
+    document.getElementById('resTotalCost').textContent = fmtCost(totalCost);
+
+    document.getElementById('resultsSection').style.display = 'block';
+  }
+
+  function resetForm() {
+    const defaults = {
+      storey: '10',
+      bldgLength: '36', bldgWidth: '24',
+      puttyCoat: '1', puttyRate: '30',
+      primerCoat: '1', primerRate: '220',
+      paintCoat: '1', paintRate: '300',
+      labourRate: '15',
+      numDoors: '1', numWindows: '1'
+    };
+    for (const [id, val] of Object.entries(defaults)) {
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    }
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .input-with-unit select {
+    width: 120px;
+    flex-shrink: 0;
+  }
+
+  .unit-label {
+    display: flex;
+    align-items: center;
+    height: 44px;
+    padding: 0 14px;
+    background: var(--bg-hover);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .table-heading {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 24px 0 12px;
+  }
+
+  .calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .calc-table th,
+  .calc-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .calc-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .calc-table td:nth-child(2),
+  .calc-table td:nth-child(3) {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  .calc-table td:nth-child(3) {
+    color: var(--color-success);
+  }
+
+  .total-row td {
+    border-top: 2px solid var(--border-strong);
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .total-row td:last-child {
+    font-size: 16px;
+    color: var(--color-success);
+  }
+</style>

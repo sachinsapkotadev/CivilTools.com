@@ -1,0 +1,502 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout 
+  title="Wood Estimator" 
+  description="Calculate wood volume for cuboid timber, round logs, and standing trees. Supports multiple unit systems with output in cubic feet, cubic meters, and more."
+  eyebrow="Estimation Tool"
+>
+  <div class="calculator-card">
+    <div class="mode-tabs">
+      <button class="mode-tab active" data-mode="cuboid">Cuboid Timber</button>
+      <button class="mode-tab" data-mode="round">Round Log</button>
+      <button class="mode-tab" data-mode="tree">Standing Tree</button>
+    </div>
+
+    <!-- Mode 1: Cuboid -->
+    <div class="mode-panel active" id="modeCuboid">
+      <h2 class="section-title">Cuboid Wood Volume Calculator</h2>
+      <div class="input-grid">
+        <div class="input-group">
+          <label>Length</label>
+          <div class="input-with-unit">
+            <input type="number" id="cubLength" value="1" step="any" />
+            <select id="cubLengthUnit">
+              <option value="m">meter</option>
+              <option value="cm">cm</option>
+              <option value="mm">mm</option>
+              <option value="ft">ft</option>
+              <option value="in">in</option>
+            </select>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Width</label>
+          <div class="input-with-unit">
+            <input type="number" id="cubWidth" value="1" step="any" />
+            <select id="cubWidthUnit">
+              <option value="m">meter</option>
+              <option value="cm">cm</option>
+              <option value="mm">mm</option>
+              <option value="ft">ft</option>
+              <option value="in">in</option>
+            </select>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Height / Thickness</label>
+          <div class="input-with-unit">
+            <input type="number" id="cubHeight" value="1" step="any" />
+            <select id="cubHeightUnit">
+              <option value="m">meter</option>
+              <option value="cm">cm</option>
+              <option value="mm">mm</option>
+              <option value="ft">ft</option>
+              <option value="in">in</option>
+            </select>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Quantity</label>
+          <div class="input-with-unit">
+            <input type="number" id="cubQty" value="1" step="1" min="1" />
+            <span class="unit-label">No.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mode 2: Round -->
+    <div class="mode-panel" id="modeRound">
+      <h2 class="section-title">Round Log Volume Calculator</h2>
+      <div class="input-grid">
+        <div class="input-group">
+          <label>Length</label>
+          <div class="input-with-unit">
+            <input type="number" id="rndLength" value="1" step="any" />
+            <select id="rndLengthUnit">
+              <option value="m">meter</option>
+              <option value="cm">cm</option>
+              <option value="mm">mm</option>
+              <option value="ft">ft</option>
+              <option value="in">in</option>
+            </select>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Diameter (thickness)</label>
+          <div class="input-with-unit">
+            <input type="number" id="rndDiameter" value="1" step="any" />
+            <select id="rndDiameterUnit">
+              <option value="m">meter</option>
+              <option value="cm">cm</option>
+              <option value="mm">mm</option>
+              <option value="ft">ft</option>
+              <option value="in">in</option>
+            </select>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Quantity</label>
+          <div class="input-with-unit">
+            <input type="number" id="rndQty" value="1" step="1" min="1" />
+            <span class="unit-label">No.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mode 3: Tree -->
+    <div class="mode-panel" id="modeTree">
+      <h2 class="section-title">Standing Tree Volume Calculator (Frustum)</h2>
+      <div class="input-grid">
+        <div class="input-group">
+          <label>Top diameter</label>
+          <div class="input-with-unit">
+            <input type="number" id="treeTopDia" value="1" step="any" />
+            <select id="treeTopUnit">
+              <option value="m">meter</option>
+              <option value="cm">cm</option>
+              <option value="mm">mm</option>
+              <option value="ft">ft</option>
+              <option value="in">in</option>
+            </select>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Bottom diameter</label>
+          <div class="input-with-unit">
+            <input type="number" id="treeBotDia" value="1" step="any" />
+            <select id="treeBotUnit">
+              <option value="m">meter</option>
+              <option value="cm">cm</option>
+              <option value="mm">mm</option>
+              <option value="ft">ft</option>
+              <option value="in">in</option>
+            </select>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Height</label>
+          <div class="input-with-unit">
+            <input type="number" id="treeHeight" value="1" step="any" />
+            <select id="treeHeightUnit">
+              <option value="m">meter</option>
+              <option value="cm">cm</option>
+              <option value="mm">mm</option>
+              <option value="ft">ft</option>
+              <option value="in">in</option>
+            </select>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Quantity</label>
+          <div class="input-with-unit">
+            <input type="number" id="treeQty" value="1" step="1" min="1" />
+            <span class="unit-label">No.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Show volume in</label>
+        <select id="volumeUnit">
+          <option value="ft3">cubic feet (ft³)</option>
+          <option value="m3">cubic meters (m³)</option>
+          <option value="cm3">cubic cm (cm³)</option>
+          <option value="in3">cubic inches (in³)</option>
+          <option value="bdft">board feet</option>
+          <option value="cft">cubic feet (CFT)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="calcBtn">Re-Calculate</button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <h3 class="table-heading">Results</h3>
+      <div class="table-wrap">
+      <table class="calc-table">
+        <thead>
+          <tr><th>Item</th><th>Value</th><th id="resVolUnitHeader">ft³</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Total volume</td><td id="resVolume">–</td><td id="resVolUnit">ft³</td></tr>
+          <tr><td>Total volume in m³</td><td id="resVolumeM3">–</td><td>m³</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  let currentMode = 'cuboid';
+
+  function toMeters(val, unit) {
+    if (unit === 'cm') return val / 100;
+    if (unit === 'mm') return val / 1000;
+    if (unit === 'ft') return val * 0.3048;
+    if (unit === 'in') return val * 0.0254;
+    return val;
+  }
+
+  function m3to(val, unit) {
+    if (unit === 'm3') return val;
+    if (unit === 'cm3') return val * 1e6;
+    if (unit === 'in3') return val * 61023.7;
+    if (unit === 'bdft') return val * 423.776;
+    return val * 35.3147; // ft3, cft default
+  }
+
+  function m3toLabel(unit) {
+    if (unit === 'm3') return 'm³';
+    if (unit === 'cm3') return 'cm³';
+    if (unit === 'in3') return 'in³';
+    if (unit === 'bdft') return 'board feet';
+    return 'ft³';
+  }
+
+  function formatNum(v, d) {
+    return Number(v.toFixed(d));
+  }
+
+  function calculate() {
+    const volUnit = document.getElementById('volumeUnit').value;
+    let volM3 = 0;
+
+    if (currentMode === 'cuboid') {
+      const L = toMeters(
+        parseFloat(document.getElementById('cubLength').value) || 0,
+        document.getElementById('cubLengthUnit').value
+      );
+      const W = toMeters(
+        parseFloat(document.getElementById('cubWidth').value) || 0,
+        document.getElementById('cubWidthUnit').value
+      );
+      const H = toMeters(
+        parseFloat(document.getElementById('cubHeight').value) || 0,
+        document.getElementById('cubHeightUnit').value
+      );
+      const qty = parseInt(document.getElementById('cubQty').value) || 1;
+      volM3 = L * W * H * qty;
+    } else if (currentMode === 'round') {
+      const L = toMeters(
+        parseFloat(document.getElementById('rndLength').value) || 0,
+        document.getElementById('rndLengthUnit').value
+      );
+      const D = toMeters(
+        parseFloat(document.getElementById('rndDiameter').value) || 0,
+        document.getElementById('rndDiameterUnit').value
+      );
+      const qty = parseInt(document.getElementById('rndQty').value) || 1;
+      volM3 = (Math.PI / 4) * D * D * L * qty;
+    } else if (currentMode === 'tree') {
+      const d = toMeters(
+        parseFloat(document.getElementById('treeTopDia').value) || 0,
+        document.getElementById('treeTopUnit').value
+      );
+      const D = toMeters(
+        parseFloat(document.getElementById('treeBotDia').value) || 0,
+        document.getElementById('treeBotUnit').value
+      );
+      const H = toMeters(
+        parseFloat(document.getElementById('treeHeight').value) || 0,
+        document.getElementById('treeHeightUnit').value
+      );
+      const qty = parseInt(document.getElementById('treeQty').value) || 1;
+      volM3 = (Math.PI * H / 12) * (D * D + D * d + d * d) * qty;
+    }
+
+    const volDisplay = m3to(volM3, volUnit);
+    const volLabel = m3toLabel(volUnit);
+
+    document.getElementById('resVolume').textContent = formatNum(volDisplay, 2);
+    document.getElementById('resVolUnit').textContent = volLabel;
+    document.getElementById('resVolUnitHeader').textContent = volLabel;
+    document.getElementById('resVolumeM3').textContent = formatNum(volM3, 3);
+
+    document.getElementById('resultsSection').style.display = 'block';
+  }
+
+  function switchMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
+    document.querySelectorAll('.mode-panel').forEach(p => p.classList.toggle('active', p.id === 'mode' + mode.charAt(0).toUpperCase() + mode.slice(1)));
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  function resetForm() {
+    // Reset cuboid
+    document.getElementById('cubLength').value = '1';
+    document.getElementById('cubLengthUnit').value = 'm';
+    document.getElementById('cubWidth').value = '1';
+    document.getElementById('cubWidthUnit').value = 'm';
+    document.getElementById('cubHeight').value = '1';
+    document.getElementById('cubHeightUnit').value = 'm';
+    document.getElementById('cubQty').value = '1';
+    // Reset round
+    document.getElementById('rndLength').value = '1';
+    document.getElementById('rndLengthUnit').value = 'm';
+    document.getElementById('rndDiameter').value = '1';
+    document.getElementById('rndDiameterUnit').value = 'm';
+    document.getElementById('rndQty').value = '1';
+    // Reset tree
+    document.getElementById('treeTopDia').value = '1';
+    document.getElementById('treeTopUnit').value = 'm';
+    document.getElementById('treeBotDia').value = '1';
+    document.getElementById('treeBotUnit').value = 'm';
+    document.getElementById('treeHeight').value = '1';
+    document.getElementById('treeHeightUnit').value = 'm';
+    document.getElementById('treeQty').value = '1';
+    // Reset output
+    document.getElementById('volumeUnit').value = 'ft3';
+    // Reset mode
+    switchMode('cuboid');
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  document.querySelectorAll('.mode-tab').forEach(tab => {
+    tab.addEventListener('click', () => switchMode(tab.dataset.mode));
+  });
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  });
+
+  calculate();
+</script>
+
+<style>
+  .mode-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 32px;
+    background: var(--table-header-bg);
+    border-radius: 10px;
+    padding: 4px;
+  }
+
+  .mode-tab {
+    flex: 1;
+    height: 42px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--result-text-muted);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .mode-tab.active {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  .mode-tab:hover:not(.active) {
+    color: var(--text-primary);
+  }
+
+  .mode-panel {
+    display: none;
+  }
+
+  .mode-panel.active {
+    display: block;
+  }
+
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .input-with-unit {
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .input-with-unit select {
+    width: 110px;
+    flex-shrink: 0;
+  }
+
+  .unit-label {
+    display: flex;
+    align-items: center;
+    height: 44px;
+    padding: 0 14px;
+    background: var(--bg-hover);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .btn-primary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--bg-hover); }
+
+  .btn-secondary {
+    height: 44px;
+    padding: 0 32px;
+    background: var(--btn-secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .table-heading {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 24px 0 12px;
+  }
+
+  .calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .calc-table th,
+  .calc-table td {
+    padding: 10px 16px;
+    border: 1px solid var(--result-border);
+    text-align: left;
+  }
+
+  .calc-table th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--result-text-muted);
+    font-size: 13px;
+  }
+
+  .calc-table td:last-child,
+  .calc-table td:nth-child(3) {
+    color: var(--text-tertiary);
+    font-size: 13px;
+  }
+
+  .calc-table td:nth-child(2) {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 768px) {
+    .mode-tabs {
+      flex-direction: column;
+    }
+    .input-with-unit select {
+      width: 80px;
+    }
+  }
+</style>
