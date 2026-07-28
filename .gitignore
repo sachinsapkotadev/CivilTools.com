@@ -32,7 +32,8 @@ pnpm-debug.log*
 # VS Code settings (except recommended extensions)
 .vscode/settings.json
 
-# Wrangler local
+# Wrangler local state
+.wrangler/
 .wrangler-local/
 
 # OpenCode agent config
