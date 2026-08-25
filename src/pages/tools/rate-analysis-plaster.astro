@@ -12,7 +12,7 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
     <div class="input-grid">
       <div class="input-group">
         <label>Area of Plaster (m²)</label>
-        <input type="number" id="plasterArea" value="1" step="any" min="0" />
+        <input type="number" id="plasterArea" value="100" step="any" min="0" />
       </div>
       <div class="input-group">
         <label>Mix Ratio (Cement : Sand)</label>
@@ -40,15 +40,15 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
     <div class="input-grid rates-grid">
       <div class="input-group">
         <label>Mason rate per day (Rs)</label>
-        <input type="number" id="rateMason" value="700" step="any" min="0" />
+        <input type="number" id="rateMason" value="1200" step="any" min="0" />
       </div>
       <div class="input-group">
         <label>Labour rate per day (Rs)</label>
-        <input type="number" id="rateLabour" value="500" step="any" min="0" />
+        <input type="number" id="rateLabour" value="800" step="any" min="0" />
       </div>
       <div class="input-group">
         <label>Cement per bag (Rs)</label>
-        <input type="number" id="rateCement" value="750" step="any" min="0" />
+        <input type="number" id="rateCement" value="800" step="any" min="0" />
       </div>
       <div class="input-group">
         <label>Sand per m³ (Rs)</label>
@@ -183,13 +183,13 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
 
   function resetForm() {
     const vals = {
-      plasterArea: '1',
+      plasterArea: '100',
       mixCement: '1', mixSand: '4',
       mortarThk: '12',
       masonReq: '0.15', labourReq: '0.2',
-      rateMason: '700', rateLabour: '500',
-      rateCement: '750', rateSand: '2500',
-      rateWater: '0.1', overheadPct: '15'
+      rateMason: '1200', rateLabour: '800',
+      rateCement: '800', rateSand: '2500',
+      rateWater: '0.06', overheadPct: '15'
     };
     for (const [id, val] of Object.entries(vals)) {
       document.getElementById(id).value = val;

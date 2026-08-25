@@ -54,11 +54,11 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
         <table class="input-table">
           <thead><tr><th>S.N</th><th>Discription</th><th>Value</th></tr></thead>
           <tbody>
-            <tr><td>1</td><td>Outer Diameter of Circular Pipe:</td><td><div class="inline-unit-input"><input type="number" id="ciOD" class="inline-input" value="100" step="any" min="0" /><select class="inline-unit-select" id="ciODUnit"><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option><option value="m">m</option></select></div></td></tr>
-            <tr><td>2</td><td>Thickness of Pipe:</td><td><div class="inline-unit-input"><input type="number" id="ciThk" class="inline-input" value="5" step="any" min="0" /><select class="inline-unit-select" id="ciThkUnit"><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option><option value="m">m</option></select></div></td></tr>
-            <tr><td>3</td><td>Length of Circular Pipe:</td><td><div class="inline-unit-input"><input type="number" id="ciLen" class="inline-input" value="1" step="any" min="0" /><select class="inline-unit-select" id="ciLenUnit"><option value="m">m</option><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option></select></div></td></tr>
+            <tr><td>1</td><td>Outer Diameter of Circular Pipe:</td><td><div class="inline-unit-input"><input type="number" id="ciOD" class="inline-input" value="48.3" step="any" min="0" /><select class="inline-unit-select" id="ciODUnit"><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option><option value="m">m</option></select></div></td></tr>
+            <tr><td>2</td><td>Thickness of Pipe:</td><td><div class="inline-unit-input"><input type="number" id="ciThk" class="inline-input" value="3.2" step="any" min="0" /><select class="inline-unit-select" id="ciThkUnit"><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option><option value="m">m</option></select></div></td></tr>
+            <tr><td>3</td><td>Length of Circular Pipe:</td><td><div class="inline-unit-input"><input type="number" id="ciLen" class="inline-input" value="6" step="any" min="0" /><select class="inline-unit-select" id="ciLenUnit"><option value="m">m</option><option value="mm">mm</option><option value="cm">cm</option><option value="inch">inch</option><option value="ft">ft</option></select></div></td></tr>
             <tr><td>4</td><td>Quantity of Circular Pipe:</td><td><div class="inline-unit-input"><input type="number" id="ciQty" class="inline-input" value="1" step="1" min="1" /><span class="unit-label">Nos.</span></div></td></tr>
-            <tr><td>5</td><td>Cost of Circular Pipe per Kg:</td><td><div class="inline-unit-input"><input type="number" id="ciRate" class="inline-input" value="155" step="any" min="0" /><span class="unit-label">Rs.</span></div></td></tr>
+            <tr><td>5</td><td>Cost of Circular Pipe per Kg:</td><td><div class="inline-unit-input"><input type="number" id="ciRate" class="inline-input" value="75" step="any" min="0" /><span class="unit-label">Rs.</span></div></td></tr>
             <tr><td>6</td><td>Density of Steel:</td><td><div class="inline-unit-input"><input type="number" id="ciDensity" class="inline-input" value="7850" step="any" min="0" /><span class="unit-label">Kg/m&sup3;</span></div></td></tr>
           </tbody>
         </table>
@@ -237,10 +237,10 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
   }
 
   function resetCircular() {
-    ciOD.value = '100'; ciODUnit.value = 'mm';
-    ciThk.value = '5'; ciThkUnit.value = 'mm';
-    ciLen.value = '1'; ciLenUnit.value = 'm';
-    ciQty.value = '1'; ciRate.value = '155'; ciDensity.value = '7850';
+    ciOD.value = '48.3'; ciODUnit.value = 'mm';
+    ciThk.value = '3.2'; ciThkUnit.value = 'mm';
+    ciLen.value = '6'; ciLenUnit.value = 'm';
+    ciQty.value = '1'; ciRate.value = '75'; ciDensity.value = '7850';
     calcCircular();
   }
 

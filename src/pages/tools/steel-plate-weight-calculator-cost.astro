@@ -24,11 +24,11 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
             <td>Length of Plate:</td>
             <td>
               <div class="inline-unit-input">
-                <input type="number" id="plateLen" class="inline-input" value="2000" step="any" min="0" />
+                <input type="number" id="plateLen" class="inline-input" value="2" step="any" min="0" />
                 <select id="lenUnit" class="inline-unit-select">
                   <option value="mm">mm</option>
                   <option value="cm">cm</option>
-                  <option value="m">m</option>
+                  <option value="m" selected>m</option>
                   <option value="inch">inch</option>
                   <option value="ft">ft</option>
                 </select>
@@ -40,11 +40,11 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
             <td>Width of Plate:</td>
             <td>
               <div class="inline-unit-input">
-                <input type="number" id="plateWidth" class="inline-input" value="1000" step="any" min="0" />
+                <input type="number" id="plateWidth" class="inline-input" value="1" step="any" min="0" />
                 <select id="widthUnit" class="inline-unit-select">
                   <option value="mm">mm</option>
                   <option value="cm">cm</option>
-                  <option value="m">m</option>
+                  <option value="m" selected>m</option>
                   <option value="inch">inch</option>
                   <option value="ft">ft</option>
                 </select>
@@ -82,7 +82,7 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
             <td>Cost of steel plate per Kg:</td>
             <td>
               <div class="inline-unit-input">
-                <input type="number" id="plateRate" class="inline-input" value="155" step="any" min="0" />
+                <input type="number" id="plateRate" class="inline-input" value="75" step="any" min="0" />
                 <span class="unit-label">Rs.</span>
               </div>
             </td>
@@ -170,14 +170,14 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
   }
 
   function resetForm() {
-    document.getElementById('plateLen').value = '2000';
-    document.getElementById('lenUnit').value = 'mm';
-    document.getElementById('plateWidth').value = '1000';
-    document.getElementById('widthUnit').value = 'mm';
+    document.getElementById('plateLen').value = '2';
+    document.getElementById('lenUnit').value = 'm';
+    document.getElementById('plateWidth').value = '1';
+    document.getElementById('widthUnit').value = 'm';
     document.getElementById('plateThk').value = '10';
     document.getElementById('thkUnit').value = 'mm';
     document.getElementById('plateQty').value = '1';
-    document.getElementById('plateRate').value = '155';
+    document.getElementById('plateRate').value = '75';
     calculate();
   }
 

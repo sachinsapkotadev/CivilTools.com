@@ -31,11 +31,11 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
           </tr>
           <tr>
             <td class="td-label">Input Numbers of Steel Rod (Nos.):</td>
-            <td><div class="inline-unit-input"><input type="number" id="barQty" class="inline-input" value="4" step="1" min="1" /></div></td>
+            <td><div class="inline-unit-input"><input type="number" id="barQty" class="inline-input" value="1" step="1" min="1" /></div></td>
           </tr>
           <tr>
             <td class="td-label">Input Cost of steel Rod per Kg. (Rs):</td>
-            <td><div class="inline-unit-input"><input type="number" id="barRate" class="inline-input" value="155" step="any" min="0" /></div></td>
+            <td><div class="inline-unit-input"><input type="number" id="barRate" class="inline-input" value="75" step="any" min="0" /></div></td>
           </tr>
         </tbody>
       </table>
@@ -91,8 +91,8 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
   function resetForm() {
     document.getElementById('barDia').value = '12';
     document.getElementById('barLength').value = '40';
-    document.getElementById('barQty').value = '4';
-    document.getElementById('barRate').value = '155';
+    document.getElementById('barQty').value = '1';
+    document.getElementById('barRate').value = '75';
     calculate();
   }
 

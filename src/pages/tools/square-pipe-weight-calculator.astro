@@ -23,7 +23,7 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
             <td>Outer side length of Square Pipe:</td>
             <td>
               <div class="inline-unit-input">
-                <input type="number" id="sideLength" class="inline-input" value="75" step="any" min="0" />
+                <input type="number" id="sideLength" class="inline-input" value="50" step="any" min="0" />
                 <select id="sideUnit" class="inline-unit-select">
                   <option value="mm">mm</option>
                   <option value="cm">cm</option>
@@ -39,7 +39,7 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
             <td>Thickness of Square Pipe:</td>
             <td>
               <div class="inline-unit-input">
-                <input type="number" id="thickness" class="inline-input" value="6" step="any" min="0" />
+                <input type="number" id="thickness" class="inline-input" value="3" step="any" min="0" />
                 <select id="thicknessUnit" class="inline-unit-select">
                   <option value="mm">mm</option>
                   <option value="cm">cm</option>
@@ -55,7 +55,7 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
             <td>Length of Square Pipe:</td>
             <td>
               <div class="inline-unit-input">
-                <input type="number" id="pipeLength" class="inline-input" value="1" step="any" min="0" />
+                <input type="number" id="pipeLength" class="inline-input" value="6" step="any" min="0" />
                 <select id="lengthUnit" class="inline-unit-select">
                   <option value="m">m</option>
                   <option value="mm">mm</option>
@@ -81,7 +81,7 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
             <td>Cost of Square Pipe per Kg:</td>
             <td>
               <div class="inline-unit-input">
-                <input type="number" id="costPerKg" class="inline-input" value="155" step="any" min="0" />
+                <input type="number" id="costPerKg" class="inline-input" value="75" step="any" min="0" />
                 <span class="unit-label">Rs.</span>
               </div>
             </td>
@@ -194,14 +194,14 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
   }
 
   function resetForm() {
-    document.getElementById('sideLength').value = '75';
+    document.getElementById('sideLength').value = '50';
     document.getElementById('sideUnit').value = 'mm';
-    document.getElementById('thickness').value = '6';
+    document.getElementById('thickness').value = '3';
     document.getElementById('thicknessUnit').value = 'mm';
-    document.getElementById('pipeLength').value = '1';
+    document.getElementById('pipeLength').value = '6';
     document.getElementById('lengthUnit').value = 'm';
     document.getElementById('quantity').value = '1';
-    document.getElementById('costPerKg').value = '155';
+    document.getElementById('costPerKg').value = '75';
     document.getElementById('density').value = '7850';
     calculate();
   }

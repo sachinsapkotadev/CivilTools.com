@@ -13,10 +13,10 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
       <div class="input-group">
         <label>Length of Wall</label>
         <div class="input-with-unit">
-          <input type="number" id="wallLength" value="12" step="any" />
+          <input type="number" id="wallLength" value="5" step="any" />
           <select id="lengthUnit">
             <option value="feet">feet</option>
-            <option value="meter">meter</option>
+            <option value="meter" selected>meter</option>
             <option value="inch">inch</option>
           </select>
         </div>
@@ -24,10 +24,10 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
       <div class="input-group">
         <label>Height of Wall</label>
         <div class="input-with-unit">
-          <input type="number" id="wallHeight" value="9" step="any" />
+          <input type="number" id="wallHeight" value="3" step="any" />
           <select id="heightUnit">
             <option value="feet">feet</option>
-            <option value="meter">meter</option>
+            <option value="meter" selected>meter</option>
             <option value="inch">inch</option>
           </select>
         </div>
@@ -35,7 +35,7 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
       <div class="input-group">
         <label>Thickness of Plaster</label>
         <div class="input-with-unit">
-          <input type="number" id="plasterThk" value="14" step="any" />
+          <input type="number" id="plasterThk" value="12" step="any" />
           <select id="thkUnit">
             <option value="mm">mm</option>
             <option value="inch">inch</option>
@@ -190,9 +190,9 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
 
   function resetForm() {
     const vals = {
-      wallLength: '12', lengthUnit: 'feet',
-      wallHeight: '9', heightUnit: 'feet',
-      plasterThk: '14', thkUnit: 'mm',
+      wallLength: '5', lengthUnit: 'meter',
+      wallHeight: '3', heightUnit: 'meter',
+      plasterThk: '12', thkUnit: 'mm',
       doorW: '3', doorH: '7', doorQty: '2',
       winW: '4', winH: '5', winQty: '3',
       cementRatio: '1', sandRatio: '4',

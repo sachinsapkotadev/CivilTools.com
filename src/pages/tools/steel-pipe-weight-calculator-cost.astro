@@ -23,22 +23,22 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
           <tr>
             <td class="td-sn">1)</td>
             <td class="td-label">Outer Diameter:</td>
-            <td><div class="inline-unit-input"><input type="number" id="od" class="inline-input" value="40" step="any" min="0" /><span class="unit-label">mm</span></div></td>
+            <td><div class="inline-unit-input"><input type="number" id="od" class="inline-input" value="48.3" step="any" min="0" /><span class="unit-label">mm</span></div></td>
           </tr>
           <tr>
             <td class="td-sn">2)</td>
             <td class="td-label">Inner Diameter:</td>
-            <td><div class="inline-unit-input"><input type="number" id="idVal" class="inline-input" value="30" step="any" min="0" /><span class="unit-label">mm</span></div></td>
+            <td><div class="inline-unit-input"><input type="number" id="idVal" class="inline-input" value="41.9" step="any" min="0" /><span class="unit-label">mm</span></div></td>
           </tr>
           <tr>
             <td class="td-sn">3)</td>
             <td class="td-label">Length of Pipe:</td>
-            <td><div class="inline-unit-input"><input type="number" id="pipeLen" class="inline-input" value="10" step="any" min="0" /><span class="unit-label">feet.</span></div></td>
+            <td><div class="inline-unit-input"><input type="number" id="pipeLen" class="inline-input" value="19.68" step="any" min="0" /><span class="unit-label">feet.</span></div></td>
           </tr>
           <tr>
             <td class="td-sn">4)</td>
             <td class="td-label">Cost of steel Pipe per Kg.:</td>
-            <td><div class="inline-unit-input"><input type="number" id="pipeRate" class="inline-input" value="155" step="any" min="0" /><span class="unit-label">Rs.</span></div></td>
+            <td><div class="inline-unit-input"><input type="number" id="pipeRate" class="inline-input" value="75" step="any" min="0" /><span class="unit-label">Rs.</span></div></td>
           </tr>
           <tr>
             <td class="td-sn">5)</td>
@@ -122,10 +122,10 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
   }
 
   function resetForm() {
-    document.getElementById('od').value = '40';
-    document.getElementById('idVal').value = '30';
-    document.getElementById('pipeLen').value = '10';
-    document.getElementById('pipeRate').value = '155';
+    document.getElementById('od').value = '48.3';
+    document.getElementById('idVal').value = '41.9';
+    document.getElementById('pipeLen').value = '19.68';
+    document.getElementById('pipeRate').value = '75';
     document.getElementById('pipeQty').value = '1';
     calculate();
   }

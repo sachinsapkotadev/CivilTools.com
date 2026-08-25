@@ -17,13 +17,13 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
             <td class="td-label">Length of plate</td>
             <td>
               <div class="inline-unit-input">
-                <input type="number" id="plateLength" class="inline-input" value="2000" step="any" min="0" />
+                <input type="number" id="plateLength" class="inline-input" value="2" step="any" min="0" />
                 <select id="lengthUnit" class="inline-unit-select">
                   <option value="mm">mm</option>
                   <option value="cm">cm</option>
                   <option value="inch">inch</option>
                   <option value="ft">ft</option>
-                  <option value="m">m</option>
+                  <option value="m" selected>m</option>
                 </select>
               </div>
             </td>
@@ -33,13 +33,13 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
             <td class="td-label">Width of plate</td>
             <td>
               <div class="inline-unit-input">
-                <input type="number" id="plateWidth" class="inline-input" value="1000" step="any" min="0" />
+                <input type="number" id="plateWidth" class="inline-input" value="1" step="any" min="0" />
                 <select id="widthUnit" class="inline-unit-select">
                   <option value="mm">mm</option>
                   <option value="cm">cm</option>
                   <option value="inch">inch</option>
                   <option value="ft">ft</option>
-                  <option value="m">m</option>
+                  <option value="m" selected>m</option>
                 </select>
               </div>
             </td>
@@ -49,7 +49,7 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
             <td class="td-label">Thickness of plate</td>
             <td>
               <div class="inline-unit-input">
-                <input type="number" id="plateThickness" class="inline-input" value="10" step="any" min="0" />
+                <input type="number" id="plateThickness" class="inline-input" value="6" step="any" min="0" />
                 <select id="thicknessUnit" class="inline-unit-select">
                   <option value="mm">mm</option>
                   <option value="cm">cm</option>
@@ -75,7 +75,7 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
             <td class="td-label">Steel rate per kg, Rs</td>
             <td>
               <div class="inline-unit-input">
-                <input type="number" id="steelRate" class="inline-input" value="155" step="any" min="0" />
+                <input type="number" id="steelRate" class="inline-input" value="75" step="any" min="0" />
               </div>
             </td>
           </tr>
@@ -225,14 +225,14 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
   }
 
   function resetForm() {
-    document.getElementById('plateLength').value = '2000';
-    document.getElementById('lengthUnit').value = 'mm';
-    document.getElementById('plateWidth').value = '1000';
-    document.getElementById('widthUnit').value = 'mm';
-    document.getElementById('plateThickness').value = '10';
+    document.getElementById('plateLength').value = '2';
+    document.getElementById('lengthUnit').value = 'm';
+    document.getElementById('plateWidth').value = '1';
+    document.getElementById('widthUnit').value = 'm';
+    document.getElementById('plateThickness').value = '6';
     document.getElementById('thicknessUnit').value = 'mm';
     document.getElementById('plateQty').value = '1';
-    document.getElementById('steelRate').value = '155';
+    document.getElementById('steelRate').value = '75';
     calculate();
   }
 

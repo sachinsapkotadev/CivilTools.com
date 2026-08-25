@@ -13,7 +13,7 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
       <div class="input-group">
         <label>1. Wall Length</label>
         <div class="input-with-unit">
-          <input type="number" id="wallLength" value="10" step="any" />
+          <input type="number" id="wallLength" value="5" step="any" />
           <select id="wallLengthUnit"><option>m</option><option>ft</option></select>
         </div>
       </div>
@@ -45,21 +45,21 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
       <div class="input-group">
         <label>1. Brick Length</label>
         <div class="input-with-unit">
-          <input type="number" id="brickLength" value="190" step="any" />
+          <input type="number" id="brickLength" value="230" step="any" />
           <select id="brickLengthUnit"><option>mm</option><option>Inch</option><option>ft</option></select>
         </div>
       </div>
       <div class="input-group">
         <label>2. Brick Width</label>
         <div class="input-with-unit">
-          <input type="number" id="brickWidth" value="90" step="any" />
+          <input type="number" id="brickWidth" value="110" step="any" />
           <select id="brickWidthUnit"><option>mm</option><option>Inch</option><option>ft</option></select>
         </div>
       </div>
       <div class="input-group">
         <label>3. Brick Height</label>
         <div class="input-with-unit">
-          <input type="number" id="brickHeight" value="90" step="any" />
+          <input type="number" id="brickHeight" value="55" step="any" />
           <select id="brickHeightUnit"><option>mm</option><option>Inch</option><option>ft</option></select>
         </div>
       </div>
@@ -172,13 +172,13 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
 
   function resetForm() {
     const vals = {
-      wallLength: '10', wallLengthUnit: 'm',
+      wallLength: '5', wallLengthUnit: 'm',
       wallHeight: '3', wallHeightUnit: 'm',
       wallThick: '0.23', wallThickUnit: 'm',
       mortarThick: '10', mortarUnit: 'mm',
-      brickLength: '190', brickLengthUnit: 'mm',
-      brickWidth: '90', brickWidthUnit: 'mm',
-      brickHeight: '90', brickHeightUnit: 'mm',
+      brickLength: '230', brickLengthUnit: 'mm',
+      brickWidth: '110', brickWidthUnit: 'mm',
+      brickHeight: '55', brickHeightUnit: 'mm',
       wastage: '5'
     };
     for (const [id, val] of Object.entries(vals)) {

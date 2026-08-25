@@ -100,47 +100,15 @@ const toolCategories = [
     { name: "Cutting Length of Helical Stirrups in Pile/Column Calculator", href: "/tools/cutting-length-helical-stirrups" },
     { name: "Cutting Length of Diamond Ties Calculator", href: "/tools/cutting-length-diamond-ties" }
   ] },
-  { id: 9, name: "Bar Bending Schedule", tools: [
-    { name: "Spacing of Stirrups in Beam Calculator" },
-    { name: "BBS of Footing" },
-    { name: "BBS of Crank Beam" },
-    { name: "BBS of Continuous Beam (No T/B Extra)" },
-    { name: "BBS of Continuous Beam (T/B Extra)" },
-    { name: "BBS of Column" }
-  ] },
-  { id: 10, name: "BOQ Maker", tools: [
-    { name: "BOQ Maker" }
-  ] },
-  { id: 11, name: "Material Lab Test", tools: [] },
-  { id: 12, name: "Concrete Technology", tools: [] },
-  { id: 13, name: "Soil Mechanics", tools: [
-    { name: "Soil Properties Calculator" },
-    { name: "Cutting and Filling Calculator" },
-    { name: "Formula for Void Ratio | Degree of Unsaturation Calculator" },
-    { name: "Minimum Depth of Foundation" },
-    { name: "Concrete Calculator for Retaining Wall" },
-    { name: "Foundation Concrete Calculator" },
-    { name: "Safe Soil Bearing Capacity Calculator" }
-  ] },
-  { id: 14, name: "Structural Analysis", tools: [] },
-  { id: 15, name: "Strength of Materials", tools: [] },
-  { id: 16, name: "Load Calculator", tools: [] },
-  { id: 17, name: "Hydraulics & Fluid Mechanics", tools: [] },
-  { id: 18, name: "Survey", tools: [] },
-  { id: 19, name: "Foundation Engineering", tools: [] },
-  { id: 20, name: "Building", tools: [] },
-  { id: 23, name: "Finance", tools: [] },
-  { id: 24, name: "Volume/Area", tools: [] },
-  { id: 25, name: "Management/Tracking", tools: [] }
 ];
 ---
 
 <Layout>
   <section class="page-header">
     <div class="band-inner">
-      <p class="eyebrow-mono">Engineering Suite</p>
-      <h1 class="page-title">Professional Tools.</h1>
-      <p class="page-desc">A growing collection of calculators and engineering tools designed for civil engineers, architects, and construction professionals.</p>
+      <p class="eyebrow-mono">60+ Calculators Free To Use ✓</p>
+      <h1 class="page-title">Complete Engineering Toolkit.</h1>
+      <p class="page-desc">A comprehensive suite of free construction calculators, material estimators, and structural engineering tools used by professionals worldwide.</p>
     </div>
   </section>
 
@@ -149,39 +117,22 @@ const toolCategories = [
       <h2 class="section-title center">All Tools.</h2>
       <div class="categories-grid">
         {toolCategories.map((category) => (
-          <div class={`category-card ${category.tools.length === 0 ? 'empty' : ''}`}>
+          <div class="category-card">
             <div class="category-header">
               <h3 class="category-name">{category.name}</h3>
-              {category.tools.length === 0 && (
-                <span class="coming-soon-badge">Coming Soon</span>
-              )}
             </div>
-            {category.tools.length > 0 ? (
-              <ul class="tool-list">
-                {category.tools.map((tool) => (
-                  <li>
-                    {tool.href ? (
-                      <a href={tool.href} class="tool-link">
-                        <svg width="4" height="4" viewBox="0 0 4 4" fill="none">
-                          <circle cx="2" cy="2" r="2" fill="#d4d4d4"/>
-                        </svg>
-                        {tool.name}
-                      </a>
-                    ) : (
-                      <span class="tool-link disabled">
-                        <svg width="4" height="4" viewBox="0 0 4 4" fill="none">
-                          <circle cx="2" cy="2" r="2" fill="#e0e0e0"/>
-                        </svg>
-                        {tool.name}
-                        <span class="coming-soon-tag">Coming Soon</span>
-                      </span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p class="empty-text">Tools in this category are under development and will be available soon.</p>
-            )}
+            <ul class="tool-list">
+              {category.tools.map((tool) => (
+                <li>
+                  <a href={tool.href} class="tool-link">
+                    <svg width="4" height="4" viewBox="0 0 4 4" fill="none">
+                      <circle cx="2" cy="2" r="2" fill="#d4d4d4"/>
+                    </svg>
+                    {tool.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         ))}
       </div>
@@ -198,8 +149,8 @@ const toolCategories = [
               <polyline points="20 6 9 17 4 12"/>
             </svg>
           </div>
-          <h3 class="feature-title">Free to Use</h3>
-          <p class="feature-desc">All our calculators are completely free. No hidden charges or usage limits.</p>
+          <h3 class="feature-title">60+ Free Tools</h3>
+          <p class="feature-desc">Every calculator is completely free with no hidden charges, no signups, and no usage limits.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">
@@ -315,12 +266,8 @@ const toolCategories = [
     transition: box-shadow 0.2s ease;
   }
 
-  .category-card:not(.empty):hover {
+  .category-card:hover {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-  }
-
-  .category-card.empty {
-    background: var(--bg-page);
   }
 
   .category-header {
@@ -336,23 +283,6 @@ const toolCategories = [
     font-weight: 600;
     color: var(--text-primary);
     margin: 0;
-  }
-
-  .category-card.empty .category-name {
-    color: var(--text-tertiary);
-  }
-
-  .coming-soon-badge {
-    font-family: JetBrains Mono, ui-monospace, monospace;
-    font-size: 10px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--text-muted);
-    background: var(--bg-hover);
-    padding: 4px 10px;
-    border-radius: 9999px;
-    white-space: nowrap;
   }
 
   .tool-list {
@@ -377,33 +307,6 @@ const toolCategories = [
 
   .tool-link:hover {
     color: var(--text-primary);
-  }
-
-  .tool-link.disabled {
-    color: var(--text-muted);
-    cursor: default;
-  }
-
-  .coming-soon-tag {
-    font-family: JetBrains Mono, ui-monospace, monospace;
-    font-size: 9px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--text-muted);
-    background: var(--bg-hover);
-    padding: 2px 8px;
-    border-radius: 9999px;
-    margin-left: auto;
-    white-space: nowrap;
-  }
-
-  .empty-text {
-    font-size: 13px;
-    line-height: 20px;
-    color: var(--text-muted);
-    margin: 0;
-    font-style: italic;
   }
 
   .features-section {

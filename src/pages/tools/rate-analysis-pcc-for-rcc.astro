@@ -12,7 +12,7 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
     <div class="input-grid">
       <div class="input-group">
         <label>Wet Volume of PCC (m³)</label>
-        <input type="number" id="wetVolume" value="5" step="any" min="0" />
+        <input type="number" id="wetVolume" value="10" step="any" min="0" />
       </div>
       <div class="input-group">
         <label>Mix Ratio (Cement : Sand : Aggregate)</label>
@@ -30,7 +30,7 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
       </div>
       <div class="input-group">
         <label>Labour required per m³ (By IS Code)</label>
-        <input type="number" id="labourRate" value="7" step="0.1" min="0" />
+        <input type="number" id="labourRate" value="5" step="0.1" min="0" />
       </div>
     </div>
 
@@ -42,23 +42,23 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
       </div>
       <div class="input-group">
         <label>Labour rate per day (Rs)</label>
-        <input type="number" id="rateLabour" value="500" step="any" min="0" />
+        <input type="number" id="rateLabour" value="800" step="any" min="0" />
       </div>
       <div class="input-group">
         <label>Cement per bag (Rs)</label>
-        <input type="number" id="rateCement" value="750" step="any" min="0" />
+        <input type="number" id="rateCement" value="800" step="any" min="0" />
       </div>
       <div class="input-group">
         <label>Sand per m³ (Rs)</label>
-        <input type="number" id="rateSand" value="600" step="any" min="0" />
+        <input type="number" id="rateSand" value="800" step="any" min="0" />
       </div>
       <div class="input-group">
         <label>Aggregate per m³ (Rs)</label>
-        <input type="number" id="rateAgg" value="1000" step="any" min="0" />
+        <input type="number" id="rateAgg" value="1200" step="any" min="0" />
       </div>
       <div class="input-group">
         <label>Water per liter (Rs)</label>
-        <input type="number" id="rateWater" value="0.1" step="0.01" min="0" />
+        <input type="number" id="rateWater" value="0.06" step="0.01" min="0" />
       </div>
       <div class="input-group">
         <label>Overhead & Profit (%)</label>
@@ -190,12 +190,12 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
 
   function resetForm() {
     const vals = {
-      wetVolume: '5',
+      wetVolume: '10',
       mixCement: '1', mixSand: '1.5', mixAgg: '3',
-      masonRate: '0.8', labourRate: '7',
-      rateMason: '1200', rateLabour: '500',
-      rateCement: '750', rateSand: '600',
-      rateAgg: '1000', rateWater: '0.1',
+      masonRate: '0.8', labourRate: '5',
+      rateMason: '1200', rateLabour: '800',
+      rateCement: '800', rateSand: '800',
+      rateAgg: '1200', rateWater: '0.06',
       overheadPct: '15'
     };
     for (const [id, val] of Object.entries(vals)) {

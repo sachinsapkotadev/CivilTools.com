@@ -19,7 +19,7 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
       </div>
       <div class="input-group">
         <label>Base Rate (Rs. / sq.ft)</label>
-        <input type="number" id="baseRate" value="3500" step="1" />
+        <input type="number" id="baseRate" value="3800" step="1" />
       </div>
     </div>
 
@@ -31,8 +31,26 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
       <div id="roomList">
         <div class="room-row">
           <input type="text" placeholder="Room Name" value="Living Room" class="room-name" />
+          <input type="number" placeholder="L (ft)" value="16" class="room-l" />
+          <input type="number" placeholder="W (ft)" value="12" class="room-w" />
+          <button class="remove-room">×</button>
+        </div>
+        <div class="room-row">
+          <input type="text" placeholder="Room Name" value="Bedroom 1" class="room-name" />
           <input type="number" placeholder="L (ft)" value="12" class="room-l" />
-          <input type="number" placeholder="W (ft)" value="10" class="room-w" />
+          <input type="number" placeholder="W (ft)" value="12" class="room-w" />
+          <button class="remove-room">×</button>
+        </div>
+        <div class="room-row">
+          <input type="text" placeholder="Room Name" value="Kitchen" class="room-name" />
+          <input type="number" placeholder="L (ft)" value="10" class="room-l" />
+          <input type="number" placeholder="W (ft)" value="8" class="room-w" />
+          <button class="remove-room">×</button>
+        </div>
+        <div class="room-row">
+          <input type="text" placeholder="Room Name" value="Bathroom" class="room-name" />
+          <input type="number" placeholder="L (ft)" value="6" class="room-l" />
+          <input type="number" placeholder="W (ft)" value="5" class="room-w" />
           <button class="remove-room">×</button>
         </div>
       </div>
@@ -110,17 +128,17 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
     });
 
     let multiplier = 1.0;
-    if (storeys === 2) multiplier = 1.7;
-    if (storeys === 3) multiplier = 2.4;
+    if (storeys === 2) multiplier = 1.75;
+    if (storeys === 3) multiplier = 2.45;
 
     const baseCost = totalArea * baseRate * multiplier;
     const fees = baseCost * 0.02;
     const totalCost = baseCost + fees;
 
     const matFactor = multiplier;
-    const cement = totalArea * 0.45 * matFactor;
-    const steel = totalArea * 5.5 * matFactor;
-    const bricks = totalArea * 22 * matFactor;
+    const cement = totalArea * 0.42 * matFactor;
+    const steel = totalArea * 4.5 * matFactor;
+    const bricks = totalArea * 20 * matFactor;
 
     document.getElementById('resTotalCost')!.textContent = 'Rs. ' + totalCost.toLocaleString(undefined, {maximumFractionDigits: 2});
     document.getElementById('resTotalArea')!.textContent = `Total Area: ${totalArea.toFixed(2)} sq.ft`;
@@ -131,16 +149,16 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
 
     // Detailed Breakdown
     const components = [
-      { name: "Labour", percent: 0.25 },
-      { name: "Cement", percent: 0.15 },
-      { name: "Sand", percent: 0.05 },
-      { name: "Steel", percent: 0.12 },
-      { name: "Bricks", percent: 0.10 },
-      { name: "Doors and Windows", percent: 0.10 },
-      { name: "Electrical Work", percent: 0.08 },
-      { name: "Plumbing Work", percent: 0.05 },
-      { name: "Finishing (Paint and Plaster)", percent: 0.05 },
-      { name: "Flooring", percent: 0.03 },
+      { name: "Labour", percent: 0.28 },
+      { name: "Cement", percent: 0.14 },
+      { name: "Sand & Aggregate", percent: 0.06 },
+      { name: "Steel Reinforcement", percent: 0.13 },
+      { name: "Bricks & Blocks", percent: 0.09 },
+      { name: "Doors and Windows", percent: 0.09 },
+      { name: "Electrical Work", percent: 0.07 },
+      { name: "Plumbing & Sanitary", percent: 0.05 },
+      { name: "Finishing (Paint and Plaster)", percent: 0.04 },
+      { name: "Flooring & Tiles", percent: 0.03 },
       { name: "Miscellaneous", percent: 0.02 }
     ];
 

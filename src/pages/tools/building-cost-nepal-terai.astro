@@ -114,8 +114,8 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
     const hasBoundary = (document.getElementById('hasBoundary') as HTMLInputElement).checked;
 
     let multiplier = 1.0;
-    if (storeys === 2) multiplier = 1.7;
-    if (storeys === 3) multiplier = 2.4;
+    if (storeys === 2) multiplier = 1.75;
+    if (storeys === 3) multiplier = 2.45;
 
     let effectiveRate = baseRate + finishing;
     if (!hasPainting) effectiveRate -= 50;
@@ -129,16 +129,16 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
 
     // Detailed Breakdown
     const components = [
-      { name: "Labour", percent: 0.25 },
-      { name: "Cement", percent: 0.15 },
-      { name: "Sand", percent: 0.05 },
-      { name: "Steel", percent: 0.12 },
-      { name: "Bricks", percent: 0.10 },
-      { name: "Doors and Windows", percent: 0.10 },
-      { name: "Electrical Work", percent: 0.08 },
-      { name: "Plumbing Work", percent: 0.05 },
-      { name: "Finishing (Paint and Plaster)", percent: 0.05 },
-      { name: "Flooring", percent: 0.03 },
+      { name: "Labour", percent: 0.28 },
+      { name: "Cement", percent: 0.14 },
+      { name: "Sand & Aggregate", percent: 0.06 },
+      { name: "Steel Reinforcement", percent: 0.13 },
+      { name: "Bricks & Blocks", percent: 0.09 },
+      { name: "Doors and Windows", percent: 0.09 },
+      { name: "Electrical Work", percent: 0.07 },
+      { name: "Plumbing & Sanitary", percent: 0.05 },
+      { name: "Finishing (Paint and Plaster)", percent: 0.04 },
+      { name: "Flooring & Tiles", percent: 0.03 },
       { name: "Miscellaneous", percent: 0.02 }
     ];
 

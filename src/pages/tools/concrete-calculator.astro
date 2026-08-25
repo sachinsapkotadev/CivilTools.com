@@ -13,8 +13,8 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
       <div class="input-group">
         <label>Member type</label>
         <select id="memberType">
-          <option value="beam">Beam</option>
           <option value="slab">Slab</option>
+          <option value="beam">Beam</option>
           <option value="column">Column</option>
           <option value="foundation">Foundation</option>
           <option value="other">Other</option>
@@ -23,21 +23,21 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
       <div class="input-group">
         <label>a) Length</label>
         <div class="input-with-unit">
-          <input type="number" id="memberLength" value="9" step="any" />
+          <input type="number" id="memberLength" value="20" step="any" />
           <select id="lengthUnit"><option>ft</option><option>m</option></select>
         </div>
       </div>
       <div class="input-group">
         <label>b) Width</label>
         <div class="input-with-unit">
-          <input type="number" id="memberWidth" value="9" step="any" />
+          <input type="number" id="memberWidth" value="15" step="any" />
           <select id="widthUnit"><option>ft</option><option>m</option></select>
         </div>
       </div>
       <div class="input-group">
         <label>c) Height / Thickness</label>
         <div class="input-with-unit">
-          <input type="number" id="memberHeight" value="10" step="any" />
+          <input type="number" id="memberHeight" value="0.5" step="any" />
           <select id="heightUnit"><option>ft</option><option>m</option></select>
         </div>
       </div>
@@ -55,11 +55,11 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
       <div class="input-group">
         <label>d) Mix ratio Cement : Sand : Aggregate</label>
         <div class="triple-input">
-          <input type="number" id="mixCement" value="1" step="1" min="1" />
+          <input type="number" id="mixCement" value="1" step="0.5" min="0.5" />
           <span class="split-sep">:</span>
-          <input type="number" id="mixSand" value="2" step="1" min="1" />
+          <input type="number" id="mixSand" value="1.5" step="0.5" min="0.5" />
           <span class="split-sep">:</span>
-          <input type="number" id="mixAgg" value="3" step="1" min="1" />
+          <input type="number" id="mixAgg" value="3" step="0.5" min="0.5" />
         </div>
       </div>
       <div class="input-group">
@@ -188,12 +188,12 @@ import ToolLayout from '../../layouts/ToolLayout.astro';
 
   function resetForm() {
     const vals = {
-      memberType: 'beam',
-      memberLength: '9', lengthUnit: 'ft',
-      memberWidth: '9', widthUnit: 'ft',
-      memberHeight: '10', heightUnit: 'ft',
+      memberType: 'slab',
+      memberLength: '20', lengthUnit: 'ft',
+      memberWidth: '15', widthUnit: 'ft',
+      memberHeight: '0.5', heightUnit: 'ft',
       memberQty: '1',
-      mixCement: '1', mixSand: '2', mixAgg: '3',
+      mixCement: '1', mixSand: '1.5', mixAgg: '3',
       dryFactor: '1.54'
     };
     for (const [id, val] of Object.entries(vals)) {
